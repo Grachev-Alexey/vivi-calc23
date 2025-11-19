@@ -1,0 +1,553 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: hsl(0, 0%, 100%);
+  --foreground: hsl(210, 20%, 8%);
+  --muted: hsl(220, 14.3%, 96.5%);
+  --muted-foreground: hsl(220, 8.9%, 46.1%);
+  --popover: hsl(0, 0%, 100%);
+  --popover-foreground: hsl(210, 20%, 8%);
+  --card: hsl(0, 0%, 99.5%);
+  --card-foreground: hsl(210, 20%, 8%);
+  --border: hsl(220, 13%, 93%);
+  --input: hsl(220, 13%, 93%);
+  --primary: hsl(338, 55%, 68%);
+  --primary-foreground: hsl(0, 0%, 100%);
+  --secondary: hsl(220, 14.3%, 95.9%);
+  --secondary-foreground: hsl(220, 8.9%, 46.1%);
+  --accent: hsl(338, 55%, 68%);
+  --accent-foreground: hsl(0, 0%, 100%);
+  --destructive: hsl(0, 84.2%, 60.2%);
+  --destructive-foreground: hsl(210, 20%, 98%);
+  --ring: hsl(338, 55%, 68%);
+  --radius: 1rem;
+  
+  /* Premium pink palette */
+  --dusty-pink: hsl(338, 55%, 68%);
+  --dusty-pink-dark: hsl(338, 55%, 58%);
+  --coral: hsl(351, 55%, 70%);
+  --coral-dark: hsl(351, 55%, 60%);
+  --graphite: hsl(210, 20%, 8%);
+  --light-gray: hsl(220, 14%, 96%);
+  --white: hsl(0, 0%, 100%);
+  
+  /* Gradients */
+  --gradient-premium: linear-gradient(135deg, var(--dusty-pink) 0%, var(--coral) 100%);
+  --gradient-subtle: linear-gradient(135deg, hsl(0, 0%, 98%) 0%, hsl(220, 14%, 96%) 100%);
+  --gradient-background: hsl(0, 0%, 100%);
+  
+  /* Shadow levels */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  --shadow-3xl: 0 35px 60px -12px rgba(0, 0, 0, 0.25);
+}
+
+/* Custom scrollbar styles */
+.scrollbar-thin {
+  scrollbar-width: thin;
+}
+
+.scrollbar-thumb-gray-300::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scrollbar-thumb-gray-300::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollbar-thumb-gray-300::-webkit-scrollbar-thumb {
+  background-color: #d1d5db;
+  border-radius: 3px;
+}
+
+.scrollbar-thumb-gray-600::-webkit-scrollbar-thumb {
+  background-color: #4b5563;
+}
+
+/* Service selector animations */
+@keyframes slideInFromTop {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.animate-in {
+  animation: slideInFromTop 200ms ease-out;
+}
+
+.slide-in-from-top-2 {
+  animation: slideInFromTop 200ms ease-out;
+}
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: hsl(338, 55%, 68%) transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: hsl(338, 55%, 68%);
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: hsl(338, 55%, 58%);
+}
+
+/* Ultra thin scrollbar for promo calculator left panel */
+.custom-left-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+  direction: rtl;
+}
+
+.custom-left-scrollbar > * {
+  direction: ltr;
+}
+
+.custom-left-scrollbar::-webkit-scrollbar {
+  width: 1px;
+}
+
+.custom-left-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-left-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 0px;
+  transition: background-color 0.2s ease;
+}
+
+.custom-left-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+/* Ultra thin pink scrollbar for promo calculator */
+.beautiful-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(216, 119, 157, 0.3) transparent;
+}
+
+.beautiful-scroll::-webkit-scrollbar {
+  width: 1px;
+}
+
+.beautiful-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.beautiful-scroll::-webkit-scrollbar-thumb {
+  background: rgba(216, 119, 157, 0.3);
+  border-radius: 0px;
+  transition: background-color 0.2s ease;
+}
+
+.beautiful-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(216, 119, 157, 0.5);
+}
+
+/* Compact scrollbar for tables */
+.table-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(156, 163, 175, 0.4) transparent;
+}
+
+.table-scroll::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.table-scroll::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 3px;
+}
+
+.table-scroll::-webkit-scrollbar-thumb {
+  background: rgba(156, 163, 175, 0.4);
+  border-radius: 3px;
+  transition: background-color 0.2s ease;
+}
+
+.table-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(156, 163, 175, 0.6);
+}
+
+/* Modern card styles with subtle separation */
+.floating-card {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  position: relative !important;
+  background: hsl(0, 0%, 99.5%) !important;
+  border: 1px solid hsl(220, 13%, 94%) !important;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.03), 0 1px 2px 0 rgba(0, 0, 0, 0.02) !important;
+}
+
+.floating-card:hover {
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03) !important;
+  border-color: hsl(220, 13%, 90%) !important;
+}
+
+/* Enhanced card for promo calculator - premium feel */
+.floating-card-enhanced {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  position: relative !important;
+  background: linear-gradient(145deg, hsl(0, 0%, 99.8%) 0%, hsl(0, 0%, 99.2%) 100%) !important;
+  border: 1px solid hsl(220, 13%, 92%) !important;
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.02), 0 1px 2px 0 rgba(0, 0, 0, 0.01) !important;
+}
+
+.floating-card-enhanced:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 8px 15px -3px rgba(0, 0, 0, 0.06), 0 4px 6px -2px rgba(0, 0, 0, 0.03) !important;
+  border-color: hsl(338, 55%, 85%) !important;
+}
+
+/* Package card modern styles */
+.package-card {
+  position: relative !important;
+  background: hsl(0, 0%, 99.8%) !important;
+  border: 1px solid hsl(220, 13%, 93%) !important;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 1px 2px 0 rgba(0, 0, 0, 0.02) !important;
+}
+
+.package-card:hover {
+  transform: translateY(-1px) !important;
+  box-shadow: 0 6px 12px -2px rgba(0, 0, 0, 0.08), 0 3px 6px -1px rgba(0, 0, 0, 0.04) !important;
+  border-color: hsl(220, 13%, 88%) !important;
+}
+
+/* Container to prevent shadow overflow */
+.shadow-container {
+  padding: 16px !important;
+  margin: -8px !important;
+  overflow: visible !important;
+  position: relative !important;
+}
+
+/* Fix for shadow clipping in parent containers */
+.shadow-safe {
+  overflow: visible !important;
+  contain: layout !important;
+}
+
+.shadow-safe > * {
+  overflow: visible !important;
+}
+
+.package-card.selected {
+  outline: 2px solid hsl(338, 55%, 68%) !important;
+  box-shadow: 0 8px 25px -5px rgba(216, 119, 157, 0.15), 0 5px 10px -3px rgba(216, 119, 157, 0.1) !important;
+}
+
+/* Section headers and containers */
+.section-container {
+  background: linear-gradient(145deg, hsl(0, 0%, 99.8%) 0%, hsl(0, 0%, 99%) 100%);
+  border: 1px solid hsl(220, 13%, 94%);
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.02);
+}
+
+/* Payment configuration styling */
+.payment-card {
+  background: linear-gradient(135deg, hsl(0, 0%, 99.5%) 0%, hsl(220, 14%, 98.5%) 100%);
+  border: 1px solid hsl(220, 13%, 93%);
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.03), 0 1px 2px 0 rgba(0, 0, 0, 0.02);
+}
+
+/* Header styling improvements */
+.header-card {
+  background: linear-gradient(135deg, hsl(0, 0%, 99.8%) 0%, hsl(220, 14%, 99.2%) 100%);
+  border-bottom: 1px solid hsl(220, 13%, 94%);
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 1px 2px 0 rgba(0, 0, 0, 0.02);
+}
+
+/* Table row improvements */
+.table-row-enhanced {
+  transition: all 0.2s ease;
+  border-bottom: 1px solid hsl(220, 13%, 96%);
+}
+
+.table-row-enhanced:hover {
+  background: linear-gradient(135deg, hsl(220, 14%, 99.5%) 0%, hsl(220, 14%, 99%) 100%);
+}
+
+.dark {
+  --background: hsl(220, 27%, 8%);
+  --foreground: hsl(210, 20%, 98%);
+  --muted: hsl(215, 27.9%, 16.9%);
+  --muted-foreground: hsl(217, 10.6%, 64.9%);
+  --popover: hsl(220, 27%, 10%);
+  --popover-foreground: hsl(210, 20%, 98%);
+  --card: hsl(220, 27%, 10%);
+  --card-foreground: hsl(210, 20%, 98%);
+  --border: hsl(215, 27.9%, 16.9%);
+  --input: hsl(215, 27.9%, 16.9%);
+  --primary: hsl(338, 55%, 68%);
+  --primary-foreground: hsl(220, 27%, 8%);
+  --secondary: hsl(215, 27.9%, 16.9%);
+  --secondary-foreground: hsl(210, 20%, 98%);
+  --accent: hsl(338, 55%, 68%);
+  --accent-foreground: hsl(220, 27%, 8%);
+  --destructive: hsl(0, 62.8%, 30.6%);
+  --destructive-foreground: hsl(210, 20%, 98%);
+  --ring: hsl(338, 55%, 68%);
+  
+  /* Dark theme adjustments */
+  --dusty-pink: hsl(338, 55%, 68%);
+  --dusty-pink-dark: hsl(338, 55%, 58%);
+  --coral: hsl(351, 55%, 70%);
+  --coral-dark: hsl(351, 55%, 60%);
+  --graphite: hsl(210, 20%, 98%);
+  --light-gray: hsl(220, 27%, 12%);
+  --white: hsl(220, 27%, 8%);
+  
+  --gradient-premium: linear-gradient(135deg, var(--dusty-pink) 0%, var(--coral) 100%);
+  --gradient-subtle: linear-gradient(135deg, hsl(220, 27%, 10%) 0%, hsl(220, 27%, 12%) 100%);
+  --gradient-background: hsl(220, 27%, 8%);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  
+  html, body {
+    height: 100%;
+    overflow: hidden;
+  }
+  
+  body {
+    background: linear-gradient(135deg, hsl(0, 0%, 100%) 0%, hsl(220, 14%, 99%) 100%);
+    font-family: 'Montserrat', 'Nunito', system-ui, sans-serif;
+    @apply antialiased;
+  }
+  
+
+  
+  .slider::-webkit-slider-thumb {
+    appearance: none;
+    height: 20px;
+    width: 20px;
+    border-radius: 50%;
+    background: var(--dusty-pink);
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    transition: all 0.2s ease;
+  }
+  
+  .slider::-webkit-slider-thumb:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  }
+  
+  .slider::-moz-range-thumb {
+    height: 20px;
+    width: 20px;
+    border-radius: 50%;
+    background: var(--dusty-pink);
+    cursor: pointer;
+    border: none;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  }
+  
+  .floating-pattern {
+    position: fixed;
+    width: 200px;
+    height: 200px;
+    background: radial-gradient(circle, rgba(0,0,0,0.02) 1px, transparent 1px);
+    background-size: 20px 20px;
+    z-index: 0;
+    pointer-events: none;
+  }
+  
+  .dark .floating-pattern {
+    background: radial-gradient(circle, rgba(255,255,255,0.03) 1px, transparent 1px);
+  }
+}
+
+@layer components {
+  .btn-premium {
+    background: var(--gradient-premium);
+    @apply text-white font-semibold py-4 px-8 rounded-2xl transition-all duration-200;
+    -webkit-font-smoothing: auto;
+    -moz-osx-font-smoothing: auto;
+  }
+  
+  .btn-outline-premium {
+    @apply border-2 border-pink-300 text-pink-600 hover:bg-pink-50 dark:border-pink-400 dark:text-pink-400 dark:hover:bg-pink-950 font-semibold py-4 px-8 rounded-2xl transition-all duration-200;
+    -webkit-font-smoothing: auto;
+    -moz-osx-font-smoothing: auto;
+  }
+  
+  .card-glass {
+    @apply bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl rounded-2xl border border-white/20 dark:border-gray-700/20;
+    -webkit-font-smoothing: auto;
+    -moz-osx-font-smoothing: auto;
+  }
+  
+  .card-package {
+    @apply bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl rounded-2xl border-2 border-transparent hover:border-pink-200 dark:hover:border-pink-700 transition-all duration-300;
+    -webkit-font-smoothing: auto;
+    -moz-osx-font-smoothing: auto;
+  }
+  
+  .card-package.selected {
+    @apply border-pink-400 dark:border-pink-500 transform;
+    -webkit-font-smoothing: auto;
+    -moz-osx-font-smoothing: auto;
+  }
+  
+  .input-glass {
+    @apply bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm border-2 border-gray-200/50 dark:border-gray-600/50 rounded-2xl px-6 py-4 focus:border-pink-400 focus:outline-none transition-all duration-200 placeholder:text-gray-400;
+  }
+  
+  .text-premium {
+    background: var(--gradient-premium);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  
+  .glass-pattern {
+    background: 
+      radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 40% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+  }
+  
+  .no-scrollbar {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 4px;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.3);
+    border-radius: 2px;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(255, 255, 255, 0.5);
+  }
+
+  /* Fix for select dropdown z-index issues */
+  [data-radix-popper-content-wrapper] {
+    z-index: 9999 !important;
+  }
+  
+  [data-radix-select-content] {
+    z-index: 9999 !important;
+  }
+  
+  .input-premium {
+    @apply bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-2 border-gray-200/50 dark:border-gray-600/50 rounded-xl px-4 py-2 focus:border-pink-400 focus:outline-none transition-all duration-200 placeholder:text-gray-400;
+  }
+}
+
+/* Responsive design improvements */
+@media (max-width: 768px) {
+  .floating-card-enhanced {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  }
+  
+  .floating-card-enhanced:hover {
+    transform: translateY(-1px) !important;
+  }
+  
+  /* Mobile specific fixes */
+  body {
+    overflow: auto !important;
+    height: auto !important;
+  }
+  
+  html {
+    overflow: auto !important;
+    height: auto !important;
+  }
+  
+  /* Ensure mobile scrolling works */
+  .promo-calculator-mobile {
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    height: 100vh !important;
+  }
+}
+
+/* Ensure proper spacing for badges and elements */
+.package-grid-container {
+  padding-top: 1rem;
+}
+
+.package-grid-container > div:nth-child(2) {
+  margin-top: 1rem;
+}
+
+/* Fix for overflow issues */
+.overflow-container {
+  overflow: visible !important;
+  position: relative !important;
+}
+
+.overflow-container > * {
+  overflow: visible !important;
+}
+
+/* Mobile touch improvements */
+@media (max-width: 768px) {
+  .slider {
+    height: 8px !important;
+  }
+  
+  .slider::-webkit-slider-thumb {
+    height: 24px !important;
+    width: 24px !important;
+  }
+  
+  /* Better touch targets */
+  button {
+    min-height: 44px;
+  }
+  
+  input[type="range"] {
+    min-height: 44px;
+  }
+}
