@@ -158,11 +158,16 @@ export default function ThreeBlockComparison({
     const pkg = getPkg(t);
     if (!pkgData || !pkg) return 0;
     if (t === "vip") return pkgData.finalCost;
-    if (selectedPackage === t) return downPayment;
     const minPct = parseFloat(pkg.minDownPaymentPercent.toString());
-    const calc = Math.round(pkgData.finalCost * minPct);
+    const calcMin = Math.round(pkgData.finalCost * minPct);
     const absMin = calculatorSettings?.minimumDownPayment || 5000;
-    return Math.max(calc, absMin);
+    const min = Math.max(calcMin, absMin);
+    const max = pkgData.finalCost;
+    // Use the user-entered down payment for all non-VIP packages, clamped to each package's valid range
+    if (downPayment > 0) {
+      return Math.max(min, Math.min(max, downPayment));
+    }
+    return min;
   };
 
   const computeMonthly = (t: string): number => {
