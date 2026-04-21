@@ -12,7 +12,10 @@ const TabsList = React.forwardRef<
   <TabsPrimitive.List
     ref={ref}
     className={cn(
-      "inline-flex h-10 items-center justify-center rounded-md bg-muted p-1 text-muted-foreground",
+      "inline-flex items-center justify-center gap-1 rounded-2xl p-1.5 text-muted-foreground",
+      "border border-[hsl(var(--border))]",
+      "bg-[linear-gradient(160deg,hsla(222,42%,11%,0.85)_0%,hsla(220,40%,7%,0.85)_100%)]",
+      "backdrop-blur-xl shadow-[0_10px_30px_-10px_rgba(0,0,0,0.5)]",
       className
     )}
     {...props}
@@ -27,7 +30,13 @@ const TabsTrigger = React.forwardRef<
   <TabsPrimitive.Trigger
     ref={ref}
     className={cn(
-      "inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm",
+      "relative inline-flex items-center justify-center whitespace-nowrap rounded-xl px-4 py-2 text-sm font-semibold tracking-tight transition-all duration-300",
+      "text-muted-foreground hover:text-foreground hover:bg-white/[0.03]",
+      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--gold))] focus-visible:ring-offset-0",
+      "disabled:pointer-events-none disabled:opacity-50",
+      "data-[state=active]:text-[hsl(var(--navy))]",
+      "data-[state=active]:bg-[linear-gradient(135deg,hsl(43,90%,62%)_0%,hsl(36,82%,48%)_100%)]",
+      "data-[state=active]:shadow-[0_8px_24px_-6px_hsla(43,88%,56%,0.45),inset_0_1px_0_hsla(0,0%,100%,0.2)]",
       className
     )}
     {...props}
@@ -42,7 +51,7 @@ const TabsContent = React.forwardRef<
   <TabsPrimitive.Content
     ref={ref}
     className={cn(
-      "mt-2 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+      "mt-2 ring-offset-background focus-visible:outline-none",
       className
     )}
     {...props}

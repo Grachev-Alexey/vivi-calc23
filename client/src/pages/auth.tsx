@@ -1,7 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Lock, Sparkles } from "lucide-react";
 
 interface User {
   id: number;
@@ -16,6 +14,7 @@ interface AuthPageProps {
 export default function AuthPage({ onLogin }: AuthPageProps) {
   const [pin, setPin] = useState(["", "", "", ""]);
   const [loading, setLoading] = useState(false);
+  const [shake, setShake] = useState(false);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const { toast } = useToast();
 
@@ -33,14 +32,16 @@ export default function AuthPage({ onLogin }: AuthPageProps) {
         const data = await response.json();
         onLogin(data.user);
         toast({
-          title: "Успешно",
-          description: `Добро пожаловать, ${data.user.name}!`,
+          title: "Добро пожаловать",
+          description: data.user.name,
         });
       } else {
         const error = await response.json();
+        setShake(true);
+        setTimeout(() => setShake(false), 450);
         toast({
-          title: "Ошибка входа",
-          description: error.message || "Неверный PIN-код",
+          title: "Неверный код",
+          description: error.message || "Попробуйте ещё раз",
           variant: "destructive",
         });
         setPin(["", "", "", ""]);
@@ -49,7 +50,7 @@ export default function AuthPage({ onLogin }: AuthPageProps) {
     } catch (error) {
       toast({
         title: "Ошибка",
-        description: "Ошибка подключения к серверу",
+        description: "Нет связи с сервером",
         variant: "destructive",
       });
       setPin(["", "", "", ""]);
@@ -88,38 +89,68 @@ export default function AuthPage({ onLogin }: AuthPageProps) {
   }, []);
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
+    <div className="min-h-screen flex items-center justify-center p-6 relative overflow-hidden">
       {/* Ambient background */}
       <div className="absolute inset-0 -z-10">
-        <div className="absolute top-[-20%] left-[-10%] w-[55vw] h-[55vw] rounded-full"
-             style={{ background: "radial-gradient(closest-side, hsla(43, 88%, 56%, 0.18), transparent)" }} />
-        <div className="absolute bottom-[-30%] right-[-15%] w-[60vw] h-[60vw] rounded-full"
-             style={{ background: "radial-gradient(closest-side, hsla(214, 92%, 56%, 0.18), transparent)" }} />
-        <div className="absolute inset-0"
-             style={{ backgroundImage: "linear-gradient(to right, hsla(218, 30%, 26%, 0.18) 1px, transparent 1px), linear-gradient(to bottom, hsla(218, 30%, 26%, 0.18) 1px, transparent 1px)", backgroundSize: "48px 48px", maskImage: "radial-gradient(ellipse at center, black 30%, transparent 75%)" }} />
+        <div
+          className="absolute top-[-25%] left-[-15%] w-[65vw] h-[65vw] rounded-full blur-[20px]"
+          style={{ background: "radial-gradient(closest-side, hsla(43, 88%, 56%, 0.18), transparent)" }}
+        />
+        <div
+          className="absolute bottom-[-30%] right-[-15%] w-[70vw] h-[70vw] rounded-full blur-[20px]"
+          style={{ background: "radial-gradient(closest-side, hsla(214, 92%, 56%, 0.20), transparent)" }}
+        />
       </div>
 
-      <Card className="w-full max-w-md card-glass border-0">
-        <CardContent className="p-10">
-          <div className="text-center mb-8">
-            <div className="inline-flex items-center gap-2 px-3 py-1 mb-6 rounded-full text-xs uppercase tracking-[0.2em] font-semibold"
-                 style={{ background: "hsla(43, 88%, 56%, 0.1)", color: "hsl(var(--gold))", border: "1px solid hsla(43, 88%, 56%, 0.25)" }}>
-              <Sparkles className="w-3 h-3" /> ENSO Studio
-            </div>
-            <div className="w-20 h-20 mx-auto mb-5 rounded-2xl flex items-center justify-center"
-                 style={{ background: "var(--gradient-premium)", boxShadow: "var(--shadow-gold)" }}>
-              <Lock className="w-9 h-9" style={{ color: "hsl(var(--navy))" }} />
-            </div>
-            <h1 className="text-3xl font-bold mb-2 tracking-tight">
-              <span className="text-premium">ЭНСО</span>
-            </h1>
-            <p className="text-sm text-muted-foreground">
-              Введите 4-значный PIN-код для входа
-            </p>
-          </div>
+      <div
+        className={`relative ${shake ? "animate-[shake_0.45s_ease]" : ""}`}
+        style={{ width: "100%", maxWidth: 420 }}
+      >
+        {/* Outer glow ring */}
+        <div
+          className="absolute -inset-px rounded-[28px] opacity-60"
+          style={{
+            background: "linear-gradient(135deg, hsla(43, 88%, 56%, 0.55), transparent 40%, hsla(214, 92%, 56%, 0.45))",
+            filter: "blur(8px)",
+          }}
+        />
 
-          <div className="space-y-6">
-            <div className="flex justify-center gap-3" onPaste={handlePaste}>
+        <div
+          className="relative rounded-[26px] overflow-hidden"
+          style={{
+            background: "linear-gradient(160deg, hsla(222, 42%, 11%, 0.92) 0%, hsla(220, 40%, 7%, 0.92) 100%)",
+            border: "1px solid hsla(43, 88%, 56%, 0.18)",
+            backdropFilter: "blur(24px)",
+            boxShadow: "0 24px 60px -20px rgba(0,0,0,0.7), inset 0 1px 0 hsla(0,0%,100%,0.05)",
+          }}
+        >
+          <div className="px-10 pt-12 pb-10">
+            {/* Logo / Wordmark */}
+            <div className="flex flex-col items-center mb-10">
+              <div
+                className="text-[64px] leading-none font-black tracking-[-0.04em] mb-3"
+                style={{
+                  fontFamily: "'Manrope', sans-serif",
+                  background: "linear-gradient(135deg, hsl(43, 95%, 75%) 0%, hsl(36, 80%, 50%) 60%, hsl(28, 70%, 38%) 100%)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  backgroundClip: "text",
+                  textShadow: "0 0 80px hsla(43, 88%, 56%, 0.3)",
+                }}
+              >
+                ЭНСО
+              </div>
+              <div
+                className="h-px w-16 mb-3"
+                style={{ background: "linear-gradient(90deg, transparent, hsla(43, 88%, 56%, 0.6), transparent)" }}
+              />
+              <div className="text-[11px] uppercase tracking-[0.4em] text-muted-foreground font-medium">
+                Студия
+              </div>
+            </div>
+
+            {/* PIN inputs */}
+            <div className="flex justify-center gap-3 mb-2" onPaste={handlePaste}>
               {pin.map((digit, index) => (
                 <input
                   key={index}
@@ -130,12 +161,18 @@ export default function AuthPage({ onLogin }: AuthPageProps) {
                   value={digit}
                   onChange={(e) => handleInputChange(index, e.target.value)}
                   onKeyDown={(e) => handleKeyDown(index, e)}
-                  className="w-14 h-16 text-center text-2xl font-bold rounded-xl transition-all duration-200 focus:outline-none focus:scale-105"
+                  className="w-14 h-16 text-center text-2xl font-bold rounded-2xl transition-all duration-200 focus:outline-none"
                   style={{
-                    background: "hsla(220, 30%, 10%, 0.7)",
-                    border: digit ? "2px solid hsl(var(--gold))" : "2px solid hsl(var(--border))",
+                    background: digit
+                      ? "linear-gradient(160deg, hsla(43, 88%, 56%, 0.12), hsla(43, 88%, 56%, 0.04))"
+                      : "hsla(220, 30%, 8%, 0.6)",
+                    border: digit
+                      ? "1.5px solid hsla(43, 88%, 56%, 0.6)"
+                      : "1.5px solid hsla(218, 30%, 22%, 1)",
                     color: "hsl(var(--foreground))",
-                    boxShadow: digit ? "0 0 0 4px hsla(43, 88%, 56%, 0.15)" : "none",
+                    boxShadow: digit
+                      ? "0 0 0 4px hsla(43, 88%, 56%, 0.1), 0 4px 12px hsla(43, 88%, 56%, 0.15)"
+                      : "inset 0 2px 4px rgba(0,0,0,0.3)",
                   }}
                   disabled={loading}
                   autoComplete="off"
@@ -144,22 +181,33 @@ export default function AuthPage({ onLogin }: AuthPageProps) {
               ))}
             </div>
 
-            {loading && (
-              <div className="text-center">
-                <div className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium"
-                     style={{ background: "var(--gradient-premium)", color: "hsl(var(--navy))" }}>
-                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-current border-t-transparent mr-2"></div>
-                  Проверка...
-                </div>
-              </div>
-            )}
+            <div className="text-center text-xs text-muted-foreground mt-6 h-5">
+              {loading ? (
+                <span className="inline-flex items-center gap-2">
+                  <span className="w-3 h-3 rounded-full border-2 border-t-transparent animate-spin"
+                    style={{ borderColor: "hsl(var(--gold))", borderTopColor: "transparent" }} />
+                  Проверка кода
+                </span>
+              ) : (
+                "Введите PIN-код"
+              )}
+            </div>
           </div>
 
-          <p className="mt-8 text-center text-xs text-muted-foreground/70">
-            ENSO Calc · Премиум калькулятор абонементов
-          </p>
-        </CardContent>
-      </Card>
+          {/* Bottom accent */}
+          <div className="h-1" style={{ background: "linear-gradient(90deg, transparent, hsl(var(--gold)), transparent)" }} />
+        </div>
+      </div>
+
+      <style>{`
+        @keyframes shake {
+          0%,100% { transform: translateX(0); }
+          20% { transform: translateX(-8px); }
+          40% { transform: translateX(8px); }
+          60% { transform: translateX(-5px); }
+          80% { transform: translateX(5px); }
+        }
+      `}</style>
     </div>
   );
 }

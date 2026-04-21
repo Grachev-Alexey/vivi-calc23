@@ -409,32 +409,47 @@ export default function AdminPage({ user, onLogout }: AdminPageProps) {
 
   return (
     <div className="min-h-screen flex flex-col promo-background">
-      <header className="header-card">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <header className="header-card sticky top-0 z-30">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: "var(--gradient-premium)", boxShadow: "var(--shadow-gold)" }}>
-                <Settings className="w-5 h-5" style={{ color: "hsl(var(--navy))" }} />
+            <div className="flex items-center gap-4">
+              <div
+                className="text-2xl font-black tracking-[-0.03em] leading-none"
+                style={{
+                  fontFamily: "'Manrope', sans-serif",
+                  background: "linear-gradient(135deg, hsl(43, 95%, 72%) 0%, hsl(36, 80%, 50%) 100%)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  backgroundClip: "text",
+                }}
+              >
+                ЭНСО
               </div>
-              <div>
-                <div className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">ENSO Studio</div>
-                <h1 className="text-lg font-bold leading-tight">
-                  <span className="text-premium">Панель администратора</span>
-                </h1>
+              <div className="h-7 w-px" style={{ background: "linear-gradient(180deg, transparent, hsla(43,88%,56%,0.4), transparent)" }} />
+              <div className="text-sm font-medium text-foreground/90">
+                Панель администратора
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <span className="text-sm text-muted-foreground" data-testid="text-user-info">
-                {user.name} <span className="opacity-60">·</span> {user.role === 'admin' ? 'Администратор' : 'Мастер'}
-              </span>
+              <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full"
+                   style={{ background: "hsla(220, 30%, 14%, 0.6)", border: "1px solid hsl(var(--border))" }}>
+                <div className="w-2 h-2 rounded-full" style={{ background: "hsl(var(--gold))", boxShadow: "0 0 8px hsl(var(--gold))" }} />
+                <span className="text-xs font-medium text-foreground/80" data-testid="text-user-info">
+                  {user.name}
+                </span>
+                <span className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                  {user.role === 'admin' ? 'админ' : 'мастер'}
+                </span>
+              </div>
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={onLogout}
-                className="rounded-lg"
+                className="rounded-xl gap-2 hover:text-[hsl(var(--gold))]"
                 data-testid="button-logout"
               >
                 <LogOut size={16} />
+                <span className="hidden sm:inline">Выход</span>
               </Button>
             </div>
           </div>
