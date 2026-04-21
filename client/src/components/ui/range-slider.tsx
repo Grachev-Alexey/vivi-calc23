@@ -44,6 +44,9 @@ export function RangeSlider({
     return val.toString();
   };
 
+  const range = Math.max(1, max - min);
+  const pct = Math.min(100, Math.max(0, ((value - min) / range) * 100));
+
   return (
     <div className={cn("w-full", className)}>
       <input
@@ -58,10 +61,11 @@ export function RangeSlider({
         onTouchStart={handleMouseDown}
         onTouchEnd={handleMouseUp}
         disabled={disabled}
-        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider disabled:opacity-50 disabled:cursor-not-allowed"
+        style={{ ["--pct" as any]: `${pct}%` }}
+        className="slider w-full appearance-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation"
       />
       {showLabels && (
-        <div className="flex justify-between text-xs text-gray-400 mt-2">
+        <div className="flex justify-between text-[10px] sm:text-xs text-muted-foreground mt-2">
           <span>{formatValue(min)}</span>
           <span>{formatValue(max)}</span>
         </div>

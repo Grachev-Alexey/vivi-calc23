@@ -410,11 +410,11 @@ export default function AdminPage({ user, onLogout }: AdminPageProps) {
   return (
     <div className="min-h-screen flex flex-col promo-background">
       <header className="header-card sticky top-0 z-30">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
-            <div className="flex items-center gap-4">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center py-3 sm:py-4 gap-2">
+            <div className="flex items-center gap-2 sm:gap-4 min-w-0">
               <div
-                className="text-2xl font-black tracking-[-0.03em] leading-none"
+                className="text-xl sm:text-2xl font-black tracking-[-0.03em] leading-none flex-shrink-0"
                 style={{
                   fontFamily: "'Manrope', sans-serif",
                   background: "linear-gradient(135deg, hsl(43, 95%, 72%) 0%, hsl(36, 80%, 50%) 100%)",
@@ -425,12 +425,13 @@ export default function AdminPage({ user, onLogout }: AdminPageProps) {
               >
                 ЭНСО
               </div>
-              <div className="h-7 w-px" style={{ background: "linear-gradient(180deg, transparent, hsla(43,88%,56%,0.4), transparent)" }} />
-              <div className="text-sm font-medium text-foreground/90">
-                Панель администратора
+              <div className="h-7 w-px hidden sm:block" style={{ background: "linear-gradient(180deg, transparent, hsla(43,88%,56%,0.4), transparent)" }} />
+              <div className="text-xs sm:text-sm font-medium text-foreground/90 truncate">
+                <span className="hidden sm:inline">Панель администратора</span>
+                <span className="sm:hidden">Админ</span>
               </div>
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
               <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full"
                    style={{ background: "hsla(220, 30%, 14%, 0.6)", border: "1px solid hsl(var(--border))" }}>
                 <div className="w-2 h-2 rounded-full" style={{ background: "hsl(var(--gold))", boxShadow: "0 0 8px hsl(var(--gold))" }} />
@@ -454,21 +455,23 @@ export default function AdminPage({ user, onLogout }: AdminPageProps) {
       </header>
 
       <main className="flex-1 overflow-hidden">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 h-full">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8 h-full">
           <Tabs defaultValue="dashboard" className="h-full flex flex-col">
-            <TabsList className="grid w-full grid-cols-9 flex-shrink-0">
-              <TabsTrigger value="dashboard">Обзор</TabsTrigger>
-              <TabsTrigger value="sales">Продажи</TabsTrigger>
-              <TabsTrigger value="users">Пользователи</TabsTrigger>
-              <TabsTrigger value="services">Услуги</TabsTrigger>
-              <TabsTrigger value="subscriptions">Абонементы</TabsTrigger>
-              <TabsTrigger value="packages">Пакеты</TabsTrigger>
-              <TabsTrigger value="perks">Преимущества</TabsTrigger>
-              <TabsTrigger value="calculator">Настройки</TabsTrigger>
-              <TabsTrigger value="yclients">API</TabsTrigger>
-            </TabsList>
+            <div className="overflow-x-auto no-scrollbar -mx-3 px-3 sm:mx-0 sm:px-0 flex-shrink-0">
+              <TabsList className="inline-flex w-auto min-w-full lg:grid lg:w-full lg:grid-cols-9 gap-1">
+                <TabsTrigger value="dashboard" className="text-xs sm:text-sm whitespace-nowrap">Обзор</TabsTrigger>
+                <TabsTrigger value="sales" className="text-xs sm:text-sm whitespace-nowrap">Продажи</TabsTrigger>
+                <TabsTrigger value="users" className="text-xs sm:text-sm whitespace-nowrap">Пользователи</TabsTrigger>
+                <TabsTrigger value="services" className="text-xs sm:text-sm whitespace-nowrap">Услуги</TabsTrigger>
+                <TabsTrigger value="subscriptions" className="text-xs sm:text-sm whitespace-nowrap">Абонементы</TabsTrigger>
+                <TabsTrigger value="packages" className="text-xs sm:text-sm whitespace-nowrap">Пакеты</TabsTrigger>
+                <TabsTrigger value="perks" className="text-xs sm:text-sm whitespace-nowrap">Преимущества</TabsTrigger>
+                <TabsTrigger value="calculator" className="text-xs sm:text-sm whitespace-nowrap">Настройки</TabsTrigger>
+                <TabsTrigger value="yclients" className="text-xs sm:text-sm whitespace-nowrap">API</TabsTrigger>
+              </TabsList>
+            </div>
 
-            <div className="flex-1 overflow-y-auto mt-6 max-h-[calc(100vh-200px)]">
+            <div className="flex-1 overflow-y-auto mt-4 sm:mt-6 max-h-[calc(100vh-180px)] sm:max-h-[calc(100vh-200px)]">
               <TabsContent value="dashboard">
                 <AdminDashboard />
               </TabsContent>

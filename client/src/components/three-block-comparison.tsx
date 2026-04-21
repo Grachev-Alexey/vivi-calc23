@@ -81,7 +81,7 @@ const PACKAGE_META: Record<string, {
     highlight: true,
     gradient: "linear-gradient(160deg, hsla(43, 88%, 56%, 0.16) 0%, hsla(43, 80%, 40%, 0.08) 60%, hsla(222, 38%, 11%, 0.95) 100%)",
     border: "1.5px solid hsla(43, 88%, 56%, 0.55)",
-    glow: "0 24px 60px -20px hsla(43, 88%, 56%, 0.45), inset 0 1px 0 hsla(0,0%,100%,0.08)",
+    glow: "0 10px 28px -16px hsla(43, 88%, 56%, 0.35), inset 0 1px 0 hsla(0,0%,100%,0.08)",
     iconBg: "linear-gradient(135deg, hsl(43, 95%, 65%), hsl(36, 80%, 45%))",
     accent: "hsl(43, 90%, 65%)",
   },
@@ -92,7 +92,7 @@ const PACKAGE_META: Record<string, {
     highlight: false,
     gradient: "linear-gradient(160deg, hsla(214, 92%, 56%, 0.10) 0%, hsla(220, 80%, 30%, 0.05) 60%, hsla(222, 38%, 10%, 0.92) 100%)",
     border: "1.5px solid hsla(214, 92%, 56%, 0.35)",
-    glow: "0 16px 40px -16px hsla(214, 92%, 56%, 0.3), inset 0 1px 0 hsla(0,0%,100%,0.05)",
+    glow: "0 8px 22px -14px hsla(214, 92%, 56%, 0.25), inset 0 1px 0 hsla(0,0%,100%,0.05)",
     iconBg: "linear-gradient(135deg, hsl(214, 95%, 65%), hsl(220, 80%, 40%))",
     accent: "hsl(214, 95%, 70%)",
   },
@@ -103,7 +103,7 @@ const PACKAGE_META: Record<string, {
     highlight: false,
     gradient: "linear-gradient(160deg, hsla(220, 30%, 18%, 0.5) 0%, hsla(222, 38%, 10%, 0.92) 100%)",
     border: "1px solid hsl(var(--border))",
-    glow: "0 12px 32px -16px rgba(0,0,0,0.5), inset 0 1px 0 hsla(0,0%,100%,0.04)",
+    glow: "0 6px 18px -12px rgba(0,0,0,0.5), inset 0 1px 0 hsla(0,0%,100%,0.04)",
     iconBg: "linear-gradient(135deg, hsl(218, 30%, 35%), hsl(220, 30%, 22%))",
     accent: "hsl(210, 30%, 80%)",
   },
@@ -233,8 +233,8 @@ export default function ThreeBlockComparison({
         return (
           <div
             key={type}
-            className={`relative flex flex-col rounded-2xl overflow-hidden transition-[border-color,box-shadow,transform] duration-300 ${
-              !isAvailable ? "opacity-50" : "cursor-pointer hover:-translate-y-0.5"
+            className={`relative flex flex-col rounded-2xl overflow-hidden transition-[border-color,box-shadow] duration-300 ${
+              !isAvailable ? "opacity-50" : "cursor-pointer hover:border-[hsla(43,88%,56%,0.6)]"
             }`}
             style={{
               background: meta.gradient,
@@ -242,7 +242,7 @@ export default function ThreeBlockComparison({
                 ? `2px solid hsl(var(--gold))`
                 : meta.border,
               boxShadow: isSelected
-                ? "0 24px 60px -18px hsla(43,88%,56%,0.5), 0 0 0 4px hsla(43,88%,56%,0.08), inset 0 1px 0 hsla(0,0%,100%,0.08)"
+                ? "0 12px 32px -16px hsla(43,88%,56%,0.45), inset 0 1px 0 hsla(0,0%,100%,0.08)"
                 : meta.glow,
             }}
             onClick={() => isAvailable && onPackageSelect(type)}

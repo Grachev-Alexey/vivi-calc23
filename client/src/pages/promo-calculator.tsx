@@ -88,17 +88,17 @@ export default function PromoCalculatorPage({ user, onLogout }: PromoCalculatorP
     n === 1 ? "месяц" : n <= 4 ? "месяца" : "месяцев";
 
   return (
-    <div className="h-screen flex flex-col promo-background overflow-hidden">
+    <div className="min-h-screen lg:h-screen flex flex-col promo-background lg:overflow-hidden">
       {/* TOP NAV */}
-      <header className="flex-shrink-0 border-b backdrop-blur-xl"
+      <header className="flex-shrink-0 border-b backdrop-blur-xl sticky top-0 z-30 lg:static"
               style={{
                 borderColor: "hsla(43, 88%, 56%, 0.15)",
                 background: "linear-gradient(180deg, hsla(222, 45%, 7%, 0.92), hsla(222, 45%, 5%, 0.85))",
               }}>
-        <div className="px-5 lg:px-8 py-3 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-4 min-w-0">
+        <div className="px-3 sm:px-5 lg:px-8 py-2.5 sm:py-3 flex items-center justify-between gap-2 sm:gap-4">
+          <div className="flex items-center gap-2 sm:gap-4 min-w-0">
             <div
-              className="text-2xl font-black tracking-[-0.04em] leading-none"
+              className="text-xl sm:text-2xl font-black tracking-[-0.04em] leading-none flex-shrink-0"
               style={{
                 fontFamily: "'Manrope', sans-serif",
                 background: "linear-gradient(135deg, hsl(43, 95%, 75%) 0%, hsl(36, 80%, 50%) 100%)",
@@ -117,7 +117,7 @@ export default function PromoCalculatorPage({ user, onLogout }: PromoCalculatorP
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
             <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full"
                  style={{ background: "hsla(220, 30%, 14%, 0.6)", border: "1px solid hsl(var(--border))" }}>
               <div className="w-1.5 h-1.5 rounded-full" style={{ background: "hsl(var(--gold))", boxShadow: "0 0 8px hsl(var(--gold))" }} />
@@ -128,7 +128,7 @@ export default function PromoCalculatorPage({ user, onLogout }: PromoCalculatorP
               size="sm"
               onClick={() => setShowSalesModal(true)}
               title="Мои продажи"
-              className="rounded-xl gap-2 text-muted-foreground hover:text-[hsl(var(--gold))]"
+              className="rounded-xl gap-2 px-2 sm:px-3 text-muted-foreground hover:text-[hsl(var(--gold))]"
               data-testid="button-sales"
             >
               <BarChart3 size={15} />
@@ -139,7 +139,7 @@ export default function PromoCalculatorPage({ user, onLogout }: PromoCalculatorP
               size="sm"
               onClick={onLogout}
               title="Выход"
-              className="rounded-xl gap-2 text-muted-foreground hover:text-[hsl(var(--gold))]"
+              className="rounded-xl gap-2 px-2 sm:px-3 text-muted-foreground hover:text-[hsl(var(--gold))]"
               data-testid="button-logout"
             >
               <LogOut size={15} />
@@ -150,19 +150,19 @@ export default function PromoCalculatorPage({ user, onLogout }: PromoCalculatorP
 
       {/* HERO BANNER (when package selected) */}
       {selectedPackage && selectedPackageData && (
-        <div className="flex-shrink-0 px-5 lg:px-8 py-3 border-b"
+        <div className="flex-shrink-0 px-3 sm:px-5 lg:px-8 py-2.5 sm:py-3 border-b"
              style={{ borderColor: "hsla(43,88%,56%,0.12)" }}>
-          <div className="flex items-center justify-between gap-4 flex-wrap">
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl flex items-center justify-center"
+          <div className="flex items-center justify-between gap-3 flex-wrap">
+            <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+              <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
                    style={{ background: "linear-gradient(135deg, hsl(43,95%,62%), hsl(36,80%,45%))", boxShadow: "var(--shadow-gold)" }}>
                 <Check className="w-5 h-5" style={{ color: "hsl(var(--navy))" }} />
               </div>
-              <div>
+              <div className="min-w-0">
                 <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">
                   Выбран пакет
                 </div>
-                <div className="text-sm font-bold">
+                <div className="text-sm font-bold truncate">
                   {packages.find((p) => p.type === selectedPackage)?.name}
                   <span className="ml-2 text-premium font-black">
                     {formatPrice(selectedPackageData.finalCost)}
@@ -173,7 +173,7 @@ export default function PromoCalculatorPage({ user, onLogout }: PromoCalculatorP
             <Button
               onClick={() => setShowClientModal(true)}
               disabled={!selectedServices.length}
-              className="btn-premium rounded-xl gap-2 px-6"
+              className="btn-premium rounded-xl gap-2 px-4 sm:px-6 w-full sm:w-auto"
               data-testid="button-checkout"
             >
               <ShoppingBag className="w-4 h-4" />
@@ -184,9 +184,9 @@ export default function PromoCalculatorPage({ user, onLogout }: PromoCalculatorP
       )}
 
       {/* MAIN */}
-      <main className="flex-1 overflow-hidden flex flex-col lg:flex-row gap-4 p-4 lg:p-5">
+      <main className="flex-1 lg:overflow-hidden flex flex-col lg:flex-row gap-3 sm:gap-4 p-3 sm:p-4 lg:p-5">
         {/* LEFT — CONFIGURATOR */}
-        <aside className="w-full lg:w-[340px] xl:w-[360px] flex-shrink-0 overflow-y-auto custom-scrollbar pr-1 space-y-3">
+        <aside className="w-full lg:w-[340px] xl:w-[360px] flex-shrink-0 lg:overflow-y-auto custom-scrollbar lg:pr-1 space-y-3">
           {/* Section: Services */}
           <SectionCard
             icon={<SlidersHorizontal className="w-4 h-4" />}
