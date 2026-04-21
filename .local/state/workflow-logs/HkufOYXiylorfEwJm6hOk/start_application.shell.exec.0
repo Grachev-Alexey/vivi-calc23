@@ -1,0 +1,20 @@
+
+> vivi-calc@1.0.1 dev
+> tsx server/index.ts
+
+[1G[0K3:05:24 PM [express] Development mode: using Vite middleware
+📱 Frontend: http://localhost:5000
+Environment: development
+
+Press Ctrl+C to stop the server
+
+3:05:24 PM [express] serving on port 5000
+3:05:28 PM [express] GET /api/auth/check 401 in 2ms :: {"message":"Не авторизован"}
+3:06:17 PM [express] POST /api/auth 200 in 53ms :: {"user":{"id":1,"name":"Администратор","role":"ad…
+3:06:17 PM [express] GET /api/services 401 in 1ms :: {"message":"Требуется авторизация"}
+3:06:17 PM [express] GET /api/perks 401 in 2ms :: {"message":"Требуется авторизация"}
+3:06:17 PM [express] GET /api/packages 401 in 1ms :: {"message":"Требуется авторизация"}
+3:06:18 PM [express] GET /api/config/minimum_down_payment 403 in 1ms :: {"message":"Требуются права …
+3:06:18 PM [express] GET /api/config/bulk_discount_percentage 403 in 1ms :: {"message":"Требуются пр…
+3:06:18 PM [express] GET /api/config/installment_months_options 403 in 0ms :: {"message":"Требуются …
+3:06:18 PM [express] GET /api/config/bulk_discount_threshold 403 in 1ms :: {"message":"Требуются пра…
