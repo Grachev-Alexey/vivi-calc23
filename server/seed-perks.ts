@@ -1,5 +1,5 @@
 import { db } from "./db";
-import { perks, packagePerkValues } from "@shared/schema";
+import { perks, packagePerkValues, packages } from "@shared/schema";
 
 const DEFAULT_PERKS = [
   { name: "Скидка на абонемент", description: "Скидка от базовой стоимости", icon: "Percent", iconColor: "#F5C76A", displayOrder: 1 },
@@ -69,6 +69,19 @@ export async function seedPerksIfEmpty(): Promise<void> {
   try {
     const existing = await db.select().from(perks).limit(1);
     if (existing.length > 0) return;
+
+    // Make sure the referenced packages exist; otherwise the FK insert below
+    // will fail and abort the whole seed.
+    const existingPackages = await db.select({ type: packages.type }).from(packages);
+    const presentTypes = new Set(existingPackages.map((p) => p.type));
+    const requiredTypes = ["vip", "standard", "economy"];
+    const missing = requiredTypes.filter((t) => !presentTypes.has(t));
+    if (missing.length > 0) {
+      console.warn(
+        `⏭  Skipping perks seed — missing package types in DB: ${missing.join(", ")}`,
+      );
+      return;
+    }
 
     console.log("🌱 Seeding default perks (table is empty)...");
 
