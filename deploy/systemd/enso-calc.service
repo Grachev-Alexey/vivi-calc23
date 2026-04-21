@@ -1,0 +1,38 @@
+[Unit]
+Description=Enso Calculator (Node.js / Express)
+Documentation=https://enso.tw1.ru
+After=network.target postgresql.service
+Wants=postgresql.service
+
+[Service]
+Type=simple
+User=enso
+Group=enso
+WorkingDirectory=/var/www/enso
+
+# Загружаем переменные окружения из .env (DATABASE_URL, SESSION_SECRET, ...)
+EnvironmentFile=/var/www/enso/.env
+
+# Запуск собранного приложения
+ExecStart=/usr/bin/node dist/index.js
+
+# Перезапуск при падении
+Restart=always
+RestartSec=5
+
+# Логи в journald (просмотр: journalctl -u enso-calc -f)
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=enso-calc
+
+# Безопасность
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=true
+
+# Производительность
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target
