@@ -58,7 +58,7 @@ export function useCalculator() {
   const [selectedServices, setSelectedServices] = useState<SelectedService[]>([]);
   const [procedureCount, setProcedureCount] = useState(10); // Теперь это максимальное количество сеансов
   const [downPayment, setDownPayment] = useState(0);
-  const [installmentMonths, setInstallmentMonths] = useState(2);
+  const [installmentMonths, setInstallmentMonths] = useState(1);
   const [usedCertificate, setUsedCertificate] = useState(false);
   const [freeZones, setFreeZones] = useState<FreeZone[]>([]);
   const [selectedPackage, setSelectedPackage] = useState<string | null>(null);
@@ -102,10 +102,10 @@ export function useCalculator() {
       );
 
       return {
-        minimumDownPayment: minPayment || 5000,
+        minimumDownPayment: minPayment || 8000,
         bulkDiscountThreshold: bulkThreshold || 15,
         bulkDiscountPercentage: bulkPercentage || 0.05,
-        installmentMonthsOptions: monthsOptions || [2, 3, 4, 5, 6],
+        installmentMonthsOptions: monthsOptions || [1, 2, 3, 4, 5, 6],
         certificateDiscountAmount: certificateAmount || 3000,
         certificateMinCourseAmount: certificateMinAmount || 25000
       };
@@ -320,7 +320,7 @@ export function useCalculator() {
             // Calculate minimum down payment as percentage of package cost
             const minPaymentPercent = parseFloat(packageConfig.minDownPaymentPercent.toString());
             const minPayment = packageData.finalCost * minPaymentPercent;
-            const globalMin = calculatorSettings?.minimumDownPayment || 5000;
+            const globalMin = calculatorSettings?.minimumDownPayment || 8000;
             
             // Always set to minimum down payment when package is selected
             newDownPayment = Math.round(Math.max(minPayment, globalMin));
@@ -350,12 +350,12 @@ export function useCalculator() {
       return packageData.finalCost;
     },
     getMinDownPayment: () => {
-      if (!selectedPackage || !calculation?.packages || packages.length === 0) return 5000;
+      if (!selectedPackage || !calculation?.packages || packages.length === 0) return 8000;
       
       const packageData = calculation.packages[selectedPackage as keyof typeof calculation.packages];
       const packageConfig = packages.find(p => p.type === selectedPackage);
       
-      if (!packageData?.isAvailable || !packageConfig) return 5000;
+      if (!packageData?.isAvailable || !packageConfig) return 8000;
       
       // If package requires full payment, min = max = full cost
       if (packageConfig.requiresFullPayment) {
@@ -367,7 +367,7 @@ export function useCalculator() {
       const percentageBasedMin = Math.round(packageData.finalCost * minPaymentPercent);
       
       // Use the higher of percentage-based minimum or global minimum
-      const globalMin = calculatorSettings?.minimumDownPayment || 5000;
+      const globalMin = calculatorSettings?.minimumDownPayment || 8000;
       return Math.max(percentageBasedMin, globalMin);
     }
   };

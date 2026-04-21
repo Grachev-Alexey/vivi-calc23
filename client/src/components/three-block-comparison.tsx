@@ -604,7 +604,7 @@ export default function ThreeBlockComparison({
                 const absoluteMinimum = calculatorSettings?.minimumDownPayment || 25000;
                 const minDownPayment = Math.max(calculatedMinPayment, absoluteMinimum);
                 const remainingCost = packageData.finalCost - minDownPayment;
-                const minInstallmentMonths = Math.min(...(calculatorSettings?.installmentMonthsOptions || [2]));
+                const minInstallmentMonths = Math.min(...(calculatorSettings?.installmentMonthsOptions || [1]));
                 monthlyPayment = Math.round(remainingCost / minInstallmentMonths);
               }
 

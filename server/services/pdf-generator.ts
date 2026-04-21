@@ -196,8 +196,9 @@ export class PDFGenerator {
 
         // Use manual gift sessions if available, otherwise use package default
         let giftSessions = 0;
-        if (offer.manualGiftSessions && offer.manualGiftSessions[offer.selectedPackage] !== undefined) {
-            giftSessions = offer.manualGiftSessions[offer.selectedPackage];
+        const manualGiftSessions = offer.manualGiftSessions as any;
+        if (manualGiftSessions && typeof manualGiftSessions === 'object' && manualGiftSessions[offer.selectedPackage] !== undefined) {
+            giftSessions = manualGiftSessions[offer.selectedPackage];
         } else if (packageData && packageData.giftSessions !== undefined) {
             giftSessions = packageData.giftSessions;
         } else {
@@ -218,6 +219,8 @@ export class PDFGenerator {
         });
         
         const paymentSchedule = offer.paymentSchedule as PaymentScheduleItem[];
+        const pdfVersion = (offer as any).pdfVersion || 'standard';
+        const isAmendment = pdfVersion === 'amendment';
 
         return `
 <!DOCTYPE html>
@@ -225,7 +228,7 @@ export class PDFGenerator {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Приложение №1 к договору-оферте</title>
+    <title>${isAmendment ? 'Изменение условий договора' : 'Приложение №1 к договору-оферте'}</title>
     <style>
         @page { 
             margin: 15mm; 
@@ -244,6 +247,16 @@ export class PDFGenerator {
             font-size: 13pt;
             font-weight: bold;
             margin-bottom: 20px;
+        }
+        .amendment-notice {
+            text-align: center;
+            font-size: 12pt;
+            font-weight: bold;
+            color: #D9534F;
+            margin-bottom: 20px;
+            padding: 10px;
+            border: 2px solid #D9534F;
+            background-color: #FFE6E6;
         }
         .subtitle {
             font-size: 11pt;
@@ -310,9 +323,18 @@ export class PDFGenerator {
     </style>
 </head>
 <body>
+    ${isAmendment ? `
+    <div class="amendment-notice">
+        ⚠️ ИЗМЕНЕНИЕ УСЛОВИЙ ДОГОВОРА ⚠️
+    </div>
+    <div class="title">
+        Дополнительное соглашение об изменении условий к договору-оферте на оказание услуг по системе абонементов в студиях аппаратной косметологии «Виви»
+    </div>
+    ` : `
     <div class="title">
         Приложение № 1 к договору-оферте на оказание услуг по системе абонементов в студиях аппаратной косметологии «Виви» (Текст договора-оферты размещен на vivilaser.ru)
     </div>
+    `}
 
     <div class="subtitle">
         Стороны договорились о следующих услугах, входящих в Абонемент

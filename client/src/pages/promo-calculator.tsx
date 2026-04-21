@@ -364,7 +364,7 @@ export default function PromoCalculatorPage({
 
                 <RangeSlider
                   min={Math.min(
-                    ...(calculatorSettings?.installmentMonthsOptions || [2]),
+                    ...(calculatorSettings?.installmentMonthsOptions || [1]),
                   )}
                   max={Math.max(
                     ...(calculatorSettings?.installmentMonthsOptions || [6]),
@@ -441,13 +441,13 @@ export default function PromoCalculatorPage({
                   <input
                     type="number"
                     min="0"
-                    max="10"
+                    max="30"
                     step="0.1"
                     value={tempCorrectionValue}
                     onChange={(e) => setTempCorrectionValue(e.target.value)}
                     onBlur={() => {
                       const value = Math.min(
-                        10,
+                        30,
                         Math.max(0, parseFloat(tempCorrectionValue) || 0),
                       );
                       setCorrectionPercent(value);
@@ -456,7 +456,7 @@ export default function PromoCalculatorPage({
                     onKeyPress={(e) => {
                       if (e.key === "Enter") {
                         const value = Math.min(
-                          10,
+                          30,
                           Math.max(0, parseFloat(tempCorrectionValue) || 0),
                         );
                         setCorrectionPercent(value);
@@ -621,7 +621,8 @@ export default function PromoCalculatorPage({
           installmentMonths={installmentMonths}
           usedCertificate={usedCertificate}
           freeZones={freeZones}
-         manualGiftSessions={manualGiftSessions}
+          manualGiftSessions={manualGiftSessions}
+          user={user}
         />
       )}
 

@@ -117,6 +117,7 @@ export const sales = pgTable("sales", {
   freeZones: json("free_zones"), // array of free zone details
   usedCertificate: boolean("used_certificate").default(false),
   manualGiftSessions: json("manual_gift_sessions"),
+  saleDate: timestamp("sale_date").defaultNow(), // дата продажи (для админов)
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -144,10 +145,12 @@ export const offers = pgTable("offers", {
   clientPhone: text("client_phone").notNull(),
   clientEmail: text("client_email"),
   pdfPath: text("pdf_path"), // путь к сгенерированному PDF
+  pdfVersion: text("pdf_version").default("standard"), // 'standard' | 'amendment' - версия PDF
   emailSent: boolean("email_sent").default(false),
   emailSentAt: timestamp("email_sent_at"),
   status: text("status").default("draft"), // draft, sent, accepted, expired
   expiresAt: timestamp("expires_at"), // срок действия предложения
+  saleDate: timestamp("sale_date").defaultNow(), // дата продажи (для админов)
   createdAt: timestamp("created_at").defaultNow(),
 });
 

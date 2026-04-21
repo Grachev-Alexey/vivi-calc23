@@ -52,7 +52,10 @@ const calculationSchema = z.object({
     serviceId: z.number(),
     quantity: z.number()
   })).default([]),
-  manualGiftSessions: z.record(z.string(), z.number()).optional()
+  manualGiftSessions: z.record(z.string(), z.number()).optional(),
+  saleDate: z.string().optional(), // Дата продажи (для админов)
+  masterId: z.number().optional() // ID мастера (для админов)
+  // Примечание: pdfVersion не включен, так как это поле только для offers, а не для sales
 });
 
 const offerSchema = z.object({
@@ -72,7 +75,9 @@ const offerSchema = z.object({
   appliedDiscounts: z.array(z.any()).optional(),
   freeZones: z.array(z.any()).optional(),
   usedCertificate: z.boolean().default(false),
-  manualGiftSessions: z.record(z.string(), z.number()).optional()
+  manualGiftSessions: z.record(z.string(), z.number()).optional(),
+  saleDate: z.string().optional(), // Дата продажи (для админов)
+  pdfVersion: z.enum(['standard', 'amendment']).optional() // Версия PDF (для админов)
 });
 
 const configSchema = z.object({
@@ -104,8 +109,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           id: user.id, 
           name: user.name, 
           role: user.role,
-          pin: user.pin,
           isActive: user.isActive
+          // PIN is intentionally excluded for security
         } 
       });
     } catch (error) {
@@ -135,8 +140,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           id: session.userId, 
           name: session.userName || 'Пользователь', 
           role: session.userRole,
-          pin: '',
           isActive: true
+          // PIN is intentionally excluded for security
         } 
       });
     } else {
@@ -160,6 +165,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
     next();
   };
+
+  // Get all active users (for admin dropdown in ClientModal)
+  // SECURITY: Only admins can access this endpoint and PIN codes are stripped
+  app.get("/api/users", requireAdmin, async (req, res) => {
+    try {
+      const users = await storage.getAllUsers();
+      // Return only active users with sensitive data stripped
+      const activeUsers = users
+        .filter(u => u.isActive)
+        .map(u => ({
+          id: u.id,
+          name: u.name,
+          role: u.role,
+          isActive: u.isActive
+          // PIN is intentionally excluded for security
+        }));
+      res.json(activeUsers);
+    } catch (error) {
+      res.status(500).json({ message: "Ошибка получения пользователей" });
+    }
+  });
 
   // Services
   app.get("/api/services", requireAuth, async (req, res) => {
@@ -837,10 +863,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log('Original calculation.services:', calculation.services);
       console.log('Saving enriched services:', enrichedServices);
 
+      // For admins, require explicit master selection
+      const session = (req as any).session;
+      let masterId = session.userId;
+      
+      if (session.userRole === 'admin') {
+        if (!calculation.masterId) {
+          return res.status(400).json({ 
+            message: "Администратор должен явно выбрать мастера для продажи" 
+          });
+        }
+        masterId = calculation.masterId;
+      }
+      
       // Save sale to database
       const sale = await storage.createSale({
         clientId: client.id,
-        masterId: (req as any).session.userId,
+        masterId: masterId,
         subscriptionTypeId: subscriptionType.id,
         selectedServices: enrichedServices,
         selectedPackage: calculation.packageType,
@@ -853,7 +892,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         appliedDiscounts: calculation.appliedDiscounts,
         freeZones: calculation.freeZones,
         usedCertificate: calculation.usedCertificate,
-        manualGiftSessions: calculation.manualGiftSessions || {}
+        manualGiftSessions: calculation.manualGiftSessions || {},
+        saleDate: calculation.saleDate ? new Date(calculation.saleDate) : undefined
       });
 
       res.json({ 
@@ -937,6 +977,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         clientName: offerData.clientName,
         clientPhone: offerData.clientPhone,
         clientEmail: offerData.clientEmail,
+        pdfVersion: offerData.pdfVersion || 'standard',
+        saleDate: offerData.saleDate ? new Date(offerData.saleDate) : undefined,
         status: 'draft',
         expiresAt
       });

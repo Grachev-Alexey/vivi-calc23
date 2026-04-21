@@ -85,7 +85,7 @@ export function calculatePackagePricing(
     const additionalDiscount = qualifiesForBulkDiscount ? baseCost * bulkDiscountPercent : 0;
     
     // Calculate correction discount (master adjustment, max 10%)
-    const correctionDiscount = Math.min(correctionPercent, 10) * baseCost * 0.01;
+    const correctionDiscount = Math.min(correctionPercent, 30) * baseCost * 0.01;
     
 
     

@@ -70,7 +70,7 @@ export default function PaymentConfig({
       );
       
       return { 
-        installmentMonthsOptions: monthsOptions || [2, 3, 4, 5, 6],
+        installmentMonthsOptions: monthsOptions || [1, 2, 3, 4, 5, 6],
         certificateDiscountAmount: certificateAmount || 3000,
         certificateMinCourseAmount: certificateMinAmount || 25000
       };
@@ -146,7 +146,7 @@ export default function PaymentConfig({
             </div>
             
             <RangeSlider
-              min={Math.min(...(calculatorSettings?.installmentMonthsOptions || [2]))}
+              min={Math.min(...(calculatorSettings?.installmentMonthsOptions || [1]))}
               max={Math.max(...(calculatorSettings?.installmentMonthsOptions || [6]))}
               step={1}
               value={installmentMonths}

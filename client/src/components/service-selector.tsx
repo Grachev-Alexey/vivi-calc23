@@ -521,7 +521,7 @@ export default function ServiceSelector({
               </div>
               
               <RangeSlider
-                min={3}
+                min={1}
                 max={20}
                 value={service.sessionCount || 10}
                 onChange={(value) => updateSessionCount(service.yclientsId, value)}

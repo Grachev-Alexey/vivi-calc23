@@ -1,13 +1,20 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
+import { useQuery } from "@tanstack/react-query";
 import { User, Loader2, Copy, CheckCircle, FileText, Calendar, CreditCard } from "lucide-react";
 import { formatPhoneNumber, validatePhoneNumber, formatPrice } from "@/lib/utils";
 import PhoneInput from "./ui/phone-input";
 
+interface UserData {
+  id: number;
+  name: string;
+  role: "master" | "admin";
+}
 
 interface ClientModalProps {
   isOpen: boolean;
@@ -21,6 +28,7 @@ interface ClientModalProps {
   usedCertificate: boolean;
   freeZones: any[];
   manualGiftSessions?: Record<string, number>;
+  user?: UserData;
 }
 
 export default function ClientModal({
@@ -34,8 +42,11 @@ export default function ClientModal({
   installmentMonths,
   usedCertificate,
   freeZones,
-  manualGiftSessions = {}
+  manualGiftSessions = {},
+  user
 }: ClientModalProps) {
+  const isAdmin = user?.role === 'admin';
+  
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [clientName, setClientName] = useState("");
@@ -43,7 +54,27 @@ export default function ClientModal({
   const [subscriptionTitle, setSubscriptionTitle] = useState("");
   const [isCompleted, setIsCompleted] = useState(false);
   const [offerSent, setOfferSent] = useState(false);
+  const [saleDate, setSaleDate] = useState(new Date().toISOString().split('T')[0]);
+  // For admins, require explicit master selection (start with undefined)
+  // For masters, use their own ID
+  const [selectedMasterId, setSelectedMasterId] = useState<number | undefined>(
+    isAdmin ? undefined : user?.id
+  );
+  const [pdfVersion, setPdfVersion] = useState<'standard' | 'amendment'>('standard');
   const { toast } = useToast();
+
+  // Load users for admin dropdown
+  const { data: users = [] } = useQuery<UserData[]>({
+    queryKey: ['/api/users'],
+    queryFn: async () => {
+      const response = await fetch('/api/users', { credentials: 'include' });
+      if (!response.ok) {
+        throw new Error('Failed to fetch users');
+      }
+      return response.json();
+    },
+    enabled: isAdmin && isOpen,
+  });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -61,6 +92,16 @@ export default function ClientModal({
       toast({
         title: "Ошибка",
         description: "Выберите пакет для продолжения",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // For admins, require explicit master selection
+    if (isAdmin && !selectedMasterId) {
+      toast({
+        title: "Ошибка",
+        description: "Выберите мастера для продажи",
         variant: "destructive"
       });
       return;
@@ -97,7 +138,12 @@ export default function ClientModal({
           monthlyPayment: selectedPackage === 'vip' ? undefined : calculation.packages[selectedPackage].monthlyPayment,
           usedCertificate,
           freeZones,
-          appliedDiscounts: calculation.packages[selectedPackage].appliedDiscounts
+          appliedDiscounts: calculation.packages[selectedPackage].appliedDiscounts,
+          ...(isAdmin && {
+            saleDate,
+            masterId: selectedMasterId
+            // Примечание: pdfVersion не передается здесь, так как он используется только при создании offer
+          })
         }
       };
       
@@ -146,19 +192,22 @@ export default function ClientModal({
       // Создаем оферту
       const packageData = calculation.packages[selectedPackage];
       
+      // Используем дату продажи для расчета графика платежей
+      const startDate = isAdmin ? new Date(saleDate) : new Date();
+      
       // Генерируем график платежей
       const paymentSchedule = [];
       if (selectedPackage === 'vip') {
         // VIP - полная оплата
         paymentSchedule.push({
-          date: new Date().toISOString().split('T')[0],
+          date: startDate.toISOString().split('T')[0],
           amount: packageData.finalCost,
           description: 'Полная оплата'
         });
       } else {
         // Стандарт/Эконом - рассрочка
         paymentSchedule.push({
-          date: new Date().toISOString().split('T')[0],
+          date: startDate.toISOString().split('T')[0],
           amount: downPayment,
           description: 'Первоначальный взнос'
         });
@@ -167,7 +216,7 @@ export default function ClientModal({
         const monthlyPayment = remainingAmount / installmentMonths;
         
         for (let i = 1; i <= installmentMonths; i++) {
-          const paymentDate = new Date();
+          const paymentDate = new Date(startDate);
           paymentDate.setMonth(paymentDate.getMonth() + i);
           
           paymentSchedule.push({
@@ -206,7 +255,12 @@ export default function ClientModal({
         usedCertificate,
         manualGiftSessions: manualGiftSessions || {},
         // Добавляем информацию о процедурах для PDF
-        procedureCount: procedureCount
+        procedureCount: procedureCount,
+        // Добавляем дату продажи и версию PDF (только для админов)
+        ...(isAdmin && {
+          saleDate,
+          pdfVersion
+        })
       };
 
       const createResponse = await fetch("/api/offers", {
@@ -384,6 +438,67 @@ export default function ClientModal({
               </div>
               
               <form onSubmit={handleSubmit} className="space-y-3">
+                {isAdmin && (
+                  <>
+                    <div className="border-b border-gray-200 pb-2 mb-3">
+                      <h4 className="text-sm font-semibold text-gray-900">Настройки продажи</h4>
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="saleDate" className="block text-sm font-medium text-gray-700 mb-1">
+                        Дата продажи *
+                      </Label>
+                      <Input
+                        id="saleDate"
+                        type="date"
+                        value={saleDate}
+                        onChange={(e) => setSaleDate(e.target.value)}
+                        className="input-premium text-sm"
+                        required
+                      />
+                    </div>
+
+                    <div>
+                      <Label htmlFor="masterId" className="block text-sm font-medium text-gray-700 mb-1">
+                        Мастер *
+                      </Label>
+                      <Select value={selectedMasterId?.toString()} onValueChange={(v) => setSelectedMasterId(Number(v))}>
+                        <SelectTrigger className="input-premium text-sm">
+                          <SelectValue placeholder="Выберите мастера" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {users
+                            .filter((u) => u.role === 'master')
+                            .map((u) => (
+                              <SelectItem key={u.id} value={u.id.toString()}>
+                                {u.name}
+                              </SelectItem>
+                            ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div>
+                      <Label htmlFor="pdfVersion" className="block text-sm font-medium text-gray-700 mb-1">
+                        Версия договора *
+                      </Label>
+                      <Select value={pdfVersion} onValueChange={(v) => setPdfVersion(v as 'standard' | 'amendment')}>
+                        <SelectTrigger className="input-premium text-sm">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="standard">Стандартный договор</SelectItem>
+                          <SelectItem value="amendment">Изменение условий договора</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="border-b border-gray-200 pb-2 mb-3 mt-4">
+                      <h4 className="text-sm font-semibold text-gray-900">Данные клиента</h4>
+                    </div>
+                  </>
+                )}
+                
                 <div>
                   <Label htmlFor="clientName" className="block text-sm font-medium text-gray-700 mb-1">
                     ФИО клиента *
@@ -439,7 +554,7 @@ export default function ClientModal({
                   <Button
                     type="submit"
                     className="flex-1 btn-primary h-9 text-sm"
-                    disabled={loading}
+                    disabled={loading || (isAdmin && !selectedMasterId)}
                   >
                     {loading ? (
                       <>
