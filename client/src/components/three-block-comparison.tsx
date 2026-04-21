@@ -223,27 +223,27 @@ export default function ThreeBlockComparison({
               (v) => v.packageType === type && v.perkId === perk.id
             );
             if (!pv) return false;
-            if (pv.valueType === "boolean" && !pv.booleanValue) return false;
-            if (pv.displayValue === "-" || !pv.displayValue) return false;
+            if (pv.valueType === "boolean" && pv.booleanValue === false) return false;
+            const dv = (pv.displayValue || "").trim();
+            if (dv === "-" || dv === "—" || dv === "✕" || dv === "x" || dv === "Не включено") return false;
             return true;
           })
-          .slice(0, 7);
+          .slice(0, 8);
 
         return (
           <div
             key={type}
-            className={`relative flex flex-col rounded-2xl overflow-hidden transition-all duration-300 ${
-              !isAvailable ? "opacity-50" : "cursor-pointer"
-            } ${isSelected ? "scale-[1.015]" : "hover:scale-[1.01]"}`}
+            className={`relative flex flex-col rounded-2xl overflow-hidden transition-[border-color,box-shadow,transform] duration-300 ${
+              !isAvailable ? "opacity-50" : "cursor-pointer hover:-translate-y-0.5"
+            }`}
             style={{
               background: meta.gradient,
               border: isSelected
-                ? `1.5px solid hsl(var(--gold))`
+                ? `2px solid hsl(var(--gold))`
                 : meta.border,
               boxShadow: isSelected
-                ? "0 28px 70px -22px hsla(43,88%,56%,0.55), inset 0 1px 0 hsla(0,0%,100%,0.1)"
+                ? "0 24px 60px -18px hsla(43,88%,56%,0.5), 0 0 0 4px hsla(43,88%,56%,0.08), inset 0 1px 0 hsla(0,0%,100%,0.08)"
                 : meta.glow,
-              backdropFilter: "blur(14px)",
             }}
             onClick={() => isAvailable && onPackageSelect(type)}
             data-testid={`card-package-${type}`}
@@ -378,7 +378,7 @@ export default function ThreeBlockComparison({
                       className="w-8 bg-transparent text-center outline-none text-[11px] font-bold"
                     />
                   ) : (
-                    <span>{giftSessions} в подарок</span>
+                    <span>+{giftSessions} {giftSessions === 1 ? "сеанс" : giftSessions < 5 ? "сеанса" : "сеансов"} в подарок</span>
                   )}
                 </div>
               )}
@@ -418,7 +418,24 @@ export default function ThreeBlockComparison({
                 );
               })}
               {cardPerks.length === 0 && (
-                <div className="text-xs text-muted-foreground italic">Базовые условия абонемента</div>
+                <div className="space-y-1.5">
+                  {[
+                    "Скидка на абонемент",
+                    "Удобная рассрочка без процентов",
+                    procedureCount >= 10 ? "Подарочные сеансы" : null,
+                    "Бонусные зоны за активность",
+                  ]
+                    .filter(Boolean)
+                    .map((label, i) => (
+                      <div key={i} className="flex items-start gap-2 text-xs">
+                        <div className="w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5"
+                             style={{ background: "hsla(140,70%,45%,0.15)", border: "1px solid hsla(140,70%,45%,0.3)" }}>
+                          <Check className="w-2.5 h-2.5" style={{ color: "hsl(140, 70%, 65%)" }} />
+                        </div>
+                        <span className="text-foreground/85 leading-snug">{label}</span>
+                      </div>
+                    ))}
+                </div>
               )}
             </div>
 

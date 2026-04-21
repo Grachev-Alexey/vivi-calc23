@@ -437,9 +437,6 @@ export default function AdminPage({ user, onLogout }: AdminPageProps) {
                 <span className="text-xs font-medium text-foreground/80" data-testid="text-user-info">
                   {user.name}
                 </span>
-                <span className="text-[10px] uppercase tracking-wider text-muted-foreground">
-                  {user.role === 'admin' ? 'админ' : 'мастер'}
-                </span>
               </div>
               <Button
                 variant="ghost"

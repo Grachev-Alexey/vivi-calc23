@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { RangeSlider } from "@/components/ui/range-slider";
 import {
@@ -41,7 +41,7 @@ const FREE_ZONE_REASONS = [
 export default function PromoCalculatorPage({ user, onLogout }: PromoCalculatorPageProps) {
   const [showClientModal, setShowClientModal] = useState(false);
   const [showSalesModal, setShowSalesModal] = useState(false);
-  const [showFreeZones, setShowFreeZones] = useState(false);
+  const [showCorrection, setShowCorrection] = useState(false);
 
   const packagePerksQuery = usePackagePerks();
   const packagePerkValues = packagePerksQuery.data || [];
@@ -76,6 +76,14 @@ export default function PromoCalculatorPage({ user, onLogout }: PromoCalculatorP
       ? (calculation.packages as any)[selectedPackage]
       : null;
 
+  // Auto-select first available package as soon as a calculation appears
+  useEffect(() => {
+    if (selectedPackage || !calculation?.packages) return;
+    const order = ["vip", "standard", "economy"];
+    const pick = order.find((t) => (calculation.packages as any)[t]?.isAvailable !== false);
+    if (pick) setSelectedPackage(pick);
+  }, [calculation, selectedPackage, setSelectedPackage]);
+
   const getMonthLabel = (n: number) =>
     n === 1 ? "месяц" : n <= 4 ? "месяца" : "месяцев";
 
@@ -104,7 +112,7 @@ export default function PromoCalculatorPage({ user, onLogout }: PromoCalculatorP
             <div className="h-7 w-px hidden sm:block"
                  style={{ background: "linear-gradient(180deg, transparent, hsla(43,88%,56%,0.4), transparent)" }} />
             <div className="hidden sm:flex flex-col leading-tight">
-              <div className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground font-medium">Студия</div>
+              <div className="text-[10px] uppercase tracking-[0.28em] text-muted-foreground font-medium">Студия лазерной эпиляции</div>
               <div className="text-sm font-semibold text-foreground/90">Калькулятор абонементов</div>
             </div>
           </div>
@@ -114,9 +122,6 @@ export default function PromoCalculatorPage({ user, onLogout }: PromoCalculatorP
                  style={{ background: "hsla(220, 30%, 14%, 0.6)", border: "1px solid hsl(var(--border))" }}>
               <div className="w-1.5 h-1.5 rounded-full" style={{ background: "hsl(var(--gold))", boxShadow: "0 0 8px hsl(var(--gold))" }} />
               <span className="text-xs font-medium">{user.name}</span>
-              <span className="text-[10px] uppercase tracking-wider text-muted-foreground">
-                {user.role === "admin" ? "админ" : "мастер"}
-              </span>
             </div>
             <Button
               variant="ghost"
@@ -252,7 +257,6 @@ export default function PromoCalculatorPage({ user, onLogout }: PromoCalculatorP
                 value={downPayment}
                 onChange={setDownPayment}
                 formatLabel={formatPrice}
-                disabled={!selectedPackage}
               />
             )}
           </SectionCard>
@@ -295,31 +299,58 @@ export default function PromoCalculatorPage({ user, onLogout }: PromoCalculatorP
             </SectionCard>
           )}
 
-          {/* Section: Correction */}
-          <SectionCard
-            icon={<Sparkles className="w-4 h-4" />}
-            title="Дополнительная скидка"
-            subtitle="Можно подкрутить специально для клиентки"
-            compact
+          {/* Section: Correction — discreet master-only tool */}
+          <div
+            className="rounded-xl px-3 py-2 flex items-center justify-between gap-2"
+            style={{
+              background: "hsla(220, 35%, 8%, 0.4)",
+              border: "1px dashed hsla(218, 30%, 22%, 0.7)",
+            }}
+            title="Только для мастера"
           >
-            <div className="flex items-center gap-3">
-              <input
-                type="number"
-                min="0"
-                max="30"
-                step="0.5"
-                value={correctionPercent}
-                onChange={(e) => {
-                  const v = Math.min(30, Math.max(0, parseFloat(e.target.value) || 0));
-                  setCorrectionPercent(v);
-                }}
-                className="flex-1 input-premium text-center"
-                placeholder="0"
-                data-testid="input-correction"
-              />
-              <span className="text-sm font-bold text-premium">%</span>
+            <div className="flex items-center gap-2 min-w-0">
+              <Sparkles className="w-3.5 h-3.5 flex-shrink-0" style={{ color: "hsl(var(--gold))", opacity: 0.7 }} />
+              <span className="text-[11px] text-muted-foreground truncate">
+                Доп. инструмент мастера
+              </span>
             </div>
-          </SectionCard>
+            {showCorrection ? (
+              <div className="flex items-center gap-1.5">
+                <input
+                  type="number"
+                  min="0"
+                  max="30"
+                  step="0.5"
+                  value={correctionPercent}
+                  onChange={(e) => {
+                    const v = Math.min(30, Math.max(0, parseFloat(e.target.value) || 0));
+                    setCorrectionPercent(v);
+                  }}
+                  className="w-12 text-xs text-center rounded-md py-1 focus:outline-none"
+                  data-testid="input-correction"
+                />
+                <span className="text-[11px] text-muted-foreground">%</span>
+                <button
+                  onClick={() => {
+                    setCorrectionPercent(0);
+                    setShowCorrection(false);
+                  }}
+                  className="text-[11px] text-muted-foreground hover:text-foreground"
+                >
+                  ×
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => setShowCorrection(true)}
+                className="text-[11px] font-semibold hover:underline"
+                style={{ color: "hsl(var(--gold))" }}
+                data-testid="button-show-correction"
+              >
+                {correctionPercent > 0 ? `+${correctionPercent}%` : "настроить"}
+              </button>
+            )}
+          </div>
 
           {/* Free zones quick toggle */}
           <SectionCard

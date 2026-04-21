@@ -97,22 +97,56 @@
 }
 
 /* ===== Sliders ===== */
-.slider::-webkit-slider-thumb {
+input[type="range"].slider,
+.slider {
+  -webkit-appearance: none;
   appearance: none;
+  background: transparent !important;
+  height: 28px;
+  cursor: pointer;
+  padding: 0;
+}
+input[type="range"].slider:focus { outline: none; }
+input[type="range"].slider::-webkit-slider-runnable-track {
+  height: 6px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, hsla(43, 88%, 56%, 0.5), hsla(43, 88%, 56%, 0.15));
+  border: 1px solid hsla(218, 30%, 24%, 0.8);
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.5);
+}
+input[type="range"].slider::-moz-range-track {
+  height: 6px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, hsla(43, 88%, 56%, 0.5), hsla(43, 88%, 56%, 0.15));
+  border: 1px solid hsla(218, 30%, 24%, 0.8);
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.5);
+}
+input[type="range"].slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  margin-top: -8px;
   height: 22px;
   width: 22px;
   border-radius: 50%;
-  background: linear-gradient(135deg, hsl(var(--gold)), hsl(var(--gold-deep)));
+  background: linear-gradient(135deg, hsl(43, 95%, 65%), hsl(36, 80%, 45%));
   cursor: pointer;
-  box-shadow: 0 0 0 4px hsla(43, 88%, 56%, 0.15), 0 4px 12px rgba(0,0,0,0.45);
+  border: 2px solid hsl(220, 40%, 6%);
+  box-shadow: 0 0 0 3px hsla(43, 88%, 56%, 0.2), 0 4px 12px rgba(0,0,0,0.5);
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
-.slider::-webkit-slider-thumb:hover { transform: scale(1.08); }
-.slider::-moz-range-thumb {
+input[type="range"].slider::-webkit-slider-thumb:hover { transform: scale(1.1); }
+input[type="range"].slider::-moz-range-thumb {
   height: 22px; width: 22px; border-radius: 50%;
-  background: linear-gradient(135deg, hsl(var(--gold)), hsl(var(--gold-deep)));
-  cursor: pointer; border: none;
-  box-shadow: 0 0 0 4px hsla(43, 88%, 56%, 0.15), 0 4px 12px rgba(0,0,0,0.45);
+  background: linear-gradient(135deg, hsl(43, 95%, 65%), hsl(36, 80%, 45%));
+  cursor: pointer; border: 2px solid hsl(220, 40%, 6%);
+  box-shadow: 0 0 0 3px hsla(43, 88%, 56%, 0.2), 0 4px 12px rgba(0,0,0,0.5);
+}
+input[type="range"].slider:disabled::-webkit-slider-thumb {
+  background: linear-gradient(135deg, hsl(220, 15%, 40%), hsl(220, 20%, 28%));
+  box-shadow: none;
+}
+input[type="range"].slider:disabled::-webkit-slider-runnable-track {
+  background: hsla(218, 30%, 18%, 0.5);
 }
 
 /* ===== Scrollbars ===== */
@@ -191,38 +225,73 @@
     background: var(--gradient-card) !important;
     border: 1px solid hsl(var(--border)) !important;
     box-shadow: var(--shadow-md) !important;
-    backdrop-filter: blur(8px);
     transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease !important;
     border-radius: var(--radius) !important;
   }
 
-  /* Promo calculator left-panel mini cards */
-  .promo-background .lg\:w-64 > div > div,
-  .promo-background .lg\:w-72 > div > div,
-  .promo-background .xl\:w-72 > div > div {
-    background: linear-gradient(160deg, hsla(222, 38%, 11%, 0.9), hsla(220, 36%, 7%, 0.85)) !important;
-    border: 1px solid hsl(var(--border)) !important;
-    border-radius: 16px !important;
-    box-shadow: 0 8px 24px -10px rgba(0,0,0,0.5), inset 0 1px 0 hsla(0,0%,100%,0.04) !important;
-    backdrop-filter: blur(10px);
-    padding: 14px !important;
+  /* Inputs / Textareas — dark theme defaults */
+  input:not([type="range"]):not([type="checkbox"]):not([type="radio"]),
+  textarea,
+  select,
+  [role="combobox"] {
+    background-color: hsla(220, 35%, 8%, 0.7) !important;
+    color: hsl(var(--foreground)) !important;
+    border-color: hsl(var(--border)) !important;
   }
+
+  /* Radix popovers (Select, Dropdown, Tooltip) — solid dark surfaces, on top */
+  [data-radix-popper-content-wrapper] {
+    z-index: 100 !important;
+  }
+  [role="listbox"],
+  [role="menu"],
+  [role="dialog"] [role="tabpanel"] [role="listbox"] {
+    background: linear-gradient(160deg, hsla(222, 42%, 12%, 0.98), hsla(220, 40%, 8%, 0.98)) !important;
+    border: 1px solid hsl(var(--border)) !important;
+    color: hsl(var(--foreground)) !important;
+    backdrop-filter: blur(16px);
+    box-shadow: 0 24px 60px -16px rgba(0,0,0,0.7) !important;
+  }
+  [role="option"]:hover,
+  [role="menuitem"]:hover,
+  [role="option"][data-highlighted],
+  [role="menuitem"][data-highlighted] {
+    background: hsla(43, 88%, 56%, 0.12) !important;
+    color: hsl(var(--gold)) !important;
+  }
+
+  /* Outline button variant — ensure visibility on dark bg */
+  button[class*="border-input"] {
+    background-color: hsla(220, 35%, 9%, 0.6) !important;
+    border-color: hsl(var(--border)) !important;
+    color: hsl(var(--foreground)) !important;
+  }
+  button[class*="border-input"]:hover {
+    background-color: hsla(43, 88%, 56%, 0.12) !important;
+    border-color: hsla(43, 88%, 56%, 0.45) !important;
+    color: hsl(var(--gold)) !important;
+  }
+  input:not([type="range"]):not([type="checkbox"]):not([type="radio"])::placeholder,
+  textarea::placeholder {
+    color: hsl(var(--muted-foreground)) !important;
+    opacity: 0.7;
+  }
+  input:not([type="range"]):not([type="checkbox"]):not([type="radio"]):focus,
+  textarea:focus,
+  select:focus {
+    border-color: hsla(43, 88%, 56%, 0.55) !important;
+    box-shadow: 0 0 0 3px hsla(43, 88%, 56%, 0.12) !important;
+    outline: none !important;
+  }
+
+  /* Allow card hover transforms to escape clipping containers */
+  .promo-background main { padding-top: 14px !important; }
+
+  /* Headings inside promo background — keep clean, no auto bullet */
   .promo-background h3,
   .promo-background h4 {
     color: hsl(var(--foreground)) !important;
-    letter-spacing: 0.02em;
-  }
-  .promo-background h3::before,
-  .promo-background h4::before {
-    content: "";
-    display: inline-block;
-    width: 3px;
-    height: 12px;
-    background: linear-gradient(180deg, hsl(var(--gold)), hsl(var(--gold-deep)));
-    border-radius: 2px;
-    margin-right: 8px;
-    vertical-align: -1px;
-    border-radius: 2px;
+    letter-spacing: 0.005em;
   }
 
   /* Comparison table polish */

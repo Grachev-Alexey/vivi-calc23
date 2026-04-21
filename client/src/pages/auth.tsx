@@ -144,8 +144,8 @@ export default function AuthPage({ onLogin }: AuthPageProps) {
                 className="h-px w-16 mb-3"
                 style={{ background: "linear-gradient(90deg, transparent, hsla(43, 88%, 56%, 0.6), transparent)" }}
               />
-              <div className="text-[11px] uppercase tracking-[0.4em] text-muted-foreground font-medium">
-                Студия
+              <div className="text-[10px] uppercase tracking-[0.32em] text-muted-foreground font-medium">
+                Студия лазерной эпиляции
               </div>
             </div>
 
