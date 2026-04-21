@@ -186,7 +186,7 @@ export default function PromoCalculatorPage({ user, onLogout }: PromoCalculatorP
       )}
 
       {/* MAIN */}
-      <main className="flex-1 lg:overflow-hidden flex flex-col lg:flex-row gap-3 sm:gap-4 p-3 sm:p-4 lg:p-5">
+      <main className="flex-1 lg:overflow-hidden flex flex-col lg:flex-row gap-2.5 sm:gap-4 p-2.5 sm:p-4 lg:p-5">
         {/* LEFT — CONFIGURATOR */}
         <aside className="w-full lg:w-[340px] xl:w-[360px] flex-shrink-0 lg:overflow-y-auto custom-scrollbar lg:pr-1 space-y-3">
           {/* Section: Services */}
@@ -416,10 +416,10 @@ export default function PromoCalculatorPage({ user, onLogout }: PromoCalculatorP
         {/* RIGHT — PRICING CARDS */}
         <section className="flex-1 min-w-0 overflow-y-auto custom-scrollbar">
           {!calculation || calculation.baseCost === 0 ? (
-            <div className="h-full flex items-center justify-center">
-              <div className="text-center max-w-md px-8">
+            <div className="lg:h-full flex items-center justify-center py-6 lg:py-0">
+              <div className="text-center max-w-md px-4 sm:px-6 lg:px-8">
                 <div
-                  className="w-24 h-24 mx-auto mb-6 rounded-3xl flex items-center justify-center"
+                  className="w-14 h-14 sm:w-20 sm:h-20 lg:w-24 lg:h-24 mx-auto mb-3 sm:mb-5 lg:mb-6 rounded-2xl lg:rounded-3xl flex items-center justify-center"
                   style={{
                     background:
                       "linear-gradient(135deg, hsla(43,88%,56%,0.18), hsla(214,92%,56%,0.12))",
@@ -427,14 +427,18 @@ export default function PromoCalculatorPage({ user, onLogout }: PromoCalculatorP
                     boxShadow: "0 24px 60px -20px hsla(43,88%,56%,0.3)",
                   }}
                 >
-                  <Sparkles className="w-12 h-12" style={{ color: "hsl(var(--gold))" }} />
+                  <Sparkles className="w-7 h-7 sm:w-10 sm:h-10 lg:w-12 lg:h-12" style={{ color: "hsl(var(--gold))" }} />
                 </div>
-                <h2 className="text-3xl font-black tracking-tight mb-3 leading-tight">
-                  Подберите идеальный <br />
-                  <span className="text-premium">абонемент для клиента</span>
+                <h2 className="text-base sm:text-2xl lg:text-3xl font-black tracking-tight mb-2 lg:mb-3 leading-tight">
+                  <span className="lg:hidden">Выберите услуги выше</span>
+                  <span className="hidden lg:inline">
+                    Подберите идеальный <br />
+                    <span className="text-premium">абонемент для клиента</span>
+                  </span>
                 </h2>
-                <p className="text-muted-foreground text-sm leading-relaxed">
-                  Соберите курс из нужных зон в левой панели — мы покажем три варианта пакетов с прозрачным расчётом скидки, рассрочки и подарочных сеансов
+                <p className="text-muted-foreground text-xs sm:text-sm leading-relaxed">
+                  <span className="lg:hidden">Добавьте зоны в блоке выше — и появятся три варианта абонемента со скидкой и рассрочкой.</span>
+                  <span className="hidden lg:inline">Соберите курс из нужных зон в левой панели — мы покажем три варианта пакетов с прозрачным расчётом скидки, рассрочки и подарочных сеансов</span>
                 </p>
               </div>
             </div>

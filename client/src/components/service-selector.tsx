@@ -219,12 +219,12 @@ export default function ServiceSelector({
     ? Math.max(...selectedServices.map(s => s.sessionCount || 10))
     : 10;
   if (isLoading) {
-    return <div className="animate-pulse bg-gray-200 h-16 lg:h-20 rounded-xl"></div>;
+    return <div className="animate-pulse h-16 lg:h-20 rounded-xl" style={{ background: "hsla(220, 30%, 14%, 0.6)" }}></div>;
   }
 
   return (
     <div>
-      <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-2">Зоны для процедур</label>
+      <label className="block text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-2">Зоны для процедур</label>
       
       {/* Service Selection */}
       <div className="relative mb-2 z-50" ref={dropdownRef}>
@@ -246,81 +246,78 @@ export default function ServiceSelector({
                 setIsOpen(true);
                 updateDropdownPosition();
               }}
-              className="input-premium text-xs h-7 pr-8 pl-8 transition-all duration-200 focus:ring-2 focus:ring-purple-500/20 focus:border-purple-400"
+              className="input-premium text-xs h-9 sm:h-8 pr-8 pl-8 transition-all duration-200"
             />
             <div className="absolute left-2 top-1/2 transform -translate-y-1/2 pointer-events-none">
-              <Search className="h-3 w-3 text-gray-400 group-focus-within:text-purple-500 transition-colors" />
+              <Search className="h-3.5 w-3.5 text-muted-foreground group-focus-within:text-[hsl(var(--gold))] transition-colors" />
             </div>
             <div className="absolute right-2 top-1/2 transform -translate-y-1/2 pointer-events-none">
-              <ChevronDown className={`h-3 w-3 text-gray-400 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
+              <ChevronDown className={`h-3.5 w-3.5 text-muted-foreground transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
             </div>
           </div>
         </div>
         
         {isOpen && dropdownPosition && createPortal(
-          <div 
+          <div
             data-dropdown-portal
-            className="fixed z-[99999] bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl backdrop-blur-sm max-h-[280px] overflow-hidden animate-in slide-in-from-top-2 duration-200"
+            className="fixed z-[99999] rounded-xl shadow-2xl backdrop-blur-xl overflow-hidden animate-in slide-in-from-top-2 duration-200"
             style={{
               top: `${dropdownPosition.top}px`,
               left: `${dropdownPosition.left}px`,
-              width: `${dropdownPosition.width}px`
+              width: `${dropdownPosition.width}px`,
+              maxHeight: "min(60vh, 320px)",
+              background: "linear-gradient(160deg, hsla(222, 38%, 11%, 0.98) 0%, hsla(220, 36%, 7%, 0.96) 100%)",
+              border: "1px solid hsla(43, 88%, 56%, 0.25)",
             }}
           >
-            <div className="overflow-y-auto max-h-[280px] beautiful-scroll">
+            <div className="overflow-y-auto custom-scrollbar" style={{ maxHeight: "min(60vh, 320px)" }}>
               {filteredServices.length === 0 ? (
                 <div className="p-6 text-center">
-                  <Search className="h-8 w-8 text-gray-300 mx-auto mb-2" />
-                  <div className="text-sm text-gray-500">
-                    {searchTerm ? "Услуги не найдены" : selectedServices.length > 0 ? "Добавить еще услуги" : "Начните вводить название услуги"}
+                  <Search className="h-8 w-8 text-muted-foreground/40 mx-auto mb-2" />
+                  <div className="text-sm text-muted-foreground">
+                    {searchTerm ? "Услуги не найдены" : selectedServices.length > 0 ? "Добавить ещё услуги" : "Начните вводить название услуги"}
                   </div>
                   {searchTerm && (
-                    <div className="text-xs text-gray-400 mt-1">
+                    <div className="text-xs text-muted-foreground/60 mt-1">
                       Попробуйте изменить поисковый запрос
                     </div>
                   )}
                 </div>
               ) : (
-                <div className="p-2">
-                  {filteredServices.slice(0, 20).map((service, index) => (
+                <div className="p-1.5">
+                  {filteredServices.slice(0, 20).map((service) => (
                     <div
                       key={service.yclientsId}
-                      className="group/item flex items-center justify-between p-2 rounded-lg cursor-pointer hover:bg-gradient-to-r hover:from-purple-50 hover:to-indigo-50 dark:hover:from-purple-900/20 dark:hover:to-indigo-900/20 transition-all duration-200 hover:shadow-sm"
+                      className="group/item flex items-center justify-between px-2.5 py-2 rounded-lg cursor-pointer transition-colors active:bg-[hsla(43,88%,56%,0.18)] hover:bg-[hsla(43,88%,56%,0.10)]"
                       onMouseDown={(e) => {
                         e.preventDefault();
                         e.stopPropagation();
                         addService(service);
                       }}
-                      style={{
-                        animationDelay: `${index * 50}ms`
+                      onTouchStart={(e) => {
+                        e.stopPropagation();
+                        addService(service);
                       }}
                     >
-                      <div className="flex items-center min-w-0 flex-1">
-                        <div className="w-1.5 h-1.5 rounded-full bg-gradient-to-r from-purple-400 to-indigo-400 mr-2 opacity-60 group-hover/item:opacity-100 transition-opacity" />
-                        <div className="min-w-0 flex-1">
-                          <div className="text-xs font-medium text-gray-900 dark:text-white truncate group-hover/item:text-purple-700 dark:group-hover/item:text-purple-300 transition-colors">
-                            {service.title}
-                          </div>
+                      <div className="flex items-center min-w-0 flex-1 gap-2">
+                        <div className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: "hsl(var(--gold))", opacity: 0.6 }} />
+                        <div className="text-xs sm:text-[13px] font-medium text-foreground/90 truncate group-hover/item:text-[hsl(var(--gold))] transition-colors">
+                          {service.title}
                         </div>
                       </div>
-                      <div className="flex items-center ml-1">
-                        <div className="bg-gradient-to-r from-purple-100 to-indigo-100 dark:from-purple-900/30 dark:to-indigo-900/30 px-1.5 py-0.5 rounded-full">
-                          <span className="text-xs font-semibold text-purple-700 dark:text-purple-300">
-                            {parseFloat(service.priceMin).toLocaleString()} ₽
-                          </span>
-                        </div>
-                        <Plus className="h-3 w-3 text-gray-400 ml-1 group-hover/item:text-purple-500 transition-colors" />
+                      <div className="flex items-center gap-1.5 ml-2 flex-shrink-0">
+                        <span className="text-[11px] font-semibold px-2 py-0.5 rounded-md"
+                              style={{ background: "hsla(43,88%,56%,0.12)", color: "hsl(var(--gold))", border: "1px solid hsla(43,88%,56%,0.25)" }}>
+                          {parseFloat(service.priceMin).toLocaleString()} ₽
+                        </span>
+                        <Plus className="h-3.5 w-3.5 text-muted-foreground group-hover/item:text-[hsl(var(--gold))] transition-colors" />
                       </div>
                     </div>
                   ))}
                   {filteredServices.length > 20 && (
-                    <div className="p-3 text-xs text-gray-500 text-center border-t border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/50">
-                      <div className="flex items-center justify-center gap-2">
-                        <div className="w-1 h-1 rounded-full bg-gray-400" />
-                        <span>Показано 20 из {filteredServices.length} услуг</span>
-                        <div className="w-1 h-1 rounded-full bg-gray-400" />
-                      </div>
-                      <div className="text-xs text-gray-400 mt-1">Уточните поиск для лучших результатов</div>
+                    <div className="p-2.5 text-[11px] text-muted-foreground text-center border-t mt-1"
+                         style={{ borderColor: "hsl(var(--border))" }}>
+                      Показано 20 из {filteredServices.length} — уточните поиск
                     </div>
                   )}
                 </div>
@@ -332,32 +329,32 @@ export default function ServiceSelector({
       </div>
       
       {/* Selected Services */}
-      <div className="space-y-1">
-        {selectedServices.map((service) => (
+      <div className="space-y-1.5">
+        {selectedServices.map((service) => {
+          const isFree = freeZones.some((zone) => zone.serviceId === service.yclientsId);
+          return (
           <div
             key={service.yclientsId}
-            className={`flex items-center justify-between rounded-lg p-1.5 cursor-pointer transition-colors border ${
-              freeZones.some(zone => zone.serviceId === service.yclientsId) 
-                ? 'bg-pink-50 border-pink-200 dark:bg-pink-950 dark:border-pink-800' 
-                : 'bg-gray-50 dark:bg-gray-800 border-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700'
-            }`}
+            className="flex items-center justify-between rounded-lg px-2.5 py-2 cursor-pointer transition-colors"
+            style={
+              isFree
+                ? { background: "hsla(330, 70%, 55%, 0.10)", border: "1px solid hsla(330, 70%, 55%, 0.35)" }
+                : { background: "hsla(220, 30%, 10%, 0.55)", border: "1px solid hsl(var(--border))" }
+            }
             onDoubleClick={() => handleDoubleClick(service)}
-            title={freeZones.some(zone => zone.serviceId === service.yclientsId) 
-              ? "Эта услуга добавлена как бесплатная зона" 
+            title={isFree
+              ? "Эта услуга добавлена как бесплатная зона"
               : "Двойной клик для добавления бесплатной зоны"
             }
           >
             <div className="flex items-center justify-between min-w-0 flex-1">
-              <div className="flex items-center gap-1">
-                <span className={`text-xs font-medium truncate mr-2 ${
-                  freeZones.some(zone => zone.serviceId === service.yclientsId)
-                    ? 'text-pink-700 dark:text-pink-300'
-                    : 'text-gray-900 dark:text-white'
-                }`}>
+              <div className="flex items-center gap-1.5 min-w-0">
+                <span className="text-xs font-medium truncate mr-2"
+                      style={{ color: isFree ? "hsl(330, 70%, 75%)" : "hsl(var(--foreground) / 0.9)" }}>
                   {service.title}
                 </span>
-                {freeZones.some(zone => zone.serviceId === service.yclientsId) && (
-                  <Gift className="w-3 h-3 text-pink-500" />
+                {isFree && (
+                  <Gift className="w-3 h-3 flex-shrink-0" style={{ color: "hsl(330, 70%, 70%)" }} />
                 )}
               </div>
               <div className="flex items-center gap-1 flex-shrink-0">
@@ -384,17 +381,24 @@ export default function ServiceSelector({
                     <span className="text-xs text-gray-500">₽</span>
                   </>
                 ) : (
-                  <span 
-                    className={`text-xs cursor-pointer hover:bg-gray-200 px-1 py-0.5 rounded transition-colors ${
-                      freeZones.some(zone => zone.serviceId === service.yclientsId)
-                        ? 'text-pink-600 font-semibold line-through'
-                        : service.customPrice 
-                          ? 'text-purple-600 font-semibold' 
-                          : 'text-gray-500 dark:text-gray-400'
+                  <span
+                    className={`text-xs px-1.5 py-0.5 rounded transition-colors ${
+                      isFree
+                        ? 'font-semibold line-through cursor-default'
+                        : service.customPrice
+                          ? 'font-semibold cursor-pointer hover:bg-white/5'
+                          : 'text-muted-foreground cursor-pointer hover:bg-white/5'
                     }`}
+                    style={{
+                      color: isFree
+                        ? "hsl(330, 70%, 70%)"
+                        : service.customPrice
+                          ? "hsl(var(--gold))"
+                          : undefined,
+                    }}
                     onClick={(e) => {
                       e.stopPropagation();
-                      if (!freeZones.some(zone => zone.serviceId === service.yclientsId)) {
+                      if (!isFree) {
                         startEditingPrice(service.yclientsId, getCurrentPrice(service));
                       }
                     }}
@@ -412,12 +416,12 @@ export default function ServiceSelector({
               variant="ghost"
               size="sm"
               onClick={() => removeService(service.yclientsId)}
-              className="text-red-500 hover:text-red-700 p-1 flex-shrink-0 h-6 w-6"
+              className="text-muted-foreground hover:text-red-400 p-1 flex-shrink-0 h-7 w-7"
             >
-              <X size={12} />
+              <X size={14} />
             </Button>
           </div>
-        ))}
+        );})}
       </div>
 
       {/* Session count configuration for all services */}
