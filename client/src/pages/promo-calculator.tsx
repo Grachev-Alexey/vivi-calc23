@@ -157,13 +157,6 @@ export default function PromoCalculatorPage({
           <div className="flex-1 overflow-y-auto space-y-1 lg:space-y-1.5 pr-1 custom-left-scrollbar max-h-[40vh] lg:max-h-none">
             {/* Service selection card with special offer badge - компактная версия */}
             <div className="bg-white dark:bg-gray-900 rounded-lg p-2 border border-gray-200">
-              {/* Special offer badge inside the card */}
-              <div className="text-center mb-2">
-                <Badge className="bg-gradient-to-r from-pink-400 to-orange-400 text-white px-2 py-0.5 text-xs font-medium border-0 shadow-none">
-                  <Sparkles className="w-3 h-3 mr-1" />
-                  Спецпредложение гостевого дня
-                </Badge>
-              </div>
               <h3 className="text-xs font-bold text-gray-900 dark:text-white mb-2">
                 Выбор услуг
               </h3>
