@@ -168,12 +168,9 @@ export default function ThreeBlockComparison({
   const computeMonthly = (t: string): number => {
     const pkgData = getPackageData(t);
     if (!pkgData || t === "vip") return 0;
-    if (selectedPackage === t) {
-      return Math.round(Math.max(0, (pkgData.finalCost - downPayment)) / Math.max(1, installmentMonths));
-    }
-    const months = Math.min(...(calculatorSettings?.installmentMonthsOptions || [1]));
-    const dp = computeDownForPkg(t);
-    return Math.round(Math.max(0, pkgData.finalCost - dp) / Math.max(1, months));
+    const months = Math.max(1, installmentMonths);
+    const dp = selectedPackage === t ? downPayment : computeDownForPkg(t);
+    return Math.round(Math.max(0, pkgData.finalCost - dp) / months);
   };
 
   if (!hasValidCalculation) {
@@ -342,7 +339,7 @@ export default function ThreeBlockComparison({
 
             {/* Highlights row */}
             <div className="px-5 pb-3 flex flex-wrap gap-1.5">
-              {procedureCount >= 10 && (
+              {procedureCount >= 10 && (giftSessions > 0 || editingGift === type) && (
                 <div
                   className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold cursor-pointer transition-colors hover:bg-white/5"
                   style={{ background: "hsla(43,88%,56%,0.1)", border: "1px solid hsla(43,88%,56%,0.35)", color: "hsl(var(--gold))" }}
@@ -378,7 +375,7 @@ export default function ThreeBlockComparison({
                       className="w-8 bg-transparent text-center outline-none text-[11px] font-bold"
                     />
                   ) : (
-                    <span>+{giftSessions} {giftSessions === 1 ? "сеанс" : giftSessions < 5 ? "сеанса" : "сеансов"} в подарок</span>
+                    <span>+{giftSessions} {giftSessions % 10 === 1 && giftSessions % 100 !== 11 ? "сеанс" : (giftSessions % 10 >= 2 && giftSessions % 10 <= 4 && (giftSessions % 100 < 12 || giftSessions % 100 > 14)) ? "сеанса" : "сеансов"} в подарок</span>
                   )}
                 </div>
               )}

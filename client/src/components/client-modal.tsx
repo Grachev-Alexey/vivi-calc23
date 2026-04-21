@@ -265,42 +265,58 @@ export default function ClientModal({
 
   const paymentSchedule = generatePaymentSchedule();
 
+  const isWide = !!(selectedPackage && selectedPackage !== 'vip' && !isCompleted);
+
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className={`${selectedPackage && selectedPackage !== 'vip' && !isCompleted ? 'max-w-3xl' : 'sm:max-w-md'}`}>
+      <DialogContent
+        className={`${isWide ? 'max-w-3xl' : 'sm:max-w-md'} max-h-[90vh] overflow-y-auto custom-scrollbar`}
+        style={{
+          background: "linear-gradient(160deg, hsla(222, 42%, 11%, 0.98), hsla(220, 40%, 7%, 0.98))",
+          border: "1px solid hsla(43, 88%, 56%, 0.25)",
+          boxShadow: "0 24px 60px -16px rgba(0,0,0,0.7)",
+        }}
+      >
         <DialogHeader>
-          <div className="flex items-center justify-center mb-3">
-            <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
-              isCompleted 
-                ? "bg-gradient-to-r from-green-500 to-green-600" 
-                : "bg-gradient-to-r from-pink-500 to-pink-600"
-            }`}>
+          <div className="flex items-center justify-center mb-2">
+            <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${
+              isCompleted
+                ? "bg-gradient-to-br from-green-500 to-green-600"
+                : ""
+            }`}
+              style={!isCompleted ? {
+                background: "linear-gradient(135deg, hsl(43, 95%, 65%), hsl(36, 80%, 45%))",
+                boxShadow: "0 8px 22px -8px hsla(43,88%,56%,0.55)",
+              } : undefined}
+            >
               {isCompleted ? (
-                <CheckCircle className="text-white" size={20} />
+                <CheckCircle className="text-white" size={22} />
               ) : (
-                <User className="text-white" size={20} />
+                <User style={{ color: "hsl(var(--navy))" }} size={22} />
               )}
             </div>
           </div>
           {isCompleted && (
-            <DialogTitle className="text-center text-xl font-bold text-gray-900">
+            <DialogTitle className="text-center text-xl font-bold text-foreground">
               Абонемент создан!
             </DialogTitle>
           )}
         </DialogHeader>
-        
+
         {isCompleted ? (
           <div className="space-y-4">
-            <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-              <Label className="block text-sm font-medium text-gray-700 mb-2">
+            <div
+              className="rounded-xl p-4"
+              style={{
+                background: "hsla(140, 70%, 45%, 0.10)",
+                border: "1px solid hsla(140, 70%, 45%, 0.35)",
+              }}
+            >
+              <Label className="block text-sm font-medium text-foreground/85 mb-2">
                 Название абонемента:
               </Label>
               <div className="flex items-center gap-2">
-                <Input
-                  value={subscriptionTitle}
-                  readOnly
-                  className="flex-1 bg-white"
-                />
+                <Input value={subscriptionTitle} readOnly className="flex-1" />
                 <Button
                   type="button"
                   variant="outline"
@@ -312,41 +328,40 @@ export default function ClientModal({
                 </Button>
               </div>
             </div>
-            
+
             {offerSent && (
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <div className="flex items-center gap-2 text-blue-800">
-                  <CheckCircle className="w-5 h-5" />
-                  <span className="font-medium">Договор-оферта сформирован</span>
-                </div>
+              <div
+                className="rounded-xl p-3 flex items-center gap-2"
+                style={{
+                  background: "hsla(214, 92%, 56%, 0.10)",
+                  border: "1px solid hsla(214, 92%, 56%, 0.35)",
+                  color: "hsl(214, 95%, 80%)",
+                }}
+              >
+                <CheckCircle className="w-5 h-5" />
+                <span className="text-sm font-medium">Договор-оферта сформирован</span>
               </div>
             )}
-            
-            <Button
-              type="button"
-              onClick={handleClose}
-              className="w-full btn-primary"
-            >
+
+            <Button type="button" onClick={handleClose} className="w-full btn-premium">
               Закрыть
             </Button>
           </div>
         ) : (
-          <div className={`${selectedPackage && selectedPackage !== 'vip' ? 'grid grid-cols-2 gap-4' : ''}`}>
-            {/* Левая колонка - Данные клиента */}
-            <div className={selectedPackage && selectedPackage !== 'vip' ? '' : 'col-span-2'}>
-              <div className="border-b border-gray-200 pb-2 mb-3">
-                <h3 className="text-base font-semibold text-gray-900">Данные клиента</h3>
+          <div className={isWide ? 'grid grid-cols-1 md:grid-cols-2 gap-4' : ''}>
+            {/* Left column — client data */}
+            <div>
+              <div className="pb-2 mb-3" style={{ borderBottom: "1px solid hsl(var(--border))" }}>
+                <h3 className="text-base font-semibold text-foreground">
+                  {isAdmin ? "Настройки продажи" : "Данные клиента"}
+                </h3>
               </div>
-              
+
               <form onSubmit={handleSubmit} className="space-y-3">
                 {isAdmin && (
                   <>
-                    <div className="border-b border-gray-200 pb-2 mb-3">
-                      <h4 className="text-sm font-semibold text-gray-900">Настройки продажи</h4>
-                    </div>
-                    
                     <div>
-                      <Label htmlFor="saleDate" className="block text-sm font-medium text-gray-700 mb-1">
+                      <Label htmlFor="saleDate" className="block text-xs font-medium text-foreground/80 mb-1">
                         Дата продажи *
                       </Label>
                       <Input
@@ -354,17 +369,17 @@ export default function ClientModal({
                         type="date"
                         value={saleDate}
                         onChange={(e) => setSaleDate(e.target.value)}
-                        className="input-premium text-sm"
+                        className="text-sm"
                         required
                       />
                     </div>
 
                     <div>
-                      <Label htmlFor="masterId" className="block text-sm font-medium text-gray-700 mb-1">
+                      <Label htmlFor="masterId" className="block text-xs font-medium text-foreground/80 mb-1">
                         Мастер *
                       </Label>
                       <Select value={selectedMasterId?.toString()} onValueChange={(v) => setSelectedMasterId(Number(v))}>
-                        <SelectTrigger className="input-premium text-sm">
+                        <SelectTrigger className="text-sm">
                           <SelectValue placeholder="Выберите мастера" />
                         </SelectTrigger>
                         <SelectContent>
@@ -380,11 +395,11 @@ export default function ClientModal({
                     </div>
 
                     <div>
-                      <Label htmlFor="pdfVersion" className="block text-sm font-medium text-gray-700 mb-1">
+                      <Label htmlFor="pdfVersion" className="block text-xs font-medium text-foreground/80 mb-1">
                         Версия договора *
                       </Label>
                       <Select value={pdfVersion} onValueChange={(v) => setPdfVersion(v as 'standard' | 'amendment')}>
-                        <SelectTrigger className="input-premium text-sm">
+                        <SelectTrigger className="text-sm">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -394,28 +409,28 @@ export default function ClientModal({
                       </Select>
                     </div>
 
-                    <div className="border-b border-gray-200 pb-2 mb-3 mt-4">
-                      <h4 className="text-sm font-semibold text-gray-900">Данные клиента</h4>
+                    <div className="pb-2 mb-1 mt-4" style={{ borderBottom: "1px solid hsl(var(--border))" }}>
+                      <h4 className="text-sm font-semibold text-foreground">Данные клиента</h4>
                     </div>
                   </>
                 )}
-                
+
                 <div>
-                  <Label htmlFor="clientName" className="block text-sm font-medium text-gray-700 mb-1">
+                  <Label htmlFor="clientName" className="block text-xs font-medium text-foreground/80 mb-1">
                     ФИО клиента *
                   </Label>
                   <Input
                     id="clientName"
                     value={clientName}
                     onChange={(e) => setClientName(e.target.value)}
-                    className="input-premium text-sm"
+                    className="text-sm"
                     placeholder="Иванов Иван Иванович"
                     required
                   />
                 </div>
-                
+
                 <div>
-                  <Label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
+                  <Label htmlFor="phone" className="block text-xs font-medium text-foreground/80 mb-1">
                     Номер телефона *
                   </Label>
                   <PhoneInput
@@ -426,8 +441,8 @@ export default function ClientModal({
                     required
                   />
                 </div>
-                
-                <div className="flex gap-3 pt-3">
+
+                <div className="flex flex-col-reverse sm:flex-row gap-2 pt-3">
                   <Button
                     type="button"
                     variant="outline"
@@ -439,7 +454,7 @@ export default function ClientModal({
                   </Button>
                   <Button
                     type="submit"
-                    className="flex-1 btn-primary h-9 text-sm"
+                    className="flex-1 btn-premium h-9 text-sm"
                     disabled={loading || (isAdmin && !selectedMasterId)}
                   >
                     {loading ? (
@@ -455,49 +470,62 @@ export default function ClientModal({
               </form>
             </div>
 
-            {/* Правая колонка - График платежей (только для стандарт/эконом) */}
+            {/* Right column — payment schedule (only for standard/economy) */}
             {selectedPackage && selectedPackage !== 'vip' && paymentSchedule.length > 0 && (
               <div>
-                <div className="border-b border-gray-200 pb-2 mb-3">
+                <div className="pb-2 mb-3" style={{ borderBottom: "1px solid hsl(var(--border))" }}>
                   <div className="flex items-center gap-2">
-                    <Calendar className="w-4 h-4 text-pink-600" />
-                    <h3 className="text-base font-semibold text-gray-900">График платежей</h3>
+                    <Calendar className="w-4 h-4" style={{ color: "hsl(var(--gold))" }} />
+                    <h3 className="text-base font-semibold text-foreground">График платежей</h3>
                   </div>
                 </div>
-                
-                <div className="space-y-2">
+
+                <div className="space-y-1.5">
                   {paymentSchedule.map((payment, index) => (
-                    <div key={index} className="flex items-center justify-between p-2 bg-pink-50 rounded border border-pink-200">
-                      <div className="flex items-center gap-2">
-                        <div className="w-5 h-5 bg-pink-100 rounded-full flex items-center justify-center">
-                          <span className="text-xs font-bold text-pink-600">{index + 1}</span>
+                    <div
+                      key={index}
+                      className="flex items-center justify-between p-2.5 rounded-lg"
+                      style={{
+                        background: "hsla(220, 30%, 10%, 0.55)",
+                        border: "1px solid hsl(var(--border))",
+                      }}
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <div
+                          className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0"
+                          style={{
+                            background: "linear-gradient(135deg, hsla(43,88%,56%,0.25), hsla(43,80%,40%,0.15))",
+                            border: "1px solid hsla(43,88%,56%,0.4)",
+                          }}
+                        >
+                          <span className="text-[10px] font-bold" style={{ color: "hsl(var(--gold))" }}>
+                            {index + 1}
+                          </span>
                         </div>
                         <div>
-                          <div className="text-xs font-medium text-gray-900">
-                            {payment.description}
-                          </div>
-                          <div className="text-xs text-gray-500">
-                            {payment.date.toLocaleDateString('ru-RU', {
-                              day: '2-digit',
-                              month: '2-digit'
-                            })}
+                          <div className="text-xs font-medium text-foreground">{payment.description}</div>
+                          <div className="text-[10px] text-muted-foreground">
+                            {payment.date.toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: '2-digit' })}
                           </div>
                         </div>
                       </div>
-                      <div className="text-xs font-bold text-pink-600">
+                      <div className="text-sm font-bold" style={{ color: "hsl(var(--gold))" }}>
                         {formatPrice(payment.amount)}
                       </div>
                     </div>
                   ))}
                 </div>
-                
-                {/* Итого */}
-                <div className="mt-2 pt-2 border-t border-pink-200 bg-pink-50 rounded p-2">
-                  <div className="flex items-center justify-between">
-                    <div className="text-xs font-semibold text-gray-900">Итого:</div>
-                    <div className="text-sm font-bold text-pink-600">
-                      {formatPrice(paymentSchedule.reduce((sum, payment) => sum + payment.amount, 0))}
-                    </div>
+
+                <div
+                  className="mt-2 p-2.5 rounded-lg flex items-center justify-between"
+                  style={{
+                    background: "linear-gradient(135deg, hsla(43,88%,56%,0.12), hsla(43,80%,40%,0.06))",
+                    border: "1px solid hsla(43,88%,56%,0.4)",
+                  }}
+                >
+                  <div className="text-xs font-semibold text-foreground/85">Итого</div>
+                  <div className="text-sm font-black" style={{ color: "hsl(var(--gold))" }}>
+                    {formatPrice(paymentSchedule.reduce((sum, payment) => sum + payment.amount, 0))}
                   </div>
                 </div>
               </div>

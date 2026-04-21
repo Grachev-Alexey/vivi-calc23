@@ -52,7 +52,6 @@ export default function ServiceSelector({
   const [tempPrice, setTempPrice] = useState<string>("");
   const [editingSessionCount, setEditingSessionCount] = useState<number | null>(null);
   const [tempSessionCount, setTempSessionCount] = useState<string>("");
-  const [isMalePricing, setIsMalePricing] = useState<boolean>(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   
@@ -78,12 +77,6 @@ export default function ServiceSelector({
       service.priceMin.includes(searchTerm)
     );
 
-  // Helper function to get adjusted price based on male pricing
-  const getAdjustedPrice = (basePrice: string | number) => {
-    const price = typeof basePrice === 'string' ? parseFloat(basePrice) : basePrice;
-    return isMalePricing ? Math.round(price * 1.4) : price;
-  };
-
   // Update dropdown position when opening
   const updateDropdownPosition = () => {
     if (dropdownRef.current) {
@@ -99,13 +92,13 @@ export default function ServiceSelector({
   const addService = (service: Service) => {
     const existingService = selectedServices.find(s => s.yclientsId === service.yclientsId);
     if (existingService) return;
-    
-    const adjustedPrice = getAdjustedPrice(service.priceMin);
-    
+
+    const basePrice = parseFloat(service.priceMin);
+
     const newService: SelectedService = {
       ...service,
-      priceMin: adjustedPrice.toString(),
-      customPrice: adjustedPrice.toString(),
+      priceMin: basePrice.toString(),
+      customPrice: basePrice.toString(),
       quantity: 1,
       sessionCount: 10 // По умолчанию 10 процедур
     };
@@ -141,33 +134,6 @@ export default function ServiceSelector({
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
-
-  // Update all selected services when male pricing toggle changes
-  const handleMalePricingToggle = (enabled: boolean) => {
-    setIsMalePricing(enabled);
-    
-    // Update prices for all selected services
-    const updatedServices = selectedServices.map(service => {
-      const originalPrice = service.customPrice ? parseFloat(service.customPrice) : parseFloat(service.priceMin);
-      let newPrice;
-      
-      if (enabled) {
-        // If enabling male pricing, increase by 40%
-        newPrice = isMalePricing ? originalPrice : Math.round(originalPrice * 1.4);
-      } else {
-        // If disabling male pricing, decrease by ~28.57% (reverse of 40% increase)
-        newPrice = isMalePricing ? Math.round(originalPrice / 1.4) : originalPrice;
-      }
-      
-      return {
-        ...service,
-        customPrice: newPrice.toString(),
-        editedPrice: newPrice.toString()
-      };
-    });
-    
-    onServicesChange(updatedServices);
-  };
 
   const removeService = (yclientsId: number) => {
     onServicesChange(selectedServices.filter(s => s.yclientsId !== yclientsId));
@@ -316,24 +282,6 @@ export default function ServiceSelector({
                 </div>
               ) : (
                 <div className="p-2">
-                  {/* Male Pricing Toggle - Pink Style */}
-                  <div className="mb-3 p-2 bg-gradient-to-r from-pink-50 to-rose-50 dark:from-pink-900/20 dark:to-rose-900/20 rounded-lg border border-pink-200 dark:border-pink-700">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs font-medium text-pink-700 dark:text-pink-300">Мужской прайс</span>
-                      </div>
-                      <label className="relative inline-flex items-center cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={isMalePricing}
-                          onChange={(e) => handleMalePricingToggle(e.target.checked)}
-                          className="sr-only peer"
-                        />
-                        <div className="w-7 h-4 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[1px] after:left-[1px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all dark:border-gray-600 peer-checked:bg-pink-500"></div>
-                      </label>
-                    </div>
-                  </div>
-
                   {filteredServices.slice(0, 20).map((service, index) => (
                     <div
                       key={service.yclientsId}
@@ -358,7 +306,7 @@ export default function ServiceSelector({
                       <div className="flex items-center ml-1">
                         <div className="bg-gradient-to-r from-purple-100 to-indigo-100 dark:from-purple-900/30 dark:to-indigo-900/30 px-1.5 py-0.5 rounded-full">
                           <span className="text-xs font-semibold text-purple-700 dark:text-purple-300">
-                            {getAdjustedPrice(service.priceMin).toLocaleString()} ₽
+                            {parseFloat(service.priceMin).toLocaleString()} ₽
                           </span>
                         </div>
                         <Plus className="h-3 w-3 text-gray-400 ml-1 group-hover/item:text-purple-500 transition-colors" />
@@ -476,9 +424,16 @@ export default function ServiceSelector({
       {selectedServices.length > 0 && (
         <div className="mt-2 space-y-2">
           {selectedServices.map((service) => (
-            <div key={`session-${service.yclientsId}`} className="bg-gray-50 dark:bg-gray-800 rounded-lg p-2 border border-gray-200">
-              <div className="flex items-center justify-between mb-1">
-                <span className="text-xs text-gray-600 dark:text-gray-400 truncate mr-2">{service.title}</span>
+            <div
+              key={`session-${service.yclientsId}`}
+              className="rounded-lg p-2.5"
+              style={{
+                background: "hsla(220, 30%, 10%, 0.55)",
+                border: "1px solid hsl(var(--border))",
+              }}
+            >
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs font-medium text-foreground/85 truncate mr-2">{service.title}</span>
                 <div className="flex items-center gap-1">
                   {editingSessionCount === service.yclientsId ? (
                     <input
@@ -497,39 +452,45 @@ export default function ServiceSelector({
                       }}
                       autoFocus
                       onFocus={(e) => e.target.select()}
-                      className="w-8 text-xs text-center border border-gray-300 dark:border-gray-600 rounded px-1 py-0.5 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-purple-500"
+                      className="w-9 text-xs text-center rounded px-1 py-0.5 focus:outline-none focus:ring-1 focus:ring-[hsl(var(--gold))]"
                     />
                   ) : (
-                    <span 
-                      className="text-xs font-bold text-purple-600 cursor-pointer hover:bg-purple-50 dark:hover:bg-purple-900/20 px-1 py-0.5 rounded transition-colors"
+                    <span
+                      className="text-xs font-bold cursor-pointer hover:bg-white/5 px-1.5 py-0.5 rounded transition-colors"
+                      style={{ color: "hsl(var(--gold))" }}
                       onClick={() => startEditingSessionCount(service.yclientsId, service.sessionCount || 10)}
                       title="Нажмите для изменения"
                     >
                       {service.sessionCount || 10}
                     </span>
                   )}
-                  <span className="text-xs text-gray-500">процедур</span>
+                  <span className="text-[11px] text-muted-foreground">процедур</span>
                 </div>
               </div>
-              
+
               <RangeSlider
                 min={1}
                 max={20}
                 value={service.sessionCount || 10}
                 onChange={(value) => updateSessionCount(service.yclientsId, value)}
-                className="dark:bg-gray-700"
                 showLabels={false}
               />
-              
             </div>
           ))}
-          
+
           {/* Общее сообщение о бонусной скидке после всех слайдеров */}
-          {maxSessionCount >= 15 && (
-            <div className="mt-2 p-2 bg-pink-50 rounded-lg border border-pink-200">
-              <div className="flex items-center justify-center text-xs text-pink-700">
-                + дополнительная скидка {((calculatorSettings?.bulkDiscountPercentage || 0.05) * 100).toFixed(1)}%
-              </div>
+          {maxSessionCount >= (calculatorSettings?.bulkDiscountThreshold || 15) && (
+            <div
+              className="mt-2 px-3 py-2 rounded-lg flex items-center justify-center gap-2"
+              style={{
+                background: "linear-gradient(135deg, hsla(43,88%,56%,0.10), hsla(43,80%,40%,0.06))",
+                border: "1px solid hsla(43,88%,56%,0.35)",
+              }}
+            >
+              <Gift className="w-3.5 h-3.5" style={{ color: "hsl(var(--gold))" }} />
+              <span className="text-[11px] font-semibold" style={{ color: "hsl(var(--gold))" }}>
+                +{((calculatorSettings?.bulkDiscountPercentage || 0.05) * 100).toFixed(1)}% за объём ({maxSessionCount}+ процедур)
+              </span>
             </div>
           )}
         </div>
