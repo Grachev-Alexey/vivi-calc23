@@ -211,7 +211,7 @@ function CalculatorSettings({ loading, setLoading }: { loading: boolean; setLoad
               </p>
             </div>
 
-            <Button onClick={saveSettings} disabled={loading} className="w-full">
+            <Button onClick={saveSettings} disabled={loading} className="btn-primary w-full">
               {loading ? "Сохранение..." : "Сохранить настройки"}
             </Button>
           </div>
@@ -798,7 +798,7 @@ function UsersManagement() {
                   <SelectItem value="admin">Администратор</SelectItem>
                 </SelectContent>
               </Select>
-              <Button onClick={createUser} disabled={loading}>
+              <Button onClick={createUser} disabled={loading} className="btn-primary">
                 Создать
               </Button>
             </div>
@@ -834,7 +834,7 @@ function UsersManagement() {
                         checked={editingUser.isActive}
                         onCheckedChange={(checked) => setEditingUser({ ...editingUser, isActive: checked })}
                       />
-                      <Button onClick={() => updateUser(editingUser)} size="sm">
+                      <Button onClick={() => updateUser(editingUser)} size="sm" className="btn-primary">
                         Сохранить
                       </Button>
                       <Button onClick={() => setEditingUser(null)} variant="outline" size="sm">
