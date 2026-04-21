@@ -408,25 +408,31 @@ export default function AdminPage({ user, onLogout }: AdminPageProps) {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
-      <header className="bg-white shadow-sm border-b">
+    <div className="min-h-screen flex flex-col promo-background">
+      <header className="header-card">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
             <div className="flex items-center gap-3">
-              <Settings className="text-blue-600" size={24} />
-              <h1 className="text-xl font-semibold text-gray-900">
-                Панель администратора
-              </h1>
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: "var(--gradient-premium)", boxShadow: "var(--shadow-gold)" }}>
+                <Settings className="w-5 h-5" style={{ color: "hsl(var(--navy))" }} />
+              </div>
+              <div>
+                <div className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">ENSO Studio</div>
+                <h1 className="text-lg font-bold leading-tight">
+                  <span className="text-premium">Панель администратора</span>
+                </h1>
+              </div>
             </div>
-            <div className="flex items-center gap-4">
-              <span className="text-sm text-gray-600">
-                {user.name} ({user.role === 'admin' ? 'Администратор' : 'Мастер'})
+            <div className="flex items-center gap-3">
+              <span className="text-sm text-muted-foreground" data-testid="text-user-info">
+                {user.name} <span className="opacity-60">·</span> {user.role === 'admin' ? 'Администратор' : 'Мастер'}
               </span>
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={onLogout}
-                className="p-2 text-gray-600 hover:text-gray-900"
+                className="rounded-lg"
+                data-testid="button-logout"
               >
                 <LogOut size={16} />
               </Button>
