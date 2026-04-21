@@ -182,8 +182,16 @@ export default function MasterSalesModal({ isOpen, onClose, masterName }: Master
             {isLoading ? (
               <div className="text-center py-8">Загрузка продаж...</div>
             ) : paginatedSales.length === 0 ? (
-              <div className="text-center py-8 text-muted-foreground">
-                {searchQuery ? "По вашему запросу ничего не найдено" : "У вас пока нет продаж"}
+              <div className="text-center py-12 space-y-2">
+                <Package className="h-10 w-10 mx-auto text-muted-foreground opacity-60" />
+                <div className="text-foreground font-medium">
+                  {searchQuery ? "По вашему запросу ничего не найдено" : "У вас пока нет продаж"}
+                </div>
+                {!searchQuery && (
+                  <div className="text-sm text-muted-foreground">
+                    Оформите первый абонемент через калькулятор — он появится здесь
+                  </div>
+                )}
               </div>
             ) : (
               <>

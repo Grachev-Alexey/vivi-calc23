@@ -112,19 +112,22 @@ const availableIcons = [
   { name: 'Settings', component: Settings, label: 'Настройки' }
 ];
 
-// Predefined colors
+// Predefined colors — оптимизированы для тёмной темы (без чёрного, который не виден)
 const colorOptions = [
-  { value: '#000000', label: 'Черный' },
-  { value: '#8B5CF6', label: 'Фиолетовый' },
-  { value: '#3B82F6', label: 'Синий' },
-  { value: '#10B981', label: 'Зеленый' },
-  { value: '#F59E0B', label: 'Оранжевый' },
-  { value: '#EF4444', label: 'Красный' },
-  { value: '#EC4899', label: 'Розовый' },
-  { value: '#6B7280', label: 'Серый' },
-  { value: '#D97706', label: 'Янтарный' },
-  { value: '#059669', label: 'Изумрудный' }
+  { value: '#F5C44E', label: 'Золотой' },
+  { value: '#FFFFFF', label: 'Белый' },
+  { value: '#A78BFA', label: 'Фиолетовый' },
+  { value: '#60A5FA', label: 'Синий' },
+  { value: '#34D399', label: 'Зеленый' },
+  { value: '#FBBF24', label: 'Оранжевый' },
+  { value: '#F87171', label: 'Красный' },
+  { value: '#F472B6', label: 'Розовый' },
+  { value: '#9CA3AF', label: 'Серый' },
+  { value: '#FCD34D', label: 'Янтарный' },
+  { value: '#10D9A0', label: 'Изумрудный' }
 ];
+
+const DEFAULT_ICON_COLOR = '#F5C44E';
 
 export default function AdminPerks({ loading, setLoading }: AdminPerksProps) {
   const [perks, setPerks] = useState<Perk[]>([]);
@@ -134,7 +137,7 @@ export default function AdminPerks({ loading, setLoading }: AdminPerksProps) {
     name: '',
     description: '',
     icon: 'Check',
-    iconColor: '#000000',
+    iconColor: DEFAULT_ICON_COLOR,
     displayOrder: 0
   });
   const { toast } = useToast();
@@ -180,7 +183,7 @@ export default function AdminPerks({ loading, setLoading }: AdminPerksProps) {
       if (response.ok) {
         const createdPerk = await response.json();
         setPerks([...perks, createdPerk]);
-        setNewPerk({ name: '', description: '', icon: 'Check', iconColor: '#000000', displayOrder: 0 });
+        setNewPerk({ name: '', description: '', icon: 'Check', iconColor: DEFAULT_ICON_COLOR, displayOrder: 0 });
         
         // Create default values for all packages
         for (const packageType of packageTypes) {
@@ -319,7 +322,7 @@ export default function AdminPerks({ loading, setLoading }: AdminPerksProps) {
     const [numberValue, setNumberValue] = useState(currentValue?.numberValue?.toString() || '');
     const [tooltip, setTooltip] = useState(currentValue?.tooltip || '');
     const [customIcon, setCustomIcon] = useState(currentValue?.customIcon || 'none');
-    const [customIconColor, setCustomIconColor] = useState(currentValue?.customIconColor || '#000000');
+    const [customIconColor, setCustomIconColor] = useState(currentValue?.customIconColor || DEFAULT_ICON_COLOR);
     const [isHighlighted, setIsHighlighted] = useState(currentValue?.isHighlighted || false);
     const [isBest, setIsBest] = useState(currentValue?.isBest || false);
     
@@ -371,12 +374,12 @@ export default function AdminPerks({ loading, setLoading }: AdminPerksProps) {
 
     if (!editing) {
       return (
-        <div className="flex items-center justify-between p-2 border rounded">
-          <div className="flex items-center space-x-2">
+        <div className="flex items-center justify-between gap-2 p-3 border border-border rounded-lg bg-card/40 hover:border-primary/40 transition-colors">
+          <div className="flex items-center gap-2 min-w-0">
             {currentValue?.customIcon && currentValue.customIcon !== 'none' && currentValue.customIcon !== null && (
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <span style={{ color: currentValue.customIconColor || '#000000' }} className="cursor-help">
+                  <span style={{ color: currentValue.customIconColor || DEFAULT_ICON_COLOR }} className="cursor-help shrink-0">
                     {React.createElement((Icons as any)[currentValue.customIcon] || Check, { className: "h-4 w-4" })}
                   </span>
                 </TooltipTrigger>
@@ -387,25 +390,22 @@ export default function AdminPerks({ loading, setLoading }: AdminPerksProps) {
                 )}
               </Tooltip>
             )}
-            <span className={`text-sm ${currentValue?.isHighlighted ? 'font-bold text-purple-600 bg-purple-100 px-2 py-1 rounded' : ''}`}>
+            <span className={`text-sm truncate ${currentValue?.isHighlighted ? 'font-semibold text-primary' : 'text-foreground'}`}>
               {currentValue?.displayValue || 'Не задано'}
             </span>
             {currentValue?.isBest && (
-              <Badge className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-xs">Лучшее</Badge>
-            )}
-            {currentValue?.isHighlighted && (
-              <Badge variant="outline" className="text-xs border-purple-500 text-purple-600">Выделено</Badge>
+              <Badge className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-[10px] shrink-0">Лучшее</Badge>
             )}
           </div>
-          <Button variant="ghost" size="sm" onClick={() => setEditing(true)}>
-            <Edit className="h-3 w-3" />
+          <Button variant="ghost" size="sm" onClick={() => setEditing(true)} className="shrink-0">
+            <Edit className="h-3.5 w-3.5" />
           </Button>
         </div>
       );
     }
 
     return (
-      <div className="space-y-3 p-3 border rounded bg-gray-50">
+      <div className="space-y-4 p-4 border border-primary/30 rounded-lg bg-card shadow-md">
         <div className="grid grid-cols-2 gap-2">
           <div>
             <Label className="text-xs">Тип значения</Label>
@@ -552,7 +552,7 @@ export default function AdminPerks({ loading, setLoading }: AdminPerksProps) {
     };
 
     return (
-      <div className="space-y-3 p-3 border rounded bg-blue-50">
+      <div className="space-y-4 p-4 border border-primary/40 rounded-lg bg-card shadow-md">
         <div className="grid grid-cols-2 gap-2">
           <div>
             <Label className="text-xs">Название</Label>
@@ -763,10 +763,22 @@ export default function AdminPerks({ loading, setLoading }: AdminPerksProps) {
                       <PerkEditor perk={perk} />
                     )}
                     
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                       {perkValuesData.map(({ packageType, value }) => (
                         <div key={packageType} className="space-y-2">
-                          <h4 className="font-medium text-sm">{packageNames[packageType]}</h4>
+                          <div className="flex items-center gap-2">
+                            <Badge
+                              className={
+                                packageType === 'vip'
+                                  ? 'bg-gradient-to-r from-yellow-500 to-amber-600 text-white border-0'
+                                  : packageType === 'standard'
+                                  ? 'bg-blue-500/90 text-white border-0'
+                                  : 'bg-emerald-500/90 text-white border-0'
+                              }
+                            >
+                              {packageNames[packageType]}
+                            </Badge>
+                          </div>
                           <PerkValueEditor
                             perkId={perk.id}
                             packageType={packageType}
