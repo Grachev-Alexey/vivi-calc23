@@ -494,7 +494,7 @@ export default function PromoCalculatorPage({
                     calculatorSettings?.bulkDiscountThreshold || 15
                   }
                   bulkDiscountPercentage={
-                    calculatorSettings?.bulkDiscountPercentage || 0.025
+                    calculatorSettings?.bulkDiscountPercentage || 0.05
                   }
                   correctionPercent={correctionPercent}
                   manualGiftSessions={manualGiftSessions}

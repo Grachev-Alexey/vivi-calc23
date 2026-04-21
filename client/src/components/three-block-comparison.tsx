@@ -80,7 +80,7 @@ export default function ThreeBlockComparison({
   freeZones = [],
   selectedServices = [],
   bulkDiscountThreshold = 15,
-  bulkDiscountPercentage = 0.025,
+  bulkDiscountPercentage = 0.05,
   correctionPercent = 0,
   manualGiftSessions = {},
   onManualGiftSessionsChange,
@@ -544,7 +544,7 @@ export default function ThreeBlockComparison({
                 const minDownPaymentPercent = parseFloat(pkg.minDownPaymentPercent.toString());
                 const calculatedMinPayment = Math.round(packageData.finalCost * minDownPaymentPercent);
                 // Применяем абсолютный минимум из настроек
-                const absoluteMinimum = calculatorSettings?.minimumDownPayment || 25000;
+                const absoluteMinimum = calculatorSettings?.minimumDownPayment || 5000;
                 displayAmount = Math.max(calculatedMinPayment, absoluteMinimum);
               }
               // Если этот пакет выбран, показываем значение слайдера
@@ -555,7 +555,7 @@ export default function ThreeBlockComparison({
               else if (selectedPackage && packageData && pkg) {
                 const minDownPaymentPercent = parseFloat(pkg.minDownPaymentPercent.toString());
                 const calculatedMinPayment = Math.round(packageData.finalCost * minDownPaymentPercent);
-                const absoluteMinimum = calculatorSettings?.minimumDownPayment || 25000;
+                const absoluteMinimum = calculatorSettings?.minimumDownPayment || 5000;
                 displayAmount = Math.max(calculatedMinPayment, absoluteMinimum);
               }
             }
@@ -583,7 +583,7 @@ export default function ThreeBlockComparison({
               if (!selectedPackage && packageData && pkg && packageType !== 'vip') {
                 const minDownPaymentPercent = parseFloat(pkg.minDownPaymentPercent.toString());
                 const calculatedMinPayment = Math.round(packageData.finalCost * minDownPaymentPercent);
-                const absoluteMinimum = calculatorSettings?.minimumDownPayment || 25000;
+                const absoluteMinimum = calculatorSettings?.minimumDownPayment || 5000;
                 const minDownPayment = Math.max(calculatedMinPayment, absoluteMinimum);
                 const remainingCost = packageData.finalCost - minDownPayment;
                 const minInstallmentMonths = Math.min(...(calculatorSettings?.installmentMonthsOptions || [1]));

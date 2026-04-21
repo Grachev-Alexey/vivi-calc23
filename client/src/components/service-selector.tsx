@@ -528,7 +528,7 @@ export default function ServiceSelector({
           {maxSessionCount >= 15 && (
             <div className="mt-2 p-2 bg-pink-50 rounded-lg border border-pink-200">
               <div className="flex items-center justify-center text-xs text-pink-700">
-                + дополнительная скидка {((calculatorSettings?.bulkDiscountPercentage || 0.025) * 100).toFixed(1)}%
+                + дополнительная скидка {((calculatorSettings?.bulkDiscountPercentage || 0.05) * 100).toFixed(1)}%
               </div>
             </div>
           )}

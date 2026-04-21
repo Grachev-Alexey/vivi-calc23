@@ -70,7 +70,7 @@ export function calculatePackagePricing(
 
     // Calculate bulk discount using configurable threshold and percentage
     const bulkThreshold = calculatorSettings?.bulkDiscountThreshold || 15;
-    const bulkDiscountPercent = calculatorSettings?.bulkDiscountPercentage || 0.025;
+    const bulkDiscountPercent = calculatorSettings?.bulkDiscountPercentage || 0.05;
     // Используем максимальное количество сеансов среди всех услуг
     const maxSessionCount = params.procedureCount || 1;
     const qualifiesForBulkDiscount = maxSessionCount >= bulkThreshold;

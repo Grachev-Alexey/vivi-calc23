@@ -47,7 +47,7 @@ function CalculatorSettings({ loading, setLoading }: { loading: boolean; setLoad
     minimumDownPayment: 5000,
     bulkDiscountThreshold: 15,
     bulkDiscountPercentage: 0.05,
-    installmentMonthsOptions: [2, 3, 4, 5, 6]
+    installmentMonthsOptions: [1, 2, 3, 4, 5, 6]
   });
   const { toast } = useToast();
 
@@ -72,7 +72,7 @@ function CalculatorSettings({ loading, setLoading }: { loading: boolean; setLoad
         minimumDownPayment: Number(minPayment) || 5000,
         bulkDiscountThreshold: Number(bulkThreshold) || 15,
         bulkDiscountPercentage: Number(bulkPercentage) || 0.05,
-        installmentMonthsOptions: monthsOptions || [2, 3, 4, 5, 6]
+        installmentMonthsOptions: monthsOptions || [1, 2, 3, 4, 5, 6]
       });
     } catch (error) {
       console.error('Error loading settings:', error);
@@ -183,7 +183,7 @@ function CalculatorSettings({ loading, setLoading }: { loading: boolean; setLoad
             <div>
               <Label>Доступные месяцы рассрочки</Label>
               <div className="grid grid-cols-6 gap-2 mt-2">
-                {[2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(month => (
+                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(month => (
                   <label key={month} className="flex items-center space-x-2">
                     <input
                       type="checkbox"
