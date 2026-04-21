@@ -25,7 +25,6 @@ interface SaleData {
   id: number;
   clientName: string | null;
   clientPhone: string;
-  clientEmail: string | null;
   masterName: string;
   subscriptionTitle: string;
   selectedPackage: string;
@@ -42,7 +41,6 @@ interface SaleData {
   freeZones: any[];
   pdfPath: string | null;
   offerNumber: string | null;
-  emailSent: boolean | null;
 }
 
 interface MasterSalesModalProps {
@@ -313,10 +311,6 @@ function SaleDetails({ sale }: { sale: SaleData }) {
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Телефон:</span>
                 <span>{sale.clientPhone}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Email:</span>
-                <span>{sale.clientEmail || 'Не указано'}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Дата:</span>

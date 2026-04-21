@@ -451,7 +451,6 @@ export class PDFGenerator {
         <div class="details"><strong>Данные клиента:</strong></div>
         <div class="details">ФИО: <span class="highlight">${offer.clientName || "Не указано"}</span></div>
         <div class="details">Телефон: <span class="highlight">${offer.clientPhone || "Не указан"}</span></div>
-        <div class="details">Email: <span class="highlight">${offer.clientEmail || "Не указан"}</span></div>
         <div class="details">Дата: <span class="highlight">${format(new Date(), "dd.MM.yyyy", { locale: ru })}</span></div>
     </div>
 </body>

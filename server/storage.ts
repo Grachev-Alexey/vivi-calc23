@@ -251,7 +251,6 @@ export class DatabaseStorage implements IStorage {
       id: sales.id,
       clientName: sql<string | null>`null`, // clients table doesn't have name field
       clientPhone: clients.phone,
-      clientEmail: clients.email,
       masterName: users.name,
       subscriptionTitle: subscriptionTypes.title,
       selectedPackage: sales.selectedPackage,

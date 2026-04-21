@@ -94,7 +94,6 @@ export const packagePerkValues = pgTable("package_perk_values", {
 export const clients = pgTable("clients", {
   id: serial("id").primaryKey(),
   phone: varchar("phone", { length: 20 }).notNull(),
-  email: text("email"),
   yclientsId: integer("yclients_id"),
   createdAt: timestamp("created_at").defaultNow(),
 });
@@ -143,11 +142,8 @@ export const offers = pgTable("offers", {
   manualGiftSessions: json("manual_gift_sessions"),
   clientName: text("client_name"),
   clientPhone: text("client_phone").notNull(),
-  clientEmail: text("client_email"),
   pdfPath: text("pdf_path"), // путь к сгенерированному PDF
   pdfVersion: text("pdf_version").default("standard"), // 'standard' | 'amendment' - версия PDF
-  emailSent: boolean("email_sent").default(false),
-  emailSentAt: timestamp("email_sent_at"),
   status: text("status").default("draft"), // draft, sent, accepted, expired
   expiresAt: timestamp("expires_at"), // срок действия предложения
   saleDate: timestamp("sale_date").defaultNow(), // дата продажи (для админов)

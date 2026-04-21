@@ -48,7 +48,6 @@ export default function ClientModal({
   const isAdmin = user?.role === 'admin';
   
   const [phone, setPhone] = useState("");
-  const [email, setEmail] = useState("");
   const [clientName, setClientName] = useState("");
   const [loading, setLoading] = useState(false);
   const [subscriptionTitle, setSubscriptionTitle] = useState("");
@@ -112,8 +111,7 @@ export default function ClientModal({
     try {
       const subscriptionData = {
         client: {
-          phone: phone.replace(/\D/g, ''),
-          email: email || undefined
+          phone: phone.replace(/\D/g, '')
         },
         calculation: {
           services: selectedServices.map(service => ({
@@ -231,7 +229,6 @@ export default function ClientModal({
         saleId, // Связываем оферту с продажей
         clientName,
         clientPhone: phone.replace(/\D/g, ''),
-        clientEmail: email,
         selectedPackage,
         selectedServices: selectedServices.map(service => ({
           id: service.yclientsId,
@@ -284,11 +281,11 @@ export default function ClientModal({
         if (sendResponse.ok) {
           setOfferSent(true);
           toast({
-            title: "Договор отправлен!",
-            description: `Договор-оферта успешно отправлен на ${email}`,
+            title: "Договор сформирован!",
+            description: "Договор-оферта успешно сформирован",
           });
         } else {
-          throw new Error("Не удалось отправить договор");
+          throw new Error("Не удалось сформировать договор");
         }
       } else {
         throw new Error("Не удалось создать договор");
@@ -318,7 +315,6 @@ export default function ClientModal({
 
   const handleClose = () => {
     setPhone("");
-    setEmail("");
     setClientName("");
     setSubscriptionTitle("");
     setIsCompleted(false);
@@ -416,7 +412,7 @@ export default function ClientModal({
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                 <div className="flex items-center gap-2 text-blue-800">
                   <CheckCircle className="w-5 h-5" />
-                  <span className="font-medium">Договор-оферта отправлен на {email}</span>
+                  <span className="font-medium">Договор-оферта сформирован</span>
                 </div>
               </div>
             )}
@@ -522,21 +518,6 @@ export default function ClientModal({
                     value={phone}
                     onChange={setPhone}
                     placeholder="+7 (___) ___-__-__"
-                    required
-                  />
-                </div>
-                
-                <div>
-                  <Label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                    Email клиента *
-                  </Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="input-premium text-sm"
-                    placeholder="client@example.com"
                     required
                   />
                 </div>

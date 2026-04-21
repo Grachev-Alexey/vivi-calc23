@@ -3,7 +3,6 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { createYclientsService } from "./services/yclients";
 import { pdfGenerator } from "./services/pdf-generator";
-import { EmailServiceFactory } from "./services/email-service";
 import { z } from "zod";
 import { eq, desc, sql } from "drizzle-orm";
 import { db } from "./db";
@@ -35,8 +34,7 @@ const authSchema = z.object({
 });
 
 const clientSchema = z.object({
-  phone: z.string().min(10),
-  email: z.string().email().optional()
+  phone: z.string().min(10)
 });
 
 const calculationSchema = z.object({
@@ -62,7 +60,6 @@ const offerSchema = z.object({
   saleId: z.number().optional(), // Связь с продажей
   clientName: z.string().min(1),
   clientPhone: z.string().min(10),
-  clientEmail: z.string().email(),
   selectedServices: z.array(z.any()),
   selectedPackage: z.enum(['vip', 'standard', 'economy']),
   baseCost: z.number(),
@@ -490,7 +487,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const salesData = await db.select({
         id: sales.id,
         clientPhone: clients.phone,
-        clientEmail: clients.email,
         masterName: users.name,
         subscriptionTitle: subscriptionTypes.title,
         selectedPackage: sales.selectedPackage,
@@ -520,12 +516,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         )`,
         offerNumber: sql<string | null>`(
           SELECT offer_number 
-          FROM offers 
-          WHERE offers.sale_id = ${sales.id} 
-          LIMIT 1
-        )`,
-        emailSent: sql<boolean | null>`(
-          SELECT email_sent 
           FROM offers 
           WHERE offers.sale_id = ${sales.id} 
           LIMIT 1
@@ -589,7 +579,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const salesData = await db.select({
         id: sales.id,
         clientPhone: clients.phone,
-        clientEmail: clients.email,
         masterName: users.name,
         subscriptionTitle: subscriptionTypes.title,
         selectedPackage: sales.selectedPackage,
@@ -619,12 +608,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         )`,
         offerNumber: sql<string | null>`(
           SELECT offer_number 
-          FROM offers 
-          WHERE offers.sale_id = ${sales.id} 
-          LIMIT 1
-        )`,
-        emailSent: sql<boolean | null>`(
-          SELECT email_sent 
           FROM offers 
           WHERE offers.sale_id = ${sales.id} 
           LIMIT 1
@@ -765,12 +748,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/subscription", requireAuth, async (req, res) => {
     try {
       const { client: clientData, calculation } = req.body;
-      const { phone, email } = clientSchema.parse(clientData);
+      const { phone } = clientSchema.parse(clientData);
       
       // Get or create client
       let client = await storage.getClientByPhone(phone);
       if (!client) {
-        client = await storage.createClient({ phone, email: email || null });
+        client = await storage.createClient({ phone });
       }
 
       // Check if subscription type exists in Yclients
@@ -946,8 +929,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let client = await storage.getClientByPhone(offerData.clientPhone);
       if (!client) {
         client = await storage.createClient({
-          phone: offerData.clientPhone,
-          email: offerData.clientEmail
+          phone: offerData.clientPhone
         });
       }
 
@@ -976,7 +958,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         manualGiftSessions: offerData.manualGiftSessions || {},
         clientName: offerData.clientName,
         clientPhone: offerData.clientPhone,
-        clientEmail: offerData.clientEmail,
         pdfVersion: offerData.pdfVersion || 'standard',
         saleDate: offerData.saleDate ? new Date(offerData.saleDate) : undefined,
         status: 'draft',
@@ -990,7 +971,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // API endpoint for generating PDF and sending email
+  // API endpoint for generating PDF for an offer
   app.post("/api/offers/:id/send", async (req, res) => {
     try {
       if (!req.session.userId) {
@@ -1007,18 +988,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Оферта не найдена" });
       }
 
-      if (!offer.clientEmail) {
-        return res.status(400).json({ message: "Email клиента не указан" });
-      }
-
-      // Get email configuration from database
-      const emailSettings = await storage.getConfig('email_settings');
-      if (!emailSettings || !emailSettings.value) {
-        return res.status(400).json({ message: "Настройки email не настроены" });
-      }
-
-      const emailConfig = emailSettings.value as any;
-
       // Get package data from database
       const packages = await storage.getPackages();
       const packageData = packages.find(pkg => pkg.type === offer.selectedPackage);
@@ -1031,60 +1000,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const filePath = path.join(pdfDir, fileName);
       await fs.writeFile(filePath, pdfBuffer);
 
-      // Create email service based on configuration
-      let emailService;
-      switch (emailConfig.provider) {
-        case 'gmail':
-          emailService = EmailServiceFactory.createGmailService(
-            emailConfig.email,
-            emailConfig.password
-          );
-          break;
-        case 'yandex':
-          emailService = EmailServiceFactory.createYandexService(
-            emailConfig.email,
-            emailConfig.password
-          );
-          break;
-        case 'mailru':
-          emailService = EmailServiceFactory.createMailRuService(
-            emailConfig.email,
-            emailConfig.password
-          );
-          break;
-        default:
-          return res.status(400).json({ message: "Неподдерживаемый провайдер email" });
-      }
+      // Update offer status with API path for PDF download
+      await storage.updateOffer(offer.id, {
+        pdfPath: `/api/pdf/${fileName}`,
+        status: 'sent'
+      });
 
-      // Test connection first
-      const connectionTest = await emailService.testConnection();
-      if (!connectionTest) {
-        return res.status(500).json({ message: "Ошибка подключения к почтовому серверу" });
-      }
-
-      // Send email
-      const emailSent = await emailService.sendOfferEmail(offer, pdfBuffer);
-      
-      if (emailSent) {
-        // Update offer status with API path for PDF download
-        await storage.updateOffer(offer.id, {
-          pdfPath: `/api/pdf/${fileName}`,
-          emailSent: true,
-          emailSentAt: new Date(),
-          status: 'sent'
-        });
-
-        res.json({ 
-          success: true, 
-          message: "Оферта успешно отправлена",
-          pdfPath: filePath 
-        });
-      } else {
-        res.status(500).json({ message: "Ошибка отправки email" });
-      }
+      res.json({ 
+        success: true, 
+        message: "Договор-оферта сформирован",
+        pdfPath: `/api/pdf/${fileName}`
+      });
     } catch (error) {
-      console.error('Ошибка отправки оферты:', error);
-      res.status(500).json({ message: "Ошибка отправки оферты" });
+      console.error('Ошибка формирования оферты:', error);
+      res.status(500).json({ message: "Ошибка формирования оферты" });
     }
   });
 
@@ -1191,84 +1120,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Ошибка обновления оферты:', error);
       res.status(500).json({ message: "Ошибка обновления оферты" });
-    }
-  });
-
-  // Email settings endpoints
-  app.get("/api/admin/email-settings", async (req, res) => {
-    try {
-      if (!req.session.userId || req.session.userRole !== 'admin') {
-        return res.status(403).json({ message: "Нет доступа" });
-      }
-
-      const settings = await storage.getConfig('email_settings');
-      res.json(settings ? settings.value : null);
-    } catch (error) {
-      console.error('Ошибка получения настроек email:', error);
-      res.status(500).json({ message: "Ошибка получения настроек email" });
-    }
-  });
-
-  app.post("/api/admin/email-settings", async (req, res) => {
-    try {
-      if (!req.session.userId || req.session.userRole !== 'admin') {
-        return res.status(403).json({ message: "Нет доступа" });
-      }
-
-      const emailSettings = req.body;
-      await storage.setConfig('email_settings', emailSettings);
-      
-      res.json({ success: true, message: "Настройки email сохранены" });
-    } catch (error) {
-      console.error('Ошибка сохранения настроек email:', error);
-      res.status(500).json({ message: "Ошибка сохранения настроек email" });
-    }
-  });
-
-  app.post("/api/admin/test-email", async (req, res) => {
-    try {
-      if (!req.session.userId || req.session.userRole !== 'admin') {
-        return res.status(403).json({ message: "Нет доступа" });
-      }
-
-      const { provider, email, password, host, port, secure, fromName } = req.body;
-      
-      let emailService;
-      
-      switch (provider) {
-        case 'gmail':
-          emailService = EmailServiceFactory.createGmailService(email, password);
-          break;
-        case 'yandex':
-          emailService = EmailServiceFactory.createYandexService(email, password);
-          break;
-        case 'mailru':
-          emailService = EmailServiceFactory.createMailRuService(email, password);
-          break;
-        case 'custom':
-          const customConfig = {
-            host,
-            port,
-            secure,
-            auth: { user: email, pass: password },
-            from: email
-          };
-          emailService = new (await import("./services/email-service")).EmailService(customConfig);
-          break;
-        default:
-          return res.status(400).json({ success: false, error: "Неподдерживаемый провайдер" });
-      }
-
-      const testResult = await emailService.testConnection();
-      
-      if (testResult) {
-        res.json({ success: true, message: "Подключение успешно" });
-      } else {
-        res.json({ success: false, error: "Ошибка подключения к почтовому серверу" });
-      }
-    } catch (error: any) {
-      console.error('Ошибка тестирования email:', error);
-      res.json({ success: false, error: error.message || "Ошибка тестирования подключения" });
     }
   });
 
