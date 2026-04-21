@@ -149,13 +149,13 @@ export default function PromoCalculatorPage({
         </Button>
       </div>
 
-      {/* Main content - адаптивная сетка */}
+      {/* Main content */}
       <div className="h-screen flex flex-col lg:flex-row gap-1 lg:gap-2 p-1 lg:p-2 overflow-hidden">
-        {/* Left panel - Controls - компактная версия */}
+        {/* Left panel - Controls */}
         <div className="w-full lg:w-64 xl:w-72 flex flex-col h-auto lg:h-full order-2 lg:order-1">
           {/* Scrollable content area with custom scrollbar */}
           <div className="flex-1 overflow-y-auto space-y-1 lg:space-y-1.5 pr-1 custom-left-scrollbar max-h-[40vh] lg:max-h-none">
-            {/* Service selection card with special offer badge - компактная версия */}
+            {/* Service selection card with special offer badge */}
             <div className="bg-white dark:bg-gray-900 rounded-lg p-2 border border-gray-200">
               <h3 className="text-xs font-bold text-gray-900 dark:text-white mb-2">
                 Выбор услуг
@@ -169,7 +169,7 @@ export default function PromoCalculatorPage({
                 calculatorSettings={calculatorSettings}
               />
 
-              {/* Cost per procedure and subscription cost - компактная версия */}
+              {/* Cost per procedure and subscription cost */}
               {calculation && calculation.baseCost > 0 && (
                 <div className="mt-2 pt-2 border-t border-gray-200 dark:border-gray-700 space-y-1">
                   <div className="flex justify-between items-center">
@@ -198,7 +198,7 @@ export default function PromoCalculatorPage({
             </div>
 
 
-            {/* Payment settings - компактная версия */}
+            {/* Payment settings */}
             <div className="bg-white dark:bg-gray-900 rounded-lg p-2 border border-gray-200">
               <h4 className="font-bold text-gray-900 dark:text-white text-xs mb-1.5">
                 {selectedPackage === "vip"
@@ -330,7 +330,7 @@ export default function PromoCalculatorPage({
               )}
             </div>
 
-            {/* Installment configuration - компактная версия */}
+            {/* Installment configuration */}
             {downPayment <
               (selectedPackage && calculation
                 ? getPackageData(selectedPackage)?.finalCost || 25000
@@ -382,7 +382,7 @@ export default function PromoCalculatorPage({
               </div>
             )}
 
-            {/* Correction block - компактная версия */}
+            {/* Correction block */}
             <div className="bg-white dark:bg-gray-900 rounded-lg p-2 border border-gray-200">
               {isEditingCorrection ? (
                 // Режим редактирования - только поле ввода по центру
@@ -502,7 +502,7 @@ export default function PromoCalculatorPage({
                 />
               </div>
 
-              {/* Блок "Бесплатные зоны" - компактная версия */}
+              {/* Блок "Бесплатные зоны" */}
               <div className="w-40 flex-shrink-0">
                 <div
                   className="bg-white dark:bg-gray-900 p-2 border border-pink-300/50 h-fit"

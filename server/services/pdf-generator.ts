@@ -104,7 +104,6 @@ export class PDFGenerator {
     }
 
     private getGiftSessions(packageType: string): number {
-        // This method is now deprecated as gift sessions come from offer data
         return 0;
     }
 

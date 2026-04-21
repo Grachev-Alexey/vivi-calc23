@@ -114,7 +114,7 @@ export const sales = pgTable("sales", {
   appliedDiscounts: json("applied_discounts"),
   freeZones: json("free_zones"),
   manualGiftSessions: json("manual_gift_sessions"),
-  // Поля договора-оферты (раньше жили в отдельной таблице offers)
+  // Поля договора-оферты
   offerNumber: text("offer_number").unique(),
   paymentSchedule: json("payment_schedule"),
   clientName: text("client_name"),
