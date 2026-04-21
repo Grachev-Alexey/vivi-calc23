@@ -1,30 +1,23 @@
-import { useState, useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { RangeSlider } from "@/components/ui/range-slider";
 import {
-  X,
-  Moon,
-  Sun,
-  Crown,
-  Star,
-  Leaf,
-  Gift,
+  LogOut,
   Sparkles,
-  Check,
   BarChart3,
+  ShoppingBag,
+  Wallet,
+  CalendarClock,
+  Gift,
+  SlidersHorizontal,
+  Check,
 } from "lucide-react";
-import * as Icons from "lucide-react";
 import { useCalculator } from "@/hooks/use-calculator";
 import { formatPrice } from "@/lib/utils";
 import ServiceSelector from "@/components/service-selector";
 import ClientModal from "@/components/client-modal";
 import MasterSalesModal from "@/components/master-sales-modal";
-import {
-  usePackagePerks,
-  type PackagePerkValue,
-} from "@/hooks/use-package-perks";
+import { usePackagePerks } from "@/hooks/use-package-perks";
 import ThreeBlockComparison from "@/components/three-block-comparison";
 
 interface User {
@@ -38,37 +31,17 @@ interface PromoCalculatorPageProps {
   onLogout: () => void;
 }
 
-interface PackageData {
-  isAvailable: boolean;
-  unavailableReason: string;
-  finalCost: number;
-  totalSavings: number;
-  monthlyPayment: number;
-  appliedDiscounts: Array<{ type: string; amount: number }>;
-}
+const FREE_ZONE_REASONS = [
+  { title: "За подругу", value: "1 зона" },
+  { title: "Отзыв в Яндекс.Картах", value: "1 зона" },
+  { title: "Отзыв в 2ГИС", value: "1 зона" },
+  { title: "Рекомендация в соцсетях", value: "1 зона" },
+];
 
-interface Package {
-  id: number;
-  type: string;
-  name: string;
-  discount: string;
-  minCost: string;
-  minDownPaymentPercent: string;
-  requiresFullPayment: boolean;
-  bonusAccountPercent: string;
-}
-
-export default function PromoCalculatorPage({
-  user,
-  onLogout,
-}: PromoCalculatorPageProps) {
-  const [darkMode, setDarkMode] = useState(false);
+export default function PromoCalculatorPage({ user, onLogout }: PromoCalculatorPageProps) {
   const [showClientModal, setShowClientModal] = useState(false);
-  const [isEditingPayment, setIsEditingPayment] = useState(false);
-  const [tempPaymentValue, setTempPaymentValue] = useState("");
-  const [isEditingCorrection, setIsEditingCorrection] = useState(false);
-  const [tempCorrectionValue, setTempCorrectionValue] = useState("");
   const [showSalesModal, setShowSalesModal] = useState(false);
+  const [showFreeZones, setShowFreeZones] = useState(false);
 
   const packagePerksQuery = usePackagePerks();
   const packagePerkValues = packagePerksQuery.data || [];
@@ -94,469 +67,339 @@ export default function PromoCalculatorPage({
     setCorrectionPercent,
     setManualGiftSessions,
     setSelectedPackage,
-    isLoading,
     getMinDownPayment,
     getMaxDownPayment,
   } = useCalculator();
 
-  const toggleDarkMode = () => {
-    setDarkMode(!darkMode);
-  };
+  const selectedPackageData =
+    selectedPackage && calculation?.packages
+      ? (calculation.packages as any)[selectedPackage]
+      : null;
 
-  const handleProceedToOrder = () => {
-    if (!selectedPackage) return;
-    setShowClientModal(true);
-  };
-
-  // Helper function to safely access calculation packages
-  const getPackageData = (packageType: string): PackageData | null => {
-    if (!calculation || !calculation.packages) return null;
-    return (
-      (calculation.packages as Record<string, PackageData>)[packageType] || null
-    );
-  };
+  const getMonthLabel = (n: number) =>
+    n === 1 ? "месяц" : n <= 4 ? "месяца" : "месяцев";
 
   return (
-    <div
-      className={`min-h-screen overflow-hidden promo-background glass-pattern ${darkMode ? "dark" : ""}`}
-    >
-      {/* Background decorative elements */}
-      <div className="floating-pattern top-10 left-10"></div>
-      <div className="floating-pattern bottom-10 right-10"></div>
-
-      {/* Top right buttons */}
-      <div className="absolute top-2 right-2 z-50 flex items-center gap-2">
-        {/* Незаметная кнопка для просмотра продаж */}
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => setShowSalesModal(true)}
-          className="opacity-30 hover:opacity-100 transition-opacity duration-200 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 p-1"
-          title="Мои продажи"
-        >
-          <BarChart3 size={14} />
-        </Button>
-        
-        {/* Кнопка выхода */}
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={onLogout}
-          className="opacity-30 hover:opacity-100 transition-opacity duration-200 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 p-1"
-          title="Выход"
-        >
-          <X size={14} />
-        </Button>
-      </div>
-
-      {/* Main content */}
-      <div className="h-screen flex flex-col lg:flex-row gap-1 lg:gap-2 p-1 lg:p-2 overflow-hidden">
-        {/* Left panel - Controls */}
-        <div className="w-full lg:w-64 xl:w-72 flex flex-col h-auto lg:h-full order-2 lg:order-1">
-          {/* Scrollable content area with custom scrollbar */}
-          <div className="flex-1 overflow-y-auto space-y-1 lg:space-y-1.5 pr-1 custom-left-scrollbar max-h-[40vh] lg:max-h-none">
-            {/* Service selection card with special offer badge */}
-            <div className="bg-white dark:bg-gray-900 rounded-lg p-2 border border-gray-200">
-              <h3 className="text-xs font-bold text-gray-900 dark:text-white mb-2">
-                Выбор услуг
-              </h3>
-              <ServiceSelector
-                selectedServices={selectedServices}
-                onServicesChange={setSelectedServices}
-                onAddFreeZone={setFreeZones}
-                freeZones={freeZones}
-                onSessionCountChange={handleSessionCountChange}
-                calculatorSettings={calculatorSettings}
-              />
-
-              {/* Cost per procedure and subscription cost */}
-              {calculation && calculation.baseCost > 0 && (
-                <div className="mt-2 pt-2 border-t border-gray-200 dark:border-gray-700 space-y-1">
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs font-medium text-gray-600 dark:text-gray-400">
-                      Стоимость за процедуру:
-                    </span>
-                                    <span className="text-xs font-bold text-gray-800 dark:text-gray-200">
-                                      {formatPrice(
-                                        selectedServices.reduce((sum, service) => {
-                                          const price = service.customPrice ? parseFloat(service.customPrice) : parseFloat(service.priceMin);
-                                          return sum + (price * service.quantity);
-                                        }, 0)
-                                      )}
-                                    </span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs font-medium text-gray-700 dark:text-gray-300">
-                      Стоимость абонемента:
-                    </span>
-                    <span className="text-xs font-bold text-gray-900 dark:text-white">
-                      {formatPrice(calculation.baseCost)}
-                    </span>
-                  </div>
-                </div>
-              )}
+    <div className="h-screen flex flex-col promo-background overflow-hidden">
+      {/* TOP NAV */}
+      <header className="flex-shrink-0 border-b backdrop-blur-xl"
+              style={{
+                borderColor: "hsla(43, 88%, 56%, 0.15)",
+                background: "linear-gradient(180deg, hsla(222, 45%, 7%, 0.92), hsla(222, 45%, 5%, 0.85))",
+              }}>
+        <div className="px-5 lg:px-8 py-3 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-4 min-w-0">
+            <div
+              className="text-2xl font-black tracking-[-0.04em] leading-none"
+              style={{
+                fontFamily: "'Manrope', sans-serif",
+                background: "linear-gradient(135deg, hsl(43, 95%, 75%) 0%, hsl(36, 80%, 50%) 100%)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                backgroundClip: "text",
+              }}
+            >
+              ЭНСО
             </div>
-
-
-            {/* Payment settings */}
-            <div className="bg-white dark:bg-gray-900 rounded-lg p-2 border border-gray-200">
-              <h4 className="font-bold text-gray-900 dark:text-white text-xs mb-1.5">
-                {selectedPackage === "vip"
-                  ? "Полная предоплата"
-                  : "Первый взнос"}
-              </h4>
-
-              <div className="text-center mb-1">
-                {selectedPackage === "vip" ? (
-                  // VIP - показываем полную стоимость стандартным цветом
-                  <div className="text-xs font-bold text-premium">
-                    {calculation?.packages?.vip
-                      ? formatPrice(calculation.packages.vip.finalCost)
-                      : formatPrice(calculation?.baseCost || 0)}
-                  </div>
-                ) : // Обычные пакеты - редактируемое поле
-                isEditingPayment ? (
-                  <input
-                    type="number"
-                    value={tempPaymentValue}
-                    onChange={(e) => setTempPaymentValue(e.target.value)}
-                    onBlur={() => {
-                      const numericValue = parseInt(tempPaymentValue) || 0;
-
-                      // Для пакета "эконом" позволяем ввод любой положительной суммы
-                      // если она меньше минимального платежа
-                      if (selectedPackage === "economy") {
-                        const minPayment = getMinDownPayment();
-                        if (numericValue < minPayment && numericValue > 0) {
-                          // Разрешаем любую положительную сумму для эконом пакета
-                          setDownPayment(numericValue);
-                        } else {
-                          // Обычная логика с ограничениями для эконом пакета
-                          const maxPayment = getMaxDownPayment();
-                          const constrainedValue = Math.max(
-                            minPayment,
-                            Math.min(maxPayment, numericValue),
-                          );
-                          setDownPayment(constrainedValue);
-                        }
-                      } else {
-                        // Для всех остальных пакетов - обычная логика с ограничениями
-                        const minPayment = getMinDownPayment();
-                        const maxPayment = getMaxDownPayment();
-                        const constrainedValue = Math.max(
-                          minPayment,
-                          Math.min(maxPayment, numericValue),
-                        );
-                        setDownPayment(constrainedValue);
-                      }
-                      setIsEditingPayment(false);
-                    }}
-                    onKeyPress={(e) => {
-                      if (e.key === "Enter") {
-                        const numericValue = parseInt(tempPaymentValue) || 0;
-
-                        // Для пакета "эконом" позволяем ввод любой положительной суммы
-                        // если она меньше минимального платежа
-                        if (selectedPackage === "economy") {
-                          const minPayment = getMinDownPayment();
-                          if (numericValue < minPayment && numericValue > 0) {
-                            // Разрешаем любую положительную сумму для эконом пакета
-                            setDownPayment(numericValue);
-                          } else {
-                            // Обычная логика с ограничениями для эконом пакета
-                            const maxPayment = getMaxDownPayment();
-                            const constrainedValue = Math.max(
-                              minPayment,
-                              Math.min(maxPayment, numericValue),
-                            );
-                            setDownPayment(constrainedValue);
-                          }
-                        } else {
-                          // Для всех остальных пакетов - обычная логика с ограничениями
-                          const minPayment = getMinDownPayment();
-                          const maxPayment = getMaxDownPayment();
-                          const constrainedValue = Math.max(
-                            minPayment,
-                            Math.min(maxPayment, numericValue),
-                          );
-                          setDownPayment(constrainedValue);
-                        }
-                        setIsEditingPayment(false);
-                      }
-                    }}
-                    autoFocus
-                    onFocus={(e) => e.target.select()}
-                    className="text-xs font-bold text-premium bg-transparent border-none text-center w-full focus:outline-none focus:ring-2 focus:ring-pink-500 rounded px-2 py-1"
-                    style={{
-                      WebkitAppearance: "none",
-                      MozAppearance: "textfield",
-                    }}
-                  />
-                ) : (
-                  <div
-                    onClick={() => {
-                      setTempPaymentValue(downPayment.toString());
-                      setIsEditingPayment(true);
-                    }}
-                    className="text-xs font-bold text-premium cursor-pointer hover:bg-pink-50 dark:hover:bg-pink-900/20 rounded px-2 py-1 transition-colors"
-                  >
-                    {formatPrice(downPayment)}
-                  </div>
-                )}
-              </div>
-
-              {selectedPackage === "vip" ? (
-                // VIP - нейтральный декоративный слайдер заблокирован на 100%
-                <div className="mb-2">
-                  <div className="relative h-2 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
-                    <div className="absolute inset-0 bg-gray-200 dark:bg-gray-600 rounded-full"></div>
-                    <div className="absolute right-1 top-1/2 transform -translate-y-1/2 w-4 h-4 bg-gray-400 dark:bg-gray-500 rounded-full flex items-center justify-center">
-                      <div className="w-2 h-2 bg-white rounded-full"></div>
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                // Обычные пакеты - обычный слайдер
-                <RangeSlider
-                  min={getMinDownPayment()}
-                  max={getMaxDownPayment()}
-                  step={1}
-                  value={downPayment}
-                  onChange={setDownPayment}
-                  className="dark:bg-gray-700 mb-2"
-                  formatLabel={formatPrice}
-                  disabled={!selectedPackage}
-                />
-              )}
-            </div>
-
-            {/* Installment configuration */}
-            {downPayment <
-              (selectedPackage && calculation
-                ? getPackageData(selectedPackage)?.finalCost || 25000
-                : 25000) && (
-              <div className="bg-white dark:bg-gray-900 rounded-lg p-2 border border-gray-200">
-                <h4 className="font-bold text-gray-900 dark:text-white mb-1.5 text-xs">
-                  Рассрочка
-                </h4>
-
-                <div className="text-center mb-1">
-                  <div className="text-xs font-bold text-premium">
-                    {installmentMonths}
-                  </div>
-                  <div className="text-xs text-gray-500 dark:text-gray-400">
-                    {installmentMonths === 1
-                      ? "месяц"
-                      : installmentMonths <= 4
-                        ? "месяца"
-                        : "месяцев"}
-                  </div>
-                </div>
-
-                <RangeSlider
-                  min={Math.min(
-                    ...(calculatorSettings?.installmentMonthsOptions || [1]),
-                  )}
-                  max={Math.max(
-                    ...(calculatorSettings?.installmentMonthsOptions || [6]),
-                  )}
-                  value={installmentMonths}
-                  onChange={setInstallmentMonths}
-                  className="dark:bg-gray-700"
-                />
-
-                {selectedPackage && calculation && (
-                  <div className="mt-1 text-center">
-                    <div className="text-xs text-gray-600 dark:text-gray-400">
-                      Ежемесячный платеж
-                    </div>
-                    <div className="text-xs font-bold text-premium">
-                      {formatPrice(
-                        ((getPackageData(selectedPackage)?.finalCost || 0) -
-                          downPayment) /
-                          installmentMonths,
-                      )}
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* Correction block */}
-            <div className="bg-white dark:bg-gray-900 rounded-lg p-2 border border-gray-200">
-              {isEditingCorrection ? (
-                // Режим редактирования - только поле ввода по центру
-                <div className="flex items-center justify-center">
-                  <input
-                    type="number"
-                    min="0"
-                    max="30"
-                    step="0.1"
-                    value={tempCorrectionValue}
-                    onChange={(e) => setTempCorrectionValue(e.target.value)}
-                    onBlur={() => {
-                      const value = Math.min(
-                        30,
-                        Math.max(0, parseFloat(tempCorrectionValue) || 0),
-                      );
-                      setCorrectionPercent(value);
-                      setIsEditingCorrection(false);
-                    }}
-                    onKeyPress={(e) => {
-                      if (e.key === "Enter") {
-                        const value = Math.min(
-                          30,
-                          Math.max(0, parseFloat(tempCorrectionValue) || 0),
-                        );
-                        setCorrectionPercent(value);
-                        setIsEditingCorrection(false);
-                      }
-                    }}
-                    autoFocus
-                    onFocus={(e) => e.target.select()}
-                    className="w-12 text-xs text-center border border-gray-300 dark:border-gray-600 rounded px-1 py-1 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-pink-500"
-                  />
-                  <span className="text-xs text-gray-500 dark:text-gray-400 ml-1">
-                    %
-                  </span>
-                </div>
-              ) : (
-                // Обычный режим - заголовок и переключатель
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h4 className="font-bold text-gray-900 dark:text-white text-xs">
-                      Коррекция
-                    </h4>
-                  </div>
-                  <label className="relative inline-flex items-center cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={correctionPercent > 0}
-                      onChange={(e) => {
-                        if (e.target.checked) {
-                          setTempCorrectionValue(
-                            correctionPercent > 0
-                              ? correctionPercent.toString()
-                              : "5",
-                          );
-                          setIsEditingCorrection(true);
-                        } else {
-                          setCorrectionPercent(0);
-                        }
-                      }}
-                      className="sr-only peer"
-                    />
-                    <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-0 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-gray-600 peer-checked:bg-premium focus:outline-none focus:ring-0"></div>
-                  </label>
-                </div>
-              )}
+            <div className="h-7 w-px hidden sm:block"
+                 style={{ background: "linear-gradient(180deg, transparent, hsla(43,88%,56%,0.4), transparent)" }} />
+            <div className="hidden sm:flex flex-col leading-tight">
+              <div className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground font-medium">Студия</div>
+              <div className="text-sm font-semibold text-foreground/90">Калькулятор абонементов</div>
             </div>
           </div>
 
-          {/* Order button - fixed at bottom */}
-          {selectedPackage && (
-            <div className="flex-shrink-0 mt-2 lg:mt-3">
-              <Button
-                onClick={handleProceedToOrder}
-                className="btn-premium w-full text-xs lg:text-sm py-2"
-                disabled={!selectedServices.length}
-              >
-                <Star className="w-3 h-3 lg:w-4 lg:h-4 mr-1" />
-                Оформить абонемент
-              </Button>
+          <div className="flex items-center gap-2">
+            <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full"
+                 style={{ background: "hsla(220, 30%, 14%, 0.6)", border: "1px solid hsl(var(--border))" }}>
+              <div className="w-1.5 h-1.5 rounded-full" style={{ background: "hsl(var(--gold))", boxShadow: "0 0 8px hsl(var(--gold))" }} />
+              <span className="text-xs font-medium">{user.name}</span>
+              <span className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                {user.role === "admin" ? "админ" : "мастер"}
+              </span>
             </div>
-          )}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowSalesModal(true)}
+              title="Мои продажи"
+              className="rounded-xl gap-2 text-muted-foreground hover:text-[hsl(var(--gold))]"
+              data-testid="button-sales"
+            >
+              <BarChart3 size={15} />
+              <span className="hidden lg:inline text-xs">Продажи</span>
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onLogout}
+              title="Выход"
+              className="rounded-xl gap-2 text-muted-foreground hover:text-[hsl(var(--gold))]"
+              data-testid="button-logout"
+            >
+              <LogOut size={15} />
+            </Button>
+          </div>
         </div>
+      </header>
 
-        {/* Right panel - Package comparison с адаптивной высотой */}
-        <div className="flex-1 flex flex-col min-w-0 overflow-hidden order-1 lg:order-2">
-          {/* Three Block Comparison - теперь занимает оставшееся место */}
-          {calculation && (
-            <div className="flex gap-2 h-full">
-              <div className="flex-1 overflow-auto">
-                <ThreeBlockComparison
-                  calculation={calculation}
-                  packages={packages}
-                  selectedPackage={selectedPackage}
-                  onPackageSelect={setSelectedPackage}
-                  downPayment={downPayment}
-                  installmentMonths={installmentMonths}
-                  procedureCount={procedureCount}
-                  packagePerkValues={packagePerkValues}
-                  calculatorSettings={calculatorSettings}
-                  freeZones={freeZones}
-                  selectedServices={selectedServices.map(service => ({
-                    ...service,
-                    serviceId: service.yclientsId,
-                    pricePerProcedure: parseFloat(service.priceMin)
-                  }))}
-                  bulkDiscountThreshold={
-                    calculatorSettings?.bulkDiscountThreshold || 15
-                  }
-                  bulkDiscountPercentage={
-                    calculatorSettings?.bulkDiscountPercentage || 0.05
-                  }
-                  correctionPercent={correctionPercent}
-                  manualGiftSessions={manualGiftSessions}
-                  onManualGiftSessionsChange={setManualGiftSessions}
-                />
+      {/* HERO BANNER (when package selected) */}
+      {selectedPackage && selectedPackageData && (
+        <div className="flex-shrink-0 px-5 lg:px-8 py-3 border-b"
+             style={{ borderColor: "hsla(43,88%,56%,0.12)" }}>
+          <div className="flex items-center justify-between gap-4 flex-wrap">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-xl flex items-center justify-center"
+                   style={{ background: "linear-gradient(135deg, hsl(43,95%,62%), hsl(36,80%,45%))", boxShadow: "var(--shadow-gold)" }}>
+                <Check className="w-5 h-5" style={{ color: "hsl(var(--navy))" }} />
               </div>
-
-              {/* Блок "Бесплатные зоны" */}
-              <div className="w-40 flex-shrink-0">
-                <div
-                  className="bg-white dark:bg-gray-900 p-2 border border-pink-300/50 h-fit"
-                  style={{ borderRadius: "6px" }}
-                >
-                  <h3 className="text-xs font-bold text-gray-900 dark:text-white mb-2 text-center">
-                    Бесплатные зоны
-                  </h3>
-
-                  <div className="space-y-1.5">
-                    <div className="p-1.5 bg-white dark:bg-gray-900 rounded border border-gray-200 dark:border-gray-700">
-                      <div className="text-xs text-gray-700 dark:text-gray-300 mb-0.5">
-                        За подруг
-                      </div>
-                      <div className="text-xs font-bold text-pink-600 dark:text-pink-400">
-                        1 зона
-                      </div>
-                    </div>
-
-                    <div className="p-1.5 bg-white dark:bg-gray-900 rounded border border-gray-200 dark:border-gray-700">
-                      <div className="text-xs text-gray-700 dark:text-gray-300 mb-0.5">
-                        За отзыв в Яндекс Картах
-                      </div>
-                      <div className="text-xs font-bold text-pink-600 dark:text-pink-400">
-                        1 зона
-                      </div>
-                    </div>
-
-                    <div className="p-1.5 bg-white dark:bg-gray-900 rounded border border-gray-200 dark:border-gray-700">
-                      <div className="text-xs text-gray-700 dark:text-gray-300 mb-0.5">
-                        За отзыв в 2ГИС
-                      </div>
-                      <div className="text-xs font-bold text-pink-600 dark:text-pink-400">
-                        1 зона
-                      </div>
-                    </div>
-
-                    <div className="p-1.5 bg-white dark:bg-gray-900 rounded border border-gray-200 dark:border-gray-700">
-                      <div className="text-xs text-gray-700 dark:text-gray-300 mb-0.5">
-                        За рекомендации в соцсетях
-                      </div>
-                      <div className="text-xs font-bold text-pink-600 dark:text-pink-400">
-                        1 зона
-                      </div>
-                    </div>
-                  </div>
+              <div>
+                <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">
+                  Выбран пакет
+                </div>
+                <div className="text-sm font-bold">
+                  {packages.find((p) => p.type === selectedPackage)?.name}
+                  <span className="ml-2 text-premium font-black">
+                    {formatPrice(selectedPackageData.finalCost)}
+                  </span>
                 </div>
               </div>
             </div>
-          )}
+            <Button
+              onClick={() => setShowClientModal(true)}
+              disabled={!selectedServices.length}
+              className="btn-premium rounded-xl gap-2 px-6"
+              data-testid="button-checkout"
+            >
+              <ShoppingBag className="w-4 h-4" />
+              Оформить абонемент
+            </Button>
+          </div>
         </div>
-      </div>
+      )}
 
-      {/* Client Modal */}
+      {/* MAIN */}
+      <main className="flex-1 overflow-hidden flex flex-col lg:flex-row gap-4 p-4 lg:p-5">
+        {/* LEFT — CONFIGURATOR */}
+        <aside className="w-full lg:w-[340px] xl:w-[360px] flex-shrink-0 overflow-y-auto custom-scrollbar pr-1 space-y-3">
+          {/* Section: Services */}
+          <SectionCard
+            icon={<SlidersHorizontal className="w-4 h-4" />}
+            title="Услуги и сеансы"
+            subtitle="Соберите курс из нужных зон"
+          >
+            <ServiceSelector
+              selectedServices={selectedServices}
+              onServicesChange={setSelectedServices}
+              onAddFreeZone={setFreeZones}
+              freeZones={freeZones}
+              onSessionCountChange={handleSessionCountChange}
+              calculatorSettings={calculatorSettings}
+            />
+
+            {calculation && calculation.baseCost > 0 && (
+              <div className="mt-3 pt-3 border-t space-y-1.5"
+                   style={{ borderColor: "hsl(var(--border))" }}>
+                <div className="flex justify-between items-center text-xs">
+                  <span className="text-muted-foreground">За одну процедуру</span>
+                  <span className="font-semibold text-foreground/80">
+                    {formatPrice(
+                      selectedServices.reduce((sum, s) => {
+                        const price = s.customPrice ? parseFloat(s.customPrice) : parseFloat(s.priceMin);
+                        return sum + price * s.quantity;
+                      }, 0)
+                    )}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-xs text-muted-foreground">Базовая стоимость курса</span>
+                  <span className="text-sm font-black text-premium">
+                    {formatPrice(calculation.baseCost)}
+                  </span>
+                </div>
+              </div>
+            )}
+          </SectionCard>
+
+          {/* Section: Down payment */}
+          <SectionCard
+            icon={<Wallet className="w-4 h-4" />}
+            title={selectedPackage === "vip" ? "Полная предоплата" : "Первый взнос"}
+            subtitle={selectedPackage === "vip" ? "VIP оплачивается единоразово" : "Сколько внести сейчас"}
+          >
+            <div className="text-center mb-3">
+              <div className="text-2xl font-black text-premium leading-none mb-1">
+                {selectedPackage === "vip"
+                  ? formatPrice(calculation?.packages?.vip?.finalCost || calculation?.baseCost || 0)
+                  : formatPrice(downPayment)}
+              </div>
+              <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                {selectedPackage === "vip" ? "к оплате" : "первый платёж"}
+              </div>
+            </div>
+
+            {selectedPackage === "vip" ? (
+              <div className="h-2 rounded-full overflow-hidden"
+                   style={{ background: "hsla(43, 88%, 56%, 0.15)" }}>
+                <div className="h-full w-full"
+                     style={{ background: "linear-gradient(90deg, hsl(43,88%,56%), hsl(36,80%,42%))" }} />
+              </div>
+            ) : (
+              <RangeSlider
+                min={getMinDownPayment()}
+                max={getMaxDownPayment()}
+                step={1}
+                value={downPayment}
+                onChange={setDownPayment}
+                formatLabel={formatPrice}
+                disabled={!selectedPackage}
+              />
+            )}
+          </SectionCard>
+
+          {/* Section: Installment */}
+          {selectedPackage !== "vip" && (
+            <SectionCard
+              icon={<CalendarClock className="w-4 h-4" />}
+              title="Рассрочка"
+              subtitle="Без процентов, удобными платежами"
+            >
+              <div className="text-center mb-3">
+                <div className="flex items-baseline justify-center gap-2 leading-none">
+                  <span className="text-2xl font-black text-premium">{installmentMonths}</span>
+                  <span className="text-xs uppercase tracking-wider text-muted-foreground">
+                    {getMonthLabel(installmentMonths)}
+                  </span>
+                </div>
+              </div>
+              <RangeSlider
+                min={Math.min(...(calculatorSettings?.installmentMonthsOptions || [1]))}
+                max={Math.max(...(calculatorSettings?.installmentMonthsOptions || [6]))}
+                value={installmentMonths}
+                onChange={setInstallmentMonths}
+              />
+              {selectedPackage && calculation && (
+                <div className="mt-3 rounded-lg p-3 text-center"
+                     style={{ background: "hsla(43,88%,56%,0.08)", border: "1px solid hsla(43,88%,56%,0.25)" }}>
+                  <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1">
+                    Платёж в месяц
+                  </div>
+                  <div className="text-lg font-black text-premium">
+                    {formatPrice(
+                      Math.max(0, ((calculation.packages as any)[selectedPackage]?.finalCost || 0) - downPayment) /
+                        Math.max(1, installmentMonths)
+                    )}
+                  </div>
+                </div>
+              )}
+            </SectionCard>
+          )}
+
+          {/* Section: Correction */}
+          <SectionCard
+            icon={<Sparkles className="w-4 h-4" />}
+            title="Дополнительная скидка"
+            subtitle="Можно подкрутить специально для клиентки"
+            compact
+          >
+            <div className="flex items-center gap-3">
+              <input
+                type="number"
+                min="0"
+                max="30"
+                step="0.5"
+                value={correctionPercent}
+                onChange={(e) => {
+                  const v = Math.min(30, Math.max(0, parseFloat(e.target.value) || 0));
+                  setCorrectionPercent(v);
+                }}
+                className="flex-1 input-premium text-center"
+                placeholder="0"
+                data-testid="input-correction"
+              />
+              <span className="text-sm font-bold text-premium">%</span>
+            </div>
+          </SectionCard>
+
+          {/* Free zones quick toggle */}
+          <SectionCard
+            icon={<Gift className="w-4 h-4" />}
+            title="Бонусные зоны"
+            subtitle="Дополнительные подарки клиентке"
+            compact
+          >
+            <div className="grid grid-cols-2 gap-1.5">
+              {FREE_ZONE_REASONS.map((r, i) => (
+                <div
+                  key={i}
+                  className="rounded-lg px-2.5 py-2 transition-colors"
+                  style={{
+                    background: "hsla(220, 30%, 10%, 0.5)",
+                    border: "1px solid hsl(var(--border))",
+                  }}
+                >
+                  <div className="text-[10px] text-muted-foreground leading-tight">{r.title}</div>
+                  <div className="text-xs font-bold mt-0.5" style={{ color: "hsl(var(--gold))" }}>
+                    {r.value}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </SectionCard>
+        </aside>
+
+        {/* RIGHT — PRICING CARDS */}
+        <section className="flex-1 min-w-0 overflow-y-auto custom-scrollbar">
+          {!calculation || calculation.baseCost === 0 ? (
+            <div className="h-full flex items-center justify-center">
+              <div className="text-center max-w-md px-8">
+                <div
+                  className="w-24 h-24 mx-auto mb-6 rounded-3xl flex items-center justify-center"
+                  style={{
+                    background:
+                      "linear-gradient(135deg, hsla(43,88%,56%,0.18), hsla(214,92%,56%,0.12))",
+                    border: "1px solid hsla(43,88%,56%,0.3)",
+                    boxShadow: "0 24px 60px -20px hsla(43,88%,56%,0.3)",
+                  }}
+                >
+                  <Sparkles className="w-12 h-12" style={{ color: "hsl(var(--gold))" }} />
+                </div>
+                <h2 className="text-3xl font-black tracking-tight mb-3 leading-tight">
+                  Подберите идеальный <br />
+                  <span className="text-premium">абонемент для клиента</span>
+                </h2>
+                <p className="text-muted-foreground text-sm leading-relaxed">
+                  Соберите курс из нужных зон в левой панели — мы покажем три варианта пакетов с прозрачным расчётом скидки, рассрочки и подарочных сеансов
+                </p>
+              </div>
+            </div>
+          ) : (
+            <ThreeBlockComparison
+              calculation={calculation}
+              packages={packages}
+              selectedPackage={selectedPackage}
+              onPackageSelect={setSelectedPackage}
+              downPayment={downPayment}
+              installmentMonths={installmentMonths}
+              procedureCount={procedureCount}
+              packagePerkValues={packagePerkValues}
+              calculatorSettings={calculatorSettings}
+              freeZones={freeZones}
+              selectedServices={selectedServices.map((s) => ({
+                ...s,
+                serviceId: s.yclientsId,
+                pricePerProcedure: parseFloat(s.priceMin),
+              }))}
+              bulkDiscountThreshold={calculatorSettings?.bulkDiscountThreshold || 15}
+              bulkDiscountPercentage={calculatorSettings?.bulkDiscountPercentage || 0.05}
+              correctionPercent={correctionPercent}
+              manualGiftSessions={manualGiftSessions}
+              onManualGiftSessionsChange={setManualGiftSessions}
+            />
+          )}
+        </section>
+      </main>
+
       {showClientModal && (
         <ClientModal
           isOpen={showClientModal}
@@ -573,7 +416,6 @@ export default function PromoCalculatorPage({
         />
       )}
 
-      {/* Master Sales Modal */}
       {showSalesModal && (
         <MasterSalesModal
           isOpen={showSalesModal}
@@ -581,6 +423,54 @@ export default function PromoCalculatorPage({
           masterName={user.name}
         />
       )}
+    </div>
+  );
+}
+
+function SectionCard({
+  icon,
+  title,
+  subtitle,
+  children,
+  compact = false,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  subtitle?: string;
+  children: React.ReactNode;
+  compact?: boolean;
+}) {
+  return (
+    <div
+      className="rounded-2xl backdrop-blur-xl"
+      style={{
+        background:
+          "linear-gradient(160deg, hsla(222, 38%, 11%, 0.92) 0%, hsla(220, 36%, 7%, 0.85) 100%)",
+        border: "1px solid hsl(var(--border))",
+        boxShadow:
+          "0 12px 32px -16px rgba(0,0,0,0.5), inset 0 1px 0 hsla(0,0%,100%,0.04)",
+      }}
+    >
+      <div className={`px-4 ${compact ? "py-3" : "pt-3.5 pb-3"} flex items-start gap-3`}>
+        <div
+          className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5"
+          style={{
+            background:
+              "linear-gradient(135deg, hsla(43,88%,56%,0.2), hsla(43,88%,56%,0.05))",
+            border: "1px solid hsla(43,88%,56%,0.3)",
+            color: "hsl(var(--gold))",
+          }}
+        >
+          {icon}
+        </div>
+        <div className="min-w-0 flex-1">
+          <div className="text-sm font-bold tracking-tight text-foreground leading-tight">{title}</div>
+          {subtitle && (
+            <div className="text-[11px] text-muted-foreground mt-0.5 leading-snug">{subtitle}</div>
+          )}
+        </div>
+      </div>
+      <div className={`px-4 ${compact ? "pb-3" : "pb-4"}`}>{children}</div>
     </div>
   );
 }

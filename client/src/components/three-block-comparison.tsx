@@ -1,7 +1,6 @@
-import { Crown, Star, Leaf, Gift, Check, Minus } from "lucide-react";
+import { Crown, Star, Leaf, Gift, Check, Minus, Sparkles, TrendingDown, Wallet, BadgeCheck } from "lucide-react";
 import * as Icons from "lucide-react";
 import { useState } from "react";
-import { Badge } from "@/components/ui/badge";
 import { formatPrice } from "@/lib/utils";
 
 interface Package {
@@ -53,12 +52,7 @@ interface ThreeBlockComparisonProps {
   procedureCount: number;
   packagePerkValues?: PackagePerkValue[];
   calculatorSettings?: any;
-  freeZones?: Array<{
-    serviceId: number;
-    title: string;
-    pricePerProcedure: number;
-    quantity: number;
-  }>;
+  freeZones?: Array<any>;
   selectedServices?: SelectedService[];
   bulkDiscountThreshold?: number;
   bulkDiscountPercentage?: number;
@@ -66,6 +60,54 @@ interface ThreeBlockComparisonProps {
   manualGiftSessions?: Record<string, number>;
   onManualGiftSessionsChange?: (sessions: Record<string, number>) => void;
 }
+
+const PACKAGE_META: Record<string, {
+  Icon: any;
+  tagline: string;
+  subtitle: string;
+  badge?: string;
+  highlight: boolean;
+  gradient: string;
+  border: string;
+  glow: string;
+  iconBg: string;
+  accent: string;
+}> = {
+  vip: {
+    Icon: Crown,
+    tagline: "Полный комфорт без ограничений",
+    subtitle: "Максимум привилегий",
+    badge: "Лучший выбор",
+    highlight: true,
+    gradient: "linear-gradient(160deg, hsla(43, 88%, 56%, 0.16) 0%, hsla(43, 80%, 40%, 0.08) 60%, hsla(222, 38%, 11%, 0.95) 100%)",
+    border: "1.5px solid hsla(43, 88%, 56%, 0.55)",
+    glow: "0 24px 60px -20px hsla(43, 88%, 56%, 0.45), inset 0 1px 0 hsla(0,0%,100%,0.08)",
+    iconBg: "linear-gradient(135deg, hsl(43, 95%, 65%), hsl(36, 80%, 45%))",
+    accent: "hsl(43, 90%, 65%)",
+  },
+  standard: {
+    Icon: Star,
+    tagline: "Оптимальный баланс цены и привилегий",
+    subtitle: "Самый популярный",
+    highlight: false,
+    gradient: "linear-gradient(160deg, hsla(214, 92%, 56%, 0.10) 0%, hsla(220, 80%, 30%, 0.05) 60%, hsla(222, 38%, 10%, 0.92) 100%)",
+    border: "1.5px solid hsla(214, 92%, 56%, 0.35)",
+    glow: "0 16px 40px -16px hsla(214, 92%, 56%, 0.3), inset 0 1px 0 hsla(0,0%,100%,0.05)",
+    iconBg: "linear-gradient(135deg, hsl(214, 95%, 65%), hsl(220, 80%, 40%))",
+    accent: "hsl(214, 95%, 70%)",
+  },
+  economy: {
+    Icon: Leaf,
+    tagline: "Лёгкий старт в мир ухода",
+    subtitle: "Доступный вход",
+    highlight: false,
+    gradient: "linear-gradient(160deg, hsla(220, 30%, 18%, 0.5) 0%, hsla(222, 38%, 10%, 0.92) 100%)",
+    border: "1px solid hsl(var(--border))",
+    glow: "0 12px 32px -16px rgba(0,0,0,0.5), inset 0 1px 0 hsla(0,0%,100%,0.04)",
+    iconBg: "linear-gradient(135deg, hsl(218, 30%, 35%), hsl(220, 30%, 22%))",
+    accent: "hsl(210, 30%, 80%)",
+  },
+};
 
 export default function ThreeBlockComparison({
   calculation,
@@ -85,707 +127,337 @@ export default function ThreeBlockComparison({
   manualGiftSessions = {},
   onManualGiftSessionsChange,
 }: ThreeBlockComparisonProps) {
-  const [editingGiftSessions, setEditingGiftSessions] = useState<string | null>(null);
-  const [tempGiftValue, setTempGiftValue] = useState("");
+  const [editingGift, setEditingGift] = useState<string | null>(null);
+  const [tempGift, setTempGift] = useState("");
 
   const packageTypes = ["vip", "standard", "economy"];
   const hasValidCalculation = calculation && calculation.baseCost > 0;
 
-  const getPackageData = (packageType: string) => {
+  const getPackageData = (t: string) => {
     if (!hasValidCalculation) return null;
-    return (calculation.packages as any)[packageType] || null;
+    return (calculation.packages as any)[t] || null;
   };
 
-  const getPackageIcon = (packageType: string) => {
-    switch (packageType) {
-      case "vip":
-        return Crown;
-      case "standard":
-        return Star;
-      case "economy":
-        return Leaf;
-      default:
-        return Star;
-    }
+  const getPkg = (t: string) => packages.find((p) => p.type === t);
+
+  const getDiscountPercent = (t: string) => {
+    const pkg = getPkg(t);
+    if (!pkg) return 0;
+    let p = parseFloat(pkg.discount) * 100;
+    if (procedureCount >= bulkDiscountThreshold) p += bulkDiscountPercentage * 100;
+    p += correctionPercent;
+    return Math.round(p);
   };
 
-  // Calculate final discount percentage with additional discounts
-  const getFinalDiscountPercent = (packageType: string) => {
-    const packageData = packages.find((p) => p.type === packageType);
-    if (!packageData) return 0;
-
-    let baseDiscountPercent = parseFloat(packageData.discount) * 100;
-    
-    // Add bulk discount using admin settings
-    if (procedureCount >= bulkDiscountThreshold) {
-      baseDiscountPercent += bulkDiscountPercentage * 100;
-    }
-    
-    // Add correction percentage
-    baseDiscountPercent += correctionPercent;
-    
-    return Math.round(baseDiscountPercent);
-  };
-
-  const getPackageName = (packageType: string) => {
-    const packageData = packages.find((p) => p.type === packageType);
-    return packageData?.name || packageType;
-  };
-
-  const getPackageColor = (packageType: string) => {
-    switch (packageType) {
-      case "vip":
-        return "from-yellow-400 to-yellow-600";
-      case "standard":
-        return "from-blue-400 to-blue-600";
-      case "economy":
-        return "from-green-400 to-green-600";
-      default:
-        return "from-blue-400 to-blue-600";
-    }
-  };
-
-  // Get unique perks for display
   const uniquePerks = Array.from(
-    new Map(packagePerkValues.map((pv) => [pv.perk.id, pv.perk])).values(),
+    new Map(packagePerkValues.map((pv) => [pv.perk.id, pv.perk])).values()
   ).sort((a, b) => (a.displayOrder || 0) - (b.displayOrder || 0));
 
-  const calculateGiftCost = (packageType: string) => {
-    if (!selectedServices.length || !hasValidCalculation) return 0;
-
-    const packageData = packages.find((p) => p.type === packageType);
-    const giftSessions = packageData?.giftSessions || 0;
-
-    if (giftSessions === 0) return 0;
-
-    const totalBaseCost = selectedServices.reduce((sum, service) => {
-      // Use custom price if available, otherwise use pricePerProcedure
-      const price = service.customPrice ? parseFloat(service.customPrice) : service.pricePerProcedure;
-      return sum + price * service.quantity;
-    }, 0);
-
-    return totalBaseCost * giftSessions;
+  const computeDownForPkg = (t: string): number => {
+    const pkgData = getPackageData(t);
+    const pkg = getPkg(t);
+    if (!pkgData || !pkg) return 0;
+    if (t === "vip") return pkgData.finalCost;
+    if (selectedPackage === t) return downPayment;
+    const minPct = parseFloat(pkg.minDownPaymentPercent.toString());
+    const calc = Math.round(pkgData.finalCost * minPct);
+    const absMin = calculatorSettings?.minimumDownPayment || 5000;
+    return Math.max(calc, absMin);
   };
 
-  const calculateFreeCost = (packageType: string) => {
-    if (!freeZones.length) return 0;
-
-    return freeZones.reduce((sum, zone) => {
-      return sum + zone.pricePerProcedure * zone.quantity;
-    }, 0);
-  };
-
-  const calculateBonusAmount = (packageType: string) => {
-    const packageData = packages.find((p) => p.type === packageType);
-    const packageCalcData = getPackageData(packageType);
-
-    if (!packageData || !packageCalcData) return 0;
-
-    const bonusPercent = packageData.bonusAccountPercent || 0;
-    return packageCalcData.finalCost * (bonusPercent / 100);
+  const computeMonthly = (t: string): number => {
+    const pkgData = getPackageData(t);
+    if (!pkgData || t === "vip") return 0;
+    if (selectedPackage === t) {
+      return Math.round(Math.max(0, (pkgData.finalCost - downPayment)) / Math.max(1, installmentMonths));
+    }
+    const months = Math.min(...(calculatorSettings?.installmentMonthsOptions || [1]));
+    const dp = computeDownForPkg(t);
+    return Math.round(Math.max(0, pkgData.finalCost - dp) / Math.max(1, months));
   };
 
   if (!hasValidCalculation) {
     return (
-      <div className="text-center p-8 text-gray-500">
-        Выберите услуги для просмотра сравнения пакетов
+      <div className="h-full flex items-center justify-center">
+        <div className="text-center max-w-md px-8">
+          <div className="w-20 h-20 mx-auto mb-6 rounded-2xl flex items-center justify-center"
+               style={{ background: "linear-gradient(135deg, hsla(43,88%,56%,0.15), hsla(214,92%,56%,0.1))", border: "1px solid hsla(43,88%,56%,0.3)" }}>
+            <Sparkles className="w-9 h-9" style={{ color: "hsl(var(--gold))" }} />
+          </div>
+          <h2 className="text-2xl font-bold mb-3 tracking-tight">
+            Подберите идеальный <span className="text-premium">абонемент</span>
+          </h2>
+          <p className="text-muted-foreground text-sm leading-relaxed">
+            Выберите услуги в левой панели — и калькулятор покажет три варианта пакетов с расчётом скидки, рассрочки и подарочных сеансов
+          </p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-3 w-full max-w-4xl">
-      {/* Преимущества with curved border */}
-      <div
-        className="relative overflow-hidden border border-pink-300/50"
-        style={{ borderRadius: "6px" }}
-      >
-        {/* Title and Package Headers grid layout */}
-        <div className="pt-2.5 px-3 mb-2">
-          {/* Title with star icon and package headers in grid */}
-          <div className="grid grid-cols-4 gap-2.5 items-center p-1">
-            {/* Title with star icon */}
-            <div className="flex items-center gap-1.5">
-              <Star className="w-3.5 h-3.5 text-yellow-500" />
-              <span className="font-bold text-gray-800 text-xs">
-                Преимущества
-              </span>
-            </div>
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 h-full content-start">
+      {packageTypes.map((type) => {
+        const meta = PACKAGE_META[type];
+        const Icon = meta.Icon;
+        const pkg = getPkg(type);
+        const pkgData = getPackageData(type);
+        const isSelected = selectedPackage === type;
+        const isAvailable = pkgData?.isAvailable !== false;
+        const finalCost = pkgData?.finalCost || 0;
+        const discountPct = getDiscountPercent(type);
+        const savings = calculation.baseCost - finalCost;
+        const dp = computeDownForPkg(type);
+        const monthly = computeMonthly(type);
+        const giftSessions =
+          manualGiftSessions[type] !== undefined
+            ? manualGiftSessions[type]
+            : pkg?.giftSessions || 0;
+        const bonusPct = parseFloat(pkg?.bonusAccountPercent || "0");
+        const bonusAmount = Math.round(finalCost * (bonusPct / 100));
 
-            {/* Package Headers - contained within grid cells */}
-            {packageTypes.map((packageType) => {
-              const Icon = getPackageIcon(packageType);
-              const packageData = getPackageData(packageType);
-              const isAvailable = packageData?.isAvailable !== false;
-              const unavailableReason = packageData?.unavailableReason || '';
-              const isSelected =
-                selectedPackage === packageType && selectedPackage !== null;
+        const cardPerks = uniquePerks
+          .filter((perk) => {
+            if (perk.name === "Гарантия возврата денег" && procedureCount < 10) return false;
+            const pv = packagePerkValues.find(
+              (v) => v.packageType === type && v.perkId === perk.id
+            );
+            if (!pv) return false;
+            if (pv.valueType === "boolean" && !pv.booleanValue) return false;
+            if (pv.displayValue === "-" || !pv.displayValue) return false;
+            return true;
+          })
+          .slice(0, 7);
 
-              return (
-                <div key={packageType} className="text-center">
-                  <div
-                    className={`transition-all duration-200 p-1 ${
-                      isAvailable 
-                        ? 'cursor-pointer hover:opacity-80' 
-                        : 'cursor-not-allowed'
-                    }`}
-                    onClick={() => isAvailable && onPackageSelect(packageType)}
-                    title={!isAvailable ? unavailableReason : ''}
-                  >
-                    <div
-                      className={`inline-flex items-center justify-center w-3.5 h-3.5 rounded bg-gradient-to-r ${getPackageColor(packageType)} mb-0.5`}
-                    >
-                      <Icon className="h-2 w-2 text-white" />
-                    </div>
-                    <div className="font-bold text-gray-800 text-xs">
-                      {getPackageName(packageType)}
-                    </div>
-                    {!isAvailable && (
-                      <div className="text-xs text-red-500 mt-0.5 leading-tight">
-                        Недоступен
-                      </div>
-                    )}
-                    {/* Dot indicator under selected package */}
-                    {isSelected && isAvailable && (
-                      <div className="flex justify-center mt-1">
-                        <div className="w-2 h-2 rounded-full bg-blue-500"></div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        <div className="px-3 pb-2.5 relative z-0">
-          <div className="space-y-0.5">
-            {uniquePerks.map((perk) => {
-              const IconComponent = (Icons as any)[perk.icon] || Star;
-
-              // Show "Гарантия возврата денег" only when 10+ procedures
-              if (perk.name === "Гарантия возврата денег" && procedureCount < 10) {
-                return null;
-              }
-
-              return (
-                <div
-                  key={perk.id}
-                  className="grid grid-cols-4 gap-2.5 py-1 border-b border-gray-100 last:border-b-0"
-                >
-                  <div className="flex items-center text-xs font-medium text-gray-700">
-                    <span>{perk.name}</span>
-                  </div>
-                  {packageTypes.map((packageType) => {
-                    const perkValue = packagePerkValues.find(
-                      (pv) =>
-                        pv.packageType === packageType && pv.perkId === perk.id,
-                    );
-
-                    let displayContent;
-                    
-                    if (!perkValue) {
-                      displayContent = (
-                        <Minus className="w-3 h-3 text-red-500" strokeWidth={1} />
-                      );
-                    } else if (perkValue.valueType === "boolean") {
-                      displayContent = perkValue.booleanValue ? (
-                        <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
-                          <Check className="w-3 h-3 text-white" />
-                        </div>
-                      ) : (
-                        <Minus className="w-3 h-3 text-red-500" strokeWidth={1} />
-                      );
-                    } else if (perkValue.displayValue === "Включено") {
-                      displayContent = (
-                        <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
-                          <Check className="w-3 h-3 text-white" />
-                        </div>
-                      );
-                    } else if (perkValue.displayValue === "✓") {
-                      displayContent = (
-                        <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
-                          <Check className="w-3 h-3 text-white" />
-                        </div>
-                      );
-                    } else if (perkValue.displayValue === "-" || !perkValue.displayValue) {
-                      displayContent = (
-                        <Minus className="w-3 h-3 text-red-500" strokeWidth={1} />
-                      );
-                    } else {
-                      displayContent = (
-                        <span className="text-xs font-semibold text-gray-700">
-                          {perkValue.displayValue}
-                        </span>
-                      );
-                    }
-
-
-
-                    return (
-                      <div
-                        key={packageType}
-                        className="flex items-center justify-center"
-                      >
-                        {displayContent}
-                      </div>
-                    );
-                  })}
-                </div>
-              );
-            })}
-
-            {/* Free Sessions Row - Show only when 10+ procedures */}
-            {procedureCount >= 10 && (
-              <div className="grid grid-cols-4 gap-2.5 py-1 border-b border-gray-100">
-                <div className="text-xs font-medium text-gray-700">
-                  Сеансы в подарок
-                </div>
-                {packageTypes.map((packageType) => {
-                  const packageData = packages.find((p) => p.type === packageType);
-                  const giftSessions = manualGiftSessions[packageType] !== undefined 
-                    ? manualGiftSessions[packageType] 
-                    : (packageData?.giftSessions || 0);
-
-                  return (
-                    <div key={packageType} className="flex items-center justify-center">
-                      {/* Всегда показываем возможность редактирования, даже если изначально 0 */}
-                      {true ? (
-                        editingGiftSessions === packageType ? (
-                          <input
-                            type="number"
-                            min="0"
-                            max="10"
-                            value={tempGiftValue}
-                            onChange={(e) => setTempGiftValue(e.target.value)}
-                            onBlur={() => {
-                              const value = Math.max(0, Math.min(10, parseInt(tempGiftValue) || 0));
-                              if (onManualGiftSessionsChange) {
-                                onManualGiftSessionsChange({
-                                  ...manualGiftSessions,
-                                  [packageType]: value
-                                });
-                              }
-                              setEditingGiftSessions(null);
-                            }}
-                            onKeyPress={(e) => {
-                              if (e.key === "Enter") {
-                                const value = Math.max(0, Math.min(10, parseInt(tempGiftValue) || 0));
-                                if (onManualGiftSessionsChange) {
-                                  onManualGiftSessionsChange({
-                                    ...manualGiftSessions,
-                                    [packageType]: value
-                                  });
-                                }
-                                setEditingGiftSessions(null);
-                              }
-                            }}
-                            autoFocus
-                            onFocus={(e) => e.target.select()}
-                            className="w-8 text-xs text-center border border-gray-300 rounded px-1 py-0.5 bg-white text-gray-900 focus:outline-none focus:ring-1 focus:ring-pink-500"
-                          />
-                        ) : (
-                          giftSessions > 0 ? (
-                            <span 
-                              className="text-sm font-bold text-gray-800 cursor-pointer hover:bg-gray-100 px-1 py-0.5 rounded transition-colors"
-                              onClick={() => {
-                                setTempGiftValue(giftSessions.toString());
-                                setEditingGiftSessions(packageType);
-                              }}
-                              title="Нажмите для изменения"
-                            >
-                              {giftSessions}
-                            </span>
-                          ) : (
-                            <span 
-                              className="cursor-pointer hover:bg-gray-100 px-1 py-0.5 rounded transition-colors flex items-center justify-center"
-                              onClick={() => {
-                                setTempGiftValue("0");
-                                setEditingGiftSessions(packageType);
-                              }}
-                              title="Нажмите для добавления подарочных сеансов"
-                            >
-                              <Minus className="w-3 h-3 text-red-500" strokeWidth={1} />
-                            </span>
-                          )
-                        )
-                      ) : (
-                        <Minus className="w-3 h-3 text-red-500" strokeWidth={1} />
-                      )}
-                    </div>
-                  );
-                })}
+        return (
+          <div
+            key={type}
+            className={`relative flex flex-col rounded-2xl overflow-hidden transition-all duration-300 ${
+              !isAvailable ? "opacity-50" : "cursor-pointer"
+            } ${isSelected ? "scale-[1.015]" : "hover:scale-[1.01]"}`}
+            style={{
+              background: meta.gradient,
+              border: isSelected
+                ? `1.5px solid hsl(var(--gold))`
+                : meta.border,
+              boxShadow: isSelected
+                ? "0 28px 70px -22px hsla(43,88%,56%,0.55), inset 0 1px 0 hsla(0,0%,100%,0.1)"
+                : meta.glow,
+              backdropFilter: "blur(14px)",
+            }}
+            onClick={() => isAvailable && onPackageSelect(type)}
+            data-testid={`card-package-${type}`}
+          >
+            {/* Top badge */}
+            {meta.badge && (
+              <div className="absolute top-3 right-3 z-10 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider"
+                   style={{
+                     background: "linear-gradient(135deg, hsl(43, 95%, 65%), hsl(36, 80%, 45%))",
+                     color: "hsl(var(--navy))",
+                     boxShadow: "0 4px 12px hsla(43,88%,56%,0.4)",
+                   }}>
+                {meta.badge}
               </div>
             )}
 
-            {/* Discount Row */}
-            <div className="grid grid-cols-4 gap-2.5 py-1 border-b border-gray-100">
-              <div className="text-xs font-medium text-gray-700">Скидка</div>
-              {packageTypes.map((packageType) => {
-                const finalDiscountPercent = getFinalDiscountPercent(packageType);
+            {/* Header */}
+            <div className="px-5 pt-5 pb-4">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0"
+                     style={{ background: meta.iconBg, boxShadow: `0 8px 20px -8px ${meta.accent}` }}>
+                  <Icon className="w-5 h-5" style={{ color: type === "economy" ? "hsl(var(--foreground))" : "hsl(var(--navy))" }} />
+                </div>
+                <div className="min-w-0">
+                  <div className="text-xl font-black tracking-tight uppercase leading-none" style={{ color: meta.accent }}>
+                    {pkg?.name || type}
+                  </div>
+                  <div className="text-[11px] text-muted-foreground mt-1 uppercase tracking-wider font-medium">
+                    {meta.subtitle}
+                  </div>
+                </div>
+              </div>
+              <p className="text-xs text-foreground/70 leading-snug">{meta.tagline}</p>
+            </div>
 
+            {!isAvailable && (
+              <div className="mx-5 mb-3 px-3 py-2 rounded-lg text-xs text-center"
+                   style={{ background: "hsla(0,72%,52%,0.12)", color: "hsl(0, 80%, 75%)", border: "1px solid hsla(0,72%,52%,0.3)" }}>
+                {pkgData?.unavailableReason || "Недоступен"}
+              </div>
+            )}
+
+            {/* Price block */}
+            <div className="px-5 pb-4">
+              <div className="rounded-xl p-4 relative overflow-hidden"
+                   style={{
+                     background: "linear-gradient(160deg, hsla(220,40%,6%,0.6), hsla(222,38%,11%,0.4))",
+                     border: "1px solid hsla(218, 30%, 22%, 0.7)",
+                   }}>
+                {savings > 0 && (
+                  <div className="flex items-center gap-1.5 mb-2">
+                    <span className="text-xs line-through text-muted-foreground/70">
+                      {formatPrice(calculation.baseCost)}
+                    </span>
+                    <span className="px-2 py-0.5 rounded-md text-[10px] font-bold"
+                          style={{ background: "hsla(43,88%,56%,0.15)", color: "hsl(var(--gold))", border: "1px solid hsla(43,88%,56%,0.3)" }}>
+                      −{discountPct}%
+                    </span>
+                  </div>
+                )}
+                <div className="flex items-baseline gap-1.5">
+                  <span className="text-3xl font-black tracking-tight" style={{ color: meta.accent }}>
+                    {formatPrice(finalCost)}
+                  </span>
+                </div>
+                {savings > 0 && (
+                  <div className="flex items-center gap-1.5 mt-2 text-xs">
+                    <TrendingDown className="w-3.5 h-3.5" style={{ color: "hsl(140, 70%, 55%)" }} />
+                    <span className="font-semibold" style={{ color: "hsl(140, 70%, 70%)" }}>
+                      Экономия {formatPrice(savings)}
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              {/* Payment plan */}
+              <div className="grid grid-cols-2 gap-2 mt-3">
+                <div className="rounded-lg px-3 py-2"
+                     style={{ background: "hsla(220,30%,10%,0.5)", border: "1px solid hsl(var(--border))" }}>
+                  <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1">
+                    Первый взнос
+                  </div>
+                  <div className="text-sm font-bold text-foreground">{formatPrice(dp)}</div>
+                </div>
+                <div className="rounded-lg px-3 py-2"
+                     style={{ background: "hsla(220,30%,10%,0.5)", border: "1px solid hsl(var(--border))" }}>
+                  <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1">
+                    {type === "vip" ? "Оплата" : "В месяц"}
+                  </div>
+                  <div className="text-sm font-bold text-foreground">
+                    {type === "vip" ? "Разово" : formatPrice(monthly)}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Highlights row */}
+            <div className="px-5 pb-3 flex flex-wrap gap-1.5">
+              {procedureCount >= 10 && (
+                <div
+                  className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold cursor-pointer transition-colors hover:bg-white/5"
+                  style={{ background: "hsla(43,88%,56%,0.1)", border: "1px solid hsla(43,88%,56%,0.35)", color: "hsl(var(--gold))" }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setTempGift(String(giftSessions));
+                    setEditingGift(type);
+                  }}
+                  title="Нажмите, чтобы изменить"
+                >
+                  <Gift className="w-3 h-3" />
+                  {editingGift === type ? (
+                    <input
+                      type="number"
+                      min="0"
+                      max="10"
+                      autoFocus
+                      value={tempGift}
+                      onChange={(e) => setTempGift(e.target.value)}
+                      onClick={(e) => e.stopPropagation()}
+                      onBlur={() => {
+                        const v = Math.max(0, Math.min(10, parseInt(tempGift) || 0));
+                        onManualGiftSessionsChange?.({ ...manualGiftSessions, [type]: v });
+                        setEditingGift(null);
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          const v = Math.max(0, Math.min(10, parseInt(tempGift) || 0));
+                          onManualGiftSessionsChange?.({ ...manualGiftSessions, [type]: v });
+                          setEditingGift(null);
+                        }
+                      }}
+                      className="w-8 bg-transparent text-center outline-none text-[11px] font-bold"
+                    />
+                  ) : (
+                    <span>{giftSessions} в подарок</span>
+                  )}
+                </div>
+              )}
+              {bonusPct > 0 && bonusAmount > 0 && (
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold"
+                     style={{ background: "hsla(214,92%,56%,0.1)", border: "1px solid hsla(214,92%,56%,0.35)", color: "hsl(214, 95%, 75%)" }}>
+                  <Wallet className="w-3 h-3" />
+                  +{formatPrice(bonusAmount)} бонус
+                </div>
+              )}
+            </div>
+
+            {/* Perks list */}
+            <div className="px-5 pb-4 flex-1 space-y-1.5">
+              {cardPerks.map((perk) => {
+                const PerkIcon = (Icons as any)[perk.icon] || BadgeCheck;
+                const pv = packagePerkValues.find(
+                  (v) => v.packageType === type && v.perkId === perk.id
+                );
+                const isText =
+                  pv && pv.valueType !== "boolean" && pv.displayValue && pv.displayValue !== "Включено" && pv.displayValue !== "✓";
                 return (
-                  <div key={packageType} className="flex items-center justify-center">
-                    <span className="text-sm font-bold text-gray-800">
-                      {finalDiscountPercent}%
+                  <div key={perk.id} className="flex items-start gap-2 text-xs">
+                    <div className="w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5"
+                         style={{ background: "hsla(140,70%,45%,0.15)", border: "1px solid hsla(140,70%,45%,0.3)" }}>
+                      <Check className="w-2.5 h-2.5" style={{ color: "hsl(140, 70%, 65%)" }} />
+                    </div>
+                    <span className="text-foreground/85 leading-snug">
+                      {perk.name}
+                      {isText && (
+                        <span className="ml-1 font-semibold" style={{ color: meta.accent }}>
+                          · {pv!.displayValue}
+                        </span>
+                      )}
                     </span>
                   </div>
                 );
               })}
+              {cardPerks.length === 0 && (
+                <div className="text-xs text-muted-foreground italic">Базовые условия абонемента</div>
+              )}
             </div>
-          </div>
-        </div>
-      </div>
 
-      {/* Стоимость with curved border */}
-      <div
-        className="relative overflow-hidden border border-pink-300/50"
-        style={{ borderRadius: "6px" }}
-      >
-
-
-        <div className="pt-2.5 px-3 space-y-0.5">
-          {/* Title with money icon */}
-          <div className="grid grid-cols-4 gap-2.5 items-center p-1 mb-2">
-            <div className="flex items-center gap-1.5">
-              <span className="text-sm">💰</span>
-              <span className="font-bold text-gray-800 text-xs">Стоимость</span>
-            </div>
-            <div></div>
-            <div></div>
-            <div></div>
-          </div>
-
-          {/* Первоначальная стоимость */}
-          <div className="grid grid-cols-4 gap-2.5 py-1 border-b border-gray-100">
-            <div className="text-xs font-medium text-gray-700">
-              Первоначальная
-            </div>
-            {packageTypes.map((packageType) => (
-              <div key={packageType} className="text-center">
-                <span className="text-xs font-semibold text-red-500 line-through">
-                  {formatPrice(calculation.baseCost)}
-                </span>
-              </div>
-            ))}
-          </div>
-
-          {/* Скидка */}
-          <div className="grid grid-cols-4 gap-2.5 py-1 border-b border-gray-100">
-            <div className="text-xs font-medium text-gray-700">Скидка</div>
-            {packageTypes.map((packageType) => {
-              const packageData = getPackageData(packageType);
-              const discount = packageData
-                ? calculation.baseCost - packageData.finalCost
-                : 0;
-
-              return (
-                <div key={packageType} className="text-center">
-                  <span className="text-xs font-semibold text-green-600">
-                    -{formatPrice(discount)}
-                  </span>
-                </div>
-              );
-            })}
-          </div>
-
-          {/* Итого стоимость курса */}
-          <div className="grid grid-cols-4 gap-2.5 py-1.5 mt-0.5">
-            <div className="text-xs font-bold text-gray-800">
-              Итого:
-            </div>
-            {packageTypes.map((packageType) => {
-              const packageData = getPackageData(packageType);
-              const isAvailable = packageData?.isAvailable !== false;
-              const unavailableReason = packageData?.unavailableReason || '';
-              const finalCost = packageData?.finalCost || 0;
-
-              return (
-                <div key={packageType} className="text-center">
-                  <span className="text-sm font-bold text-pink-400">
-                    {formatPrice(finalCost)}
-                  </span>
-                </div>
-              );
-            })}
-          </div>
-
-
-
-        </div>
-      </div>
-
-      {/* Первый взнос и Платеж в месяц - вынесены за пределы блока */}
-      <div className="space-y-0.5 -mt-3">
-        {/* Первый взнос */}
-        <div className="grid grid-cols-4 gap-2.5 py-1">
-          <div className="text-xs text-gray-600">Первый взнос:</div>
-          {packageTypes.map((packageType) => {
-            const packageData = getPackageData(packageType);
-            const pkg = packages.find(p => p.type === packageType);
-            let displayAmount = downPayment;
-            
-            // Логика для VIP пакета
-            if (packageType === 'vip') {
-              // Если VIP выбран, показываем значение слайдера (полную стоимость)
-              if (selectedPackage === 'vip') {
-                displayAmount = downPayment; // Для VIP это всегда полная стоимость
-              } 
-              // Если выбран другой пакет (стандарт/эконом) или не выбран - показываем полную стоимость VIP
-              else {
-                displayAmount = packageData?.finalCost || 0;
-              }
-            }
-            // Логика для остальных пакетов (стандарт и эконом)
-            else {
-              // Если пакет не выбран, показываем минимальный взнос для этого пакета
-              if (!selectedPackage && packageData && pkg) {
-                // Используем minDownPaymentPercent из настроек пакета
-                const minDownPaymentPercent = parseFloat(pkg.minDownPaymentPercent.toString());
-                const calculatedMinPayment = Math.round(packageData.finalCost * minDownPaymentPercent);
-                // Применяем абсолютный минимум из настроек
-                const absoluteMinimum = calculatorSettings?.minimumDownPayment || 5000;
-                displayAmount = Math.max(calculatedMinPayment, absoluteMinimum);
-              }
-              // Если этот пакет выбран, показываем значение слайдера
-              else if (selectedPackage === packageType) {
-                displayAmount = downPayment;
-              }
-              // Если выбран другой пакет, показываем минимальный взнос для этого пакета
-              else if (selectedPackage && packageData && pkg) {
-                const minDownPaymentPercent = parseFloat(pkg.minDownPaymentPercent.toString());
-                const calculatedMinPayment = Math.round(packageData.finalCost * minDownPaymentPercent);
-                const absoluteMinimum = calculatorSettings?.minimumDownPayment || 5000;
-                displayAmount = Math.max(calculatedMinPayment, absoluteMinimum);
-              }
-            }
-            
-            return (
-              <div key={packageType} className="text-center">
-                <span className="text-xs text-gray-600">
-                  {formatPrice(displayAmount)}
-                </span>
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Платеж в месяц */}
-        {installmentMonths > 0 && (
-          <div className="grid grid-cols-4 gap-2.5 py-1">
-            <div className="text-xs text-gray-600">Платеж в месяц</div>
-            {packageTypes.map((packageType) => {
-              const packageData = getPackageData(packageType);
-              const pkg = packages.find(p => p.type === packageType);
-              let monthlyPayment = packageData?.monthlyPayment || 0;
-              
-              // Если пакет не выбран, рассчитываем ежемесячный платеж для показа
-              if (!selectedPackage && packageData && pkg && packageType !== 'vip') {
-                const minDownPaymentPercent = parseFloat(pkg.minDownPaymentPercent.toString());
-                const calculatedMinPayment = Math.round(packageData.finalCost * minDownPaymentPercent);
-                const absoluteMinimum = calculatorSettings?.minimumDownPayment || 5000;
-                const minDownPayment = Math.max(calculatedMinPayment, absoluteMinimum);
-                const remainingCost = packageData.finalCost - minDownPayment;
-                const minInstallmentMonths = Math.min(...(calculatorSettings?.installmentMonthsOptions || [1]));
-                monthlyPayment = Math.round(remainingCost / minInstallmentMonths);
-              }
-
-              return (
-                <div key={packageType} className="flex items-center justify-center">
-                  {packageType === 'vip' ? (
-                    <Minus className="w-3 h-3 text-red-500" strokeWidth={1} />
-                  ) : (
-                    <span className="text-xs text-gray-600">
-                      {formatPrice(monthlyPayment)}
-                    </span>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        )}
-      </div>
-
-      {/* Подарки with curved border */}
-      <div
-        className="relative overflow-hidden border border-pink-300/50"
-        style={{ borderRadius: "6px" }}
-      >
-
-
-        <div className="pt-2.5 px-3 space-y-0.5 relative z-0">
-          {/* Title with gift box icon */}
-          <div className="grid grid-cols-4 gap-2.5 items-center p-1 mb-2">
-            <div className="flex items-center gap-1.5">
-              <span className="text-sm">🎁</span>
-              <span className="font-bold text-gray-800 text-xs">Подарки</span>
-            </div>
-            <div></div>
-            <div></div>
-            <div></div>
-          </div>
-
-          {/* Gift Procedures Cost Row - Show only when 10+ procedures */}
-          {procedureCount >= 10 && (
-            <div className="grid grid-cols-4 gap-2.5 py-1 border-b border-gray-100">
-              <div className="text-xs font-medium text-gray-700">
-                Подарочные процедуры
-              </div>
-            {packageTypes.map((packageType) => {
-              const packageData = packages.find((p) => p.type === packageType);
-            const giftSessions = manualGiftSessions[packageType] !== undefined 
-              ? manualGiftSessions[packageType] 
-              : (packageData?.giftSessions || 0);
-
-              // Calculate cost of one visit using original table logic
-              let costOfOneVisit = 0;
-              if (selectedServices && selectedServices.length > 0) {
-                // Sum of all selected services base prices
-                costOfOneVisit = selectedServices.reduce((sum, service) => {
-                  return (
-                    sum +
-                    parseFloat(service.priceMin?.toString() || service.pricePerProcedure.toString())
-                  );
-                }, 0);
-
-                // Subtract free zones from cost of one visit
-                if (freeZones && freeZones.length > 0) {
-                  const freeZonesCost = freeZones.reduce((sum, zone) => {
-                    return sum + zone.pricePerProcedure;
-                  }, 0);
-                  costOfOneVisit = Math.max(0, costOfOneVisit - freeZonesCost);
+            {/* CTA */}
+            <div className="px-5 pb-5">
+              <button
+                disabled={!isAvailable}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  isAvailable && onPackageSelect(type);
+                }}
+                className="w-full py-3 rounded-xl text-sm font-bold tracking-wide transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed"
+                style={
+                  isSelected
+                    ? {
+                        background: "linear-gradient(135deg, hsl(43, 95%, 62%), hsl(36, 80%, 45%))",
+                        color: "hsl(var(--navy))",
+                        boxShadow: "0 12px 32px -10px hsla(43,88%,56%,0.5), inset 0 1px 0 hsla(0,0%,100%,0.2)",
+                      }
+                    : {
+                        background: "hsla(220,30%,10%,0.6)",
+                        color: "hsl(var(--foreground))",
+                        border: "1px solid hsl(var(--border))",
+                      }
                 }
-              } else {
-                // If no specific services selected, use total cost divided by total procedures
-                costOfOneVisit =
-                  calculation.totalProcedures > 0
-                    ? calculation.baseCost / calculation.totalProcedures
-                    : 0;
-              }
-
-              // Gift value = cost of one visit * gift sessions
-              const giftValue =
-                packageData && giftSessions > 0
-                  ? costOfOneVisit * giftSessions
-                  : 0;
-
-              return (
-                <div key={packageType} className="flex items-center justify-center">
-                  {giftValue > 0 ? (
-                    <span className="text-xs font-semibold text-gray-700">
-                      {formatPrice(giftValue)}
-                    </span>
-                  ) : (
-                    <Minus className="w-3 h-3 text-red-500" strokeWidth={1} />
-                  )}
-                </div>
-              );
-            })}
-            </div>
-          )}
-
-          {/* Free Zones Cost Rows - Show each free zone separately like in original */}
-          {freeZones &&
-            freeZones.length > 0 &&
-            freeZones.map((zone, index) => (
-              <div
-                key={`free-zone-${zone.serviceId}-${index}`}
-                className="grid grid-cols-4 gap-2.5 py-1 border-b border-gray-100"
+                data-testid={`button-select-${type}`}
               >
-                <div className="text-xs font-medium text-gray-700">
-                  {zone.title}{" "}
-                  {zone.quantity > 1 ? `(${zone.quantity} шт.)` : ""}
-                </div>
-                {packageTypes.map((packageType) => {
-                  // Calculate individual zone value: price per procedure * procedure count from slider
-                  const zoneValue = zone.pricePerProcedure * procedureCount;
-
-                  return (
-                    <div key={packageType} className="text-center">
-                      <span className="text-xs font-semibold text-gray-700">
-                        {zoneValue > 0 ? formatPrice(zoneValue) : "-"}
-                      </span>
-                    </div>
-                  );
-                })}
-              </div>
-            ))}
-
-
-
-          
-          {/* Total Gifts Value Row */}
-          <div className="grid grid-cols-4 gap-2.5 py-1.5 mt-0.5">
-            <div className="text-xs font-bold text-gray-800">
-              Итого:
-            </div>
-            {packageTypes.map((packageType) => {
-              const packageData = packages.find((p) => p.type === packageType);
-              const packageCalcData = getPackageData(packageType);
-              const giftSessions = manualGiftSessions[packageType] !== undefined 
-                ? manualGiftSessions[packageType] 
-                : (packageData?.giftSessions || 0);
-
-              // Calculate gift value using original logic
-              let costOfOneVisit = 0;
-              if (selectedServices && selectedServices.length > 0) {
-                costOfOneVisit = selectedServices.reduce((sum, service) => {
-                  return (
-                    sum +
-                    parseFloat(service.priceMin?.toString() || service.pricePerProcedure.toString())
-                  );
-                }, 0);
-
-                if (freeZones && freeZones.length > 0) {
-                  const freeZonesCost = freeZones.reduce((sum, zone) => {
-                    return sum + zone.pricePerProcedure;
-                  }, 0);
-                  costOfOneVisit = Math.max(0, costOfOneVisit - freeZonesCost);
-                }
-              } else {
-                costOfOneVisit =
-                  calculation.totalProcedures > 0
-                    ? calculation.baseCost / calculation.totalProcedures
-                    : 0;
-              }
-
-              const giftValue =
-                packageData && giftSessions > 0
-                  ? costOfOneVisit * giftSessions
-                  : 0;
-
-              // Calculate bonus amount
-              const bonusPercent = packageData
-                ? parseFloat(packageData.bonusAccountPercent.toString())
-                : 0;
-              const bonusAmount =
-                packageCalcData && bonusPercent > 0
-                  ? (packageCalcData.finalCost || 0) * bonusPercent
-                  : 0;
-
-              // Calculate free zones value
-              const freeZoneValue =
-                freeZones && freeZones.length > 0
-                  ? freeZones.reduce(
-                      (total, zone) =>
-                        total + zone.pricePerProcedure * procedureCount,
-                      0,
-                    )
-                  : 0;
-
-              const totalGifts = giftValue + bonusAmount + freeZoneValue;
-
-              return (
-                <div key={packageType} className="text-center">
-                  <span className="text-sm font-bold text-pink-400">
-                    {formatPrice(totalGifts)}
+                {isSelected ? (
+                  <span className="inline-flex items-center gap-2">
+                    <Check className="w-4 h-4" /> Выбран
                   </span>
-                </div>
-              );
-            })}
+                ) : (
+                  "Выбрать пакет"
+                )}
+              </button>
+            </div>
           </div>
-        </div>
-      </div>
+        );
+      })}
     </div>
   );
 }
