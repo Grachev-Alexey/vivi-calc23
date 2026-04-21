@@ -42,6 +42,8 @@ export default function PromoCalculatorPage({ user, onLogout }: PromoCalculatorP
   const [showClientModal, setShowClientModal] = useState(false);
   const [showSalesModal, setShowSalesModal] = useState(false);
   const [showCorrection, setShowCorrection] = useState(false);
+  const [editingDownPayment, setEditingDownPayment] = useState(false);
+  const [tempDownPayment, setTempDownPayment] = useState("");
 
   const packagePerksQuery = usePackagePerks();
   const packagePerkValues = packagePerksQuery.data || [];
@@ -233,13 +235,48 @@ export default function PromoCalculatorPage({ user, onLogout }: PromoCalculatorP
             subtitle={selectedPackage === "vip" ? "VIP оплачивается единоразово" : "Сколько внести сейчас"}
           >
             <div className="text-center mb-3">
-              <div className="text-2xl font-black text-premium leading-none mb-1">
-                {selectedPackage === "vip"
-                  ? formatPrice(calculation?.packages?.vip?.finalCost || calculation?.baseCost || 0)
-                  : formatPrice(downPayment)}
-              </div>
+              {selectedPackage === "vip" ? (
+                <div className="text-2xl font-black text-premium leading-none mb-1">
+                  {formatPrice(calculation?.packages?.vip?.finalCost || calculation?.baseCost || 0)}
+                </div>
+              ) : editingDownPayment ? (
+                <div className="flex items-baseline justify-center gap-1 mb-1">
+                  <input
+                    type="number"
+                    autoFocus
+                    value={tempDownPayment}
+                    onChange={(e) => setTempDownPayment(e.target.value)}
+                    onBlur={() => {
+                      const v = parseInt(tempDownPayment) || 0;
+                      const min = getMinDownPayment();
+                      const max = getMaxDownPayment();
+                      setDownPayment(Math.max(min, Math.min(max, v)));
+                      setEditingDownPayment(false);
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") (e.target as HTMLInputElement).blur();
+                      if (e.key === "Escape") setEditingDownPayment(false);
+                    }}
+                    className="text-2xl font-black text-premium leading-none bg-transparent text-center outline-none border-b-2 w-40"
+                    style={{ borderColor: "hsl(var(--gold))" }}
+                  />
+                  <span className="text-2xl font-black text-premium leading-none">₽</span>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setTempDownPayment(String(downPayment));
+                    setEditingDownPayment(true);
+                  }}
+                  className="text-2xl font-black text-premium leading-none mb-1 hover:opacity-80 transition-opacity cursor-text"
+                  title="Нажмите, чтобы ввести вручную"
+                >
+                  {formatPrice(downPayment)}
+                </button>
+              )}
               <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
-                {selectedPackage === "vip" ? "к оплате" : "первый платёж"}
+                {selectedPackage === "vip" ? "к оплате" : "первый платёж · нажмите чтобы изменить"}
               </div>
             </div>
 

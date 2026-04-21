@@ -498,29 +498,36 @@ export default function ServiceSelector({
 
       {/* Free Zones - only show if there are any */}
       {freeZones.length > 0 && (
-        <div className="mt-2">
+        <div className="mt-3">
           <div className="flex items-center gap-1.5 mb-1.5">
-            <Gift className="w-3 h-3 text-pink-500" />
-            <span className="text-sm font-bold text-pink-600">Бесплатные зоны</span>
+            <Gift className="w-3.5 h-3.5" style={{ color: "hsl(var(--gold))" }} />
+            <span className="text-xs font-bold uppercase tracking-wider" style={{ color: "hsl(var(--gold))" }}>
+              Бонусные зоны (бесплатно)
+            </span>
           </div>
-          
+
           <div className="space-y-1">
             {freeZones.map((zone) => (
               <div
                 key={zone.serviceId}
-                className="flex items-center justify-between bg-pink-50 rounded-lg p-2 border border-pink-200"
+                className="flex items-center justify-between rounded-lg px-2.5 py-1.5"
+                style={{
+                  background: "hsla(43,88%,56%,0.08)",
+                  border: "1px solid hsla(43,88%,56%,0.3)",
+                }}
               >
-                <div className="flex items-center min-w-0 flex-1">
-                  <span className="text-xs font-medium truncate">{zone.title}</span>
+                <div className="flex items-center min-w-0 flex-1 gap-1.5">
+                  <Gift className="w-3 h-3 flex-shrink-0" style={{ color: "hsl(var(--gold))" }} />
+                  <span className="text-xs font-medium text-foreground/90 truncate">{zone.title}</span>
                 </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
+                <button
+                  type="button"
                   onClick={() => removeFreeZone(zone.serviceId)}
-                  className="text-red-500 hover:text-red-700 p-0.5 flex-shrink-0 h-5 w-5"
+                  className="text-muted-foreground hover:text-red-400 p-0.5 flex-shrink-0 h-5 w-5 flex items-center justify-center rounded transition-colors"
+                  title="Убрать из бонусных зон"
                 >
-                  <X size={10} />
-                </Button>
+                  <X size={12} />
+                </button>
               </div>
             ))}
           </div>
