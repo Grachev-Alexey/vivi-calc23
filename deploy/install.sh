@@ -11,7 +11,7 @@ set -euo pipefail
 DOMAIN="enso.tw1.ru"
 APP_DIR="/var/www/enso"
 DB_NAME="enso"
-DB_USER="enso"
+DB_USER="postgres"
 DB_PASSWORD="cd5d56a8"
 NODE_MAJOR="20"
 
@@ -46,21 +46,22 @@ if ! command -v pm2 >/dev/null; then
 fi
 echo "   pm2: $(pm2 -v)"
 
-# ----- 4. PostgreSQL: база и роль ----------------------------
+# ----- 4. PostgreSQL: пароль для postgres + база -------------
 echo "🐘 Настраиваю PostgreSQL (пользователь ${DB_USER}, база ${DB_NAME})..."
-sudo -u postgres psql -v ON_ERROR_STOP=1 <<SQL
-DO \$\$
-BEGIN
-  IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname='${DB_USER}') THEN
-    CREATE ROLE ${DB_USER} LOGIN PASSWORD '${DB_PASSWORD}';
-  ELSE
-    ALTER ROLE ${DB_USER} WITH LOGIN PASSWORD '${DB_PASSWORD}';
-  END IF;
-END
-\$\$;
-SQL
+# Ставим пароль стандартному суперпользователю postgres
+sudo -u postgres psql -v ON_ERROR_STOP=1 -c "ALTER USER ${DB_USER} WITH PASSWORD '${DB_PASSWORD}';"
+
+# Создаём базу, если её ещё нет
 sudo -u postgres psql -tc "SELECT 1 FROM pg_database WHERE datname='${DB_NAME}'" \
   | grep -q 1 || sudo -u postgres createdb -O "$DB_USER" "$DB_NAME"
+
+# Разрешаем подключение по паролю с localhost для пользователя postgres
+PG_HBA="$(sudo -u postgres psql -tAc 'SHOW hba_file;')"
+if ! grep -qE "^\s*host\s+all\s+postgres\s+127\.0\.0\.1/32\s+(md5|scram-sha-256)" "$PG_HBA"; then
+  echo "host    all   postgres   127.0.0.1/32   scram-sha-256" >> "$PG_HBA"
+  echo "host    all   postgres   ::1/128        scram-sha-256" >> "$PG_HBA"
+  systemctl reload postgresql
+fi
 
 # ----- 5. Копируем код ---------------------------------------
 echo "📦 Копирую код в $APP_DIR..."
@@ -132,6 +133,7 @@ echo ""
 echo "   🌐 Сайт:        https://$DOMAIN"
 echo "   📁 Каталог:     $APP_DIR"
 echo "   🗄  База:        ${DB_NAME}  (user: ${DB_USER}, pass: ${DB_PASSWORD})"
+echo "                  postgres://${DB_USER}:${DB_PASSWORD}@localhost:5432/${DB_NAME}"
 echo "   ⚙️  PM2 процесс: enso-calc"
 echo ""
 echo "Полезные команды:"
