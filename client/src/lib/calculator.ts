@@ -99,15 +99,30 @@ export function calculatePackagePricing(
     const freeZonesValue = params.freeZonesValue || 0;
     
     // Total savings - only actual discounts, free zones are separate gifts
-    const actualDiscounts = packageDiscount + additionalDiscount + correctionDiscount;
+    let actualDiscounts = packageDiscount + additionalDiscount + correctionDiscount;
+    let finalCost = baseCost - actualDiscounts; // Actual cost without gift sessions
+
+    // Additional 5000₽ discount when paying the package in full
+    const FULL_PAYMENT_BONUS = 5000;
+    const paysInFull = packageData.requiresFullPayment || params.downPayment >= finalCost;
+    let fullPaymentBonus = 0;
+    if (paysInFull && finalCost > FULL_PAYMENT_BONUS) {
+      fullPaymentBonus = FULL_PAYMENT_BONUS;
+      finalCost -= FULL_PAYMENT_BONUS;
+      actualDiscounts += FULL_PAYMENT_BONUS;
+    }
     const totalSavings = actualDiscounts; // Only actual discounts, not gifts
-    const finalCost = baseCost - actualDiscounts; // Actual cost without gift sessions
 
     // All packages are available for selection - payment constraints will be applied when selected
-    const minDownPayment = Math.max(
+    let minDownPayment = Math.max(
       packageData.minDownPayment || 0,
       finalCost * packageData.minDownPaymentPercent
     );
+
+    // For packages from 30 000₽: double the first installment when it falls in 1000–5000₽
+    if (finalCost >= 30000 && minDownPayment >= 1000 && minDownPayment <= 5000) {
+      minDownPayment = minDownPayment * 2;
+    }
 
     // Calculate monthly payment
     const remainingAmount = finalCost - params.downPayment;

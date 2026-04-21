@@ -313,7 +313,12 @@ export function useCalculator() {
             const globalMin = calculatorSettings?.minimumDownPayment || 5000;
             
             // Always set to minimum down payment when package is selected
-            newDownPayment = Math.round(Math.max(minPayment, globalMin));
+            let baseMin = Math.round(Math.max(minPayment, globalMin));
+            // For packages from 30 000₽: double the first installment when 1000–5000₽
+            if (packageData.finalCost >= 30000 && baseMin >= 1000 && baseMin <= 5000) {
+              baseMin = baseMin * 2;
+            }
+            newDownPayment = baseMin;
           }
           
           if (newDownPayment !== downPayment) {
@@ -358,7 +363,12 @@ export function useCalculator() {
       
       // Use the higher of percentage-based minimum or global minimum
       const globalMin = calculatorSettings?.minimumDownPayment || 5000;
-      return Math.max(percentageBasedMin, globalMin);
+      let result = Math.max(percentageBasedMin, globalMin);
+      // For packages from 30 000₽: double the first installment when 1000–5000₽
+      if (packageData.finalCost >= 30000 && result >= 1000 && result <= 5000) {
+        result = result * 2;
+      }
+      return result;
     }
   };
 }
