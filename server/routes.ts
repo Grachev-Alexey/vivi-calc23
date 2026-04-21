@@ -9,7 +9,7 @@ import { db } from "./db";
 import { users, services, insertUserSchema, insertConfigSchema, insertServiceSchema, 
   insertSubscriptionTypeSchema, insertPerkSchema, insertPackagePerkValueSchema,
   insertPackageSchema, config, perks, packagePerkValues,
-  packages as packagesTable, sales, clients, subscriptionTypes, offers } from "@shared/schema";
+  packages as packagesTable, sales, clients, subscriptionTypes } from "@shared/schema";
 import fs from 'fs/promises';
 import path from 'path';
 
@@ -51,30 +51,11 @@ const calculationSchema = z.object({
     quantity: z.number()
   })).default([]),
   manualGiftSessions: z.record(z.string(), z.number()).optional(),
-  saleDate: z.string().optional(), // Дата продажи (для админов)
-  masterId: z.number().optional() // ID мастера (для админов)
-  // Примечание: pdfVersion не включен, так как это поле только для offers, а не для sales
-});
-
-const offerSchema = z.object({
-  saleId: z.number().optional(), // Связь с продажей
-  clientName: z.string().min(1),
-  clientPhone: z.string().min(10),
-  selectedServices: z.array(z.any()),
-  selectedPackage: z.enum(['vip', 'standard', 'economy']),
-  baseCost: z.number(),
-  finalCost: z.number(),
-  totalSavings: z.number(),
-  downPayment: z.number(),
-  installmentMonths: z.number().optional(),
-  monthlyPayment: z.number().optional(),
-  paymentSchedule: z.array(z.any()),
-  appliedDiscounts: z.array(z.any()).optional(),
-  freeZones: z.array(z.any()).optional(),
-  usedCertificate: z.boolean().default(false),
-  manualGiftSessions: z.record(z.string(), z.number()).optional(),
-  saleDate: z.string().optional(), // Дата продажи (для админов)
-  pdfVersion: z.enum(['standard', 'amendment']).optional() // Версия PDF (для админов)
+  saleDate: z.string().optional(),
+  masterId: z.number().optional(),
+  // Поля договора-оферты (заполняются при оформлении продажи)
+  clientName: z.string().min(1).optional(),
+  pdfVersion: z.enum(['standard', 'amendment']).optional()
 });
 
 const configSchema = z.object({
@@ -509,25 +490,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         selectedServices: sales.selectedServices,
         appliedDiscounts: sales.appliedDiscounts,
         freeZones: sales.freeZones,
-        // Client name from offers (get the first one if multiple exist)
-        clientName: sql<string | null>`(
-          SELECT client_name 
-          FROM offers 
-          WHERE offers.sale_id = ${sales.id} 
-          LIMIT 1
-        )`,
-        pdfPath: sql<string | null>`(
-          SELECT pdf_path 
-          FROM offers 
-          WHERE offers.sale_id = ${sales.id} 
-          LIMIT 1
-        )`,
-        offerNumber: sql<string | null>`(
-          SELECT offer_number 
-          FROM offers 
-          WHERE offers.sale_id = ${sales.id} 
-          LIMIT 1
-        )`
+        clientName: sales.clientName,
+        pdfPath: sales.pdfPath,
+        offerNumber: sales.offerNumber,
       })
       .from(sales)
       .leftJoin(clients, eq(sales.clientId, clients.id))
@@ -601,25 +566,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         selectedServices: sales.selectedServices,
         appliedDiscounts: sales.appliedDiscounts,
         freeZones: sales.freeZones,
-        // Client name from offers (get the first one if multiple exist)
-        clientName: sql<string | null>`(
-          SELECT client_name 
-          FROM offers 
-          WHERE offers.sale_id = ${sales.id} 
-          LIMIT 1
-        )`,
-        pdfPath: sql<string | null>`(
-          SELECT pdf_path 
-          FROM offers 
-          WHERE offers.sale_id = ${sales.id} 
-          LIMIT 1
-        )`,
-        offerNumber: sql<string | null>`(
-          SELECT offer_number 
-          FROM offers 
-          WHERE offers.sale_id = ${sales.id} 
-          LIMIT 1
-        )`
+        clientName: sales.clientName,
+        pdfPath: sales.pdfPath,
+        offerNumber: sales.offerNumber,
       })
       .from(sales)
       .leftJoin(clients, eq(sales.clientId, clients.id))
@@ -867,6 +816,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         masterId = calculation.masterId;
       }
       
+      // Generate offer number and payment schedule (договор-оферта в той же записи)
+      const offerNumber = await generateUniqueOfferNumber();
+      const paymentSchedule = generatePaymentSchedule(
+        calculation.downPayment,
+        calculation.finalCost,
+        calculation.installmentMonths
+      );
+      const expiresAt = new Date();
+      expiresAt.setDate(expiresAt.getDate() + 7);
+
       // Save sale to database
       const sale = await storage.createSale({
         clientId: client.id,
@@ -884,13 +843,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         freeZones: calculation.freeZones,
         usedCertificate: calculation.usedCertificate,
         manualGiftSessions: calculation.manualGiftSessions || {},
-        saleDate: calculation.saleDate ? new Date(calculation.saleDate) : undefined
+        saleDate: calculation.saleDate ? new Date(calculation.saleDate) : undefined,
+        offerNumber,
+        paymentSchedule,
+        clientName: calculation.clientName,
+        pdfVersion: calculation.pdfVersion || 'standard',
+        status: 'draft',
+        expiresAt
       });
 
       res.json({ 
         success: true, 
         subscriptionType: subscriptionType.title,
-        saleId: sale.id 
+        saleId: sale.id,
+        offerNumber: sale.offerNumber
       });
     } catch (error) {
       console.error('Subscription creation error:', error);
@@ -906,110 +872,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
     await fs.mkdir(pdfDir, { recursive: true });
   }
 
-  // API endpoint for creating offers
-  app.post("/api/offers", async (req, res) => {
+  // API endpoint for generating PDF for a sale's offer
+  app.post("/api/sales/:id/pdf", async (req, res) => {
     try {
       if (!req.session.userId) {
         return res.status(401).json({ message: "Не авторизован" });
       }
 
-      // Generate payment schedule first
-      const paymentSchedule = generatePaymentSchedule(
-        req.body.downPayment,
-        req.body.finalCost,
-        req.body.installmentMonths
-      );
-      
-      // Add payment schedule to request body for validation
-      const requestWithSchedule = {
-        ...req.body,
-        paymentSchedule,
-        appliedDiscounts: req.body.appliedDiscounts || [],
-        freeZones: req.body.freeZones || []
-      };
-      
-      const offerData = offerSchema.parse(requestWithSchedule);
-      
-      // Generate unique offer number
-      const offerNumber = await generateUniqueOfferNumber();
+      const saleId = parseInt(req.params.id);
+      const sale = await storage.getSaleById(saleId);
 
-      // Create or find client
-      let client = await storage.getClientByPhone(offerData.clientPhone);
-      if (!client) {
-        client = await storage.createClient({
-          phone: offerData.clientPhone
-        });
+      if (!sale) {
+        return res.status(404).json({ message: "Продажа не найдена" });
       }
 
-      // Set expiration date (7 days from now)
-      const expiresAt = new Date();
-      expiresAt.setDate(expiresAt.getDate() + 7);
-
-      // Create offer
-      const offer = await storage.createOffer({
-        clientId: client.id,
-        masterId: req.session.userId,
-        saleId: offerData.saleId, // Связываем оферту с продажей
-        offerNumber,
-        selectedServices: offerData.selectedServices,
-        selectedPackage: offerData.selectedPackage,
-        baseCost: offerData.baseCost.toString(),
-        finalCost: offerData.finalCost.toString(),
-        totalSavings: offerData.totalSavings.toString(),
-        downPayment: offerData.downPayment.toString(),
-        installmentMonths: offerData.installmentMonths,
-        monthlyPayment: offerData.monthlyPayment?.toString(),
-        paymentSchedule: offerData.paymentSchedule,
-        appliedDiscounts: offerData.appliedDiscounts || [],
-        freeZones: offerData.freeZones || [],
-        usedCertificate: offerData.usedCertificate,
-        manualGiftSessions: offerData.manualGiftSessions || {},
-        clientName: offerData.clientName,
-        clientPhone: offerData.clientPhone,
-        pdfVersion: offerData.pdfVersion || 'standard',
-        saleDate: offerData.saleDate ? new Date(offerData.saleDate) : undefined,
-        status: 'draft',
-        expiresAt
-      });
-
-      res.json(offer);
-    } catch (error) {
-      console.error('Ошибка создания оферты:', error as any);
-      res.status(500).json({ message: "Ошибка создания оферты" });
-    }
-  });
-
-  // API endpoint for generating PDF for an offer
-  app.post("/api/offers/:id/send", async (req, res) => {
-    try {
-      if (!req.session.userId) {
-        return res.status(401).json({ message: "Не авторизован" });
+      // Только владелец-мастер или админ
+      const session = (req as any).session;
+      if (sale.masterId !== session.userId && session.userRole !== 'admin') {
+        return res.status(403).json({ message: "Нет доступа к этой продаже" });
       }
 
-      const offerId = parseInt(req.params.id);
-
-      // Get offer
-      const offers = await storage.getOffersByMaster(req.session.userId);
-      const offer = offers.find(o => o.id === offerId);
-      
-      if (!offer) {
-        return res.status(404).json({ message: "Оферта не найдена" });
+      if (!sale.offerNumber) {
+        return res.status(400).json({ message: "У продажи нет номера договора-оферты" });
       }
 
       // Get package data from database
       const packages = await storage.getPackages();
-      const packageData = packages.find(pkg => pkg.type === offer.selectedPackage);
+      const packageData = packages.find(pkg => pkg.type === sale.selectedPackage);
+
+      // Get client phone
+      const client = sale.clientId ? await db.select().from(clients).where(eq(clients.id, sale.clientId)).then(r => r[0]) : null;
 
       // Generate PDF
-      const pdfBuffer = await pdfGenerator.generateOfferPDF(offer, packageData);
+      const pdfBuffer = await pdfGenerator.generateOfferPDF(sale, packageData, client?.phone || '');
       
       // Save PDF to file
-      const fileName = `offer_${offer.offerNumber}.pdf`;
+      const fileName = `offer_${sale.offerNumber}.pdf`;
       const filePath = path.join(pdfDir, fileName);
       await fs.writeFile(filePath, pdfBuffer);
 
-      // Update offer status with API path for PDF download
-      await storage.updateOffer(offer.id, {
+      // Update sale with PDF path and status
+      await storage.updateSale(sale.id, {
         pdfPath: `/api/pdf/${fileName}`,
         status: 'sent'
       });
@@ -1022,37 +925,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Ошибка формирования оферты:', error);
       res.status(500).json({ message: "Ошибка формирования оферты" });
-    }
-  });
-
-  // API endpoint for getting offers
-  app.get("/api/offers", async (req, res) => {
-    try {
-      if (!req.session.userId) {
-        return res.status(401).json({ message: "Не авторизован" });
-      }
-
-      const offers = await storage.getOffersByMaster(req.session.userId);
-      res.json(offers);
-    } catch (error) {
-      console.error('Ошибка получения оферт:', error);
-      res.status(500).json({ message: "Ошибка получения оферт" });
-    }
-  });
-
-  // API endpoint for getting specific offer
-  app.get("/api/offers/:number", async (req, res) => {
-    try {
-      const offer = await storage.getOfferByNumber(req.params.number);
-      
-      if (!offer) {
-        return res.status(404).json({ message: "Оферта не найдена" });
-      }
-
-      res.json(offer);
-    } catch (error) {
-      console.error('Ошибка получения оферты:', error);
-      res.status(500).json({ message: "Ошибка получения оферты" });
     }
   });
 
@@ -1105,29 +977,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Ошибка скачивания PDF:', error);
       res.status(500).json({ message: "Ошибка скачивания PDF" });
-    }
-  });
-
-  // API endpoint for updating offer status
-  app.patch("/api/offers/:id", async (req, res) => {
-    try {
-      if (!req.session.userId) {
-        return res.status(401).json({ message: "Не авторизован" });
-      }
-
-      const offerId = parseInt(req.params.id);
-      const { status } = req.body;
-
-      const updatedOffer = await storage.updateOffer(offerId, { status });
-      
-      if (!updatedOffer) {
-        return res.status(404).json({ message: "Оферта не найдена" });
-      }
-
-      res.json(updatedOffer);
-    } catch (error) {
-      console.error('Ошибка обновления оферты:', error);
-      res.status(500).json({ message: "Ошибка обновления оферты" });
     }
   });
 
@@ -1299,13 +1148,14 @@ async function generateUniqueOfferNumber(): Promise<string> {
   const year = new Date().getFullYear().toString().slice(-2);
   const month = (new Date().getMonth() + 1).toString().padStart(2, '0');
   
-  // Find the highest number for this month across ALL offers, not just one master
-  const existingOffers = await storage.getAllOffers();
+  // Find the highest number for this month across ALL sales, not just one master
+  const existingSales = await storage.getAllSales();
   const thisMonthPattern = new RegExp(`^${year}${month}(\\d{3})$`);
   
   let maxNumber = 0;
-  existingOffers.forEach(offer => {
-    const match = offer.offerNumber.match(thisMonthPattern);
+  existingSales.forEach(sale => {
+    if (!sale.offerNumber) return;
+    const match = sale.offerNumber.match(thisMonthPattern);
     if (match) {
       const num = parseInt(match[1]);
       if (num > maxNumber) maxNumber = num;

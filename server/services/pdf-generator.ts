@@ -1,5 +1,5 @@
 import puppeteer from "puppeteer";
-import { Offer } from "@shared/schema";
+import { Sale } from "@shared/schema";
 import { format } from "date-fns";
 import { ru } from "date-fns/locale";
 import { execSync } from "child_process";
@@ -13,7 +13,7 @@ interface PaymentScheduleItem {
 export class PDFGenerator {
     constructor(private storage?: any) {}
 
-    async generateOfferPDF(offer: Offer, packageData?: any): Promise<Buffer> {
+    async generateOfferPDF(offer: Sale, packageData?: any, clientPhone: string = ''): Promise<Buffer> {
         console.log('PDF Generator - Input data:', {
             offerNumber: offer.offerNumber,
             selectedPackage: offer.selectedPackage,
@@ -56,6 +56,7 @@ export class PDFGenerator {
             const htmlContent = await this.generateOfferHTML(
                 offer,
                 packageData,
+                clientPhone,
             );
             await page.setContent(htmlContent, { waitUntil: "networkidle0" });
 
@@ -175,8 +176,9 @@ export class PDFGenerator {
     }
 
     private async generateOfferHTML(
-        offer: Offer,
+        offer: Sale,
         packageData?: any,
+        clientPhone: string = '',
     ): Promise<string> {
         const selectedServices = offer.selectedServices as any[];
         const packagePerks = this.getPackagePerks(offer.selectedPackage);
@@ -450,7 +452,7 @@ export class PDFGenerator {
     <div class="section" style="margin-top: 30px; border-top: 1px solid #ccc; padding-top: 20px;">
         <div class="details"><strong>Данные клиента:</strong></div>
         <div class="details">ФИО: <span class="highlight">${offer.clientName || "Не указано"}</span></div>
-        <div class="details">Телефон: <span class="highlight">${offer.clientPhone || "Не указан"}</span></div>
+        <div class="details">Телефон: <span class="highlight">${clientPhone || "Не указан"}</span></div>
         <div class="details">Дата: <span class="highlight">${format(new Date(), "dd.MM.yyyy", { locale: ru })}</span></div>
     </div>
 </body>

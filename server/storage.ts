@@ -1,11 +1,10 @@
 import { 
-  users, config, services, subscriptionTypes, clients, sales, packages, perks, packagePerkValues, offers,
+  users, config, services, subscriptionTypes, clients, sales, packages, perks, packagePerkValues,
   type User, type InsertUser, type Config, type InsertConfig,
   type Service, type InsertService, type SubscriptionType, type InsertSubscriptionType,
   type Package, type InsertPackage, type Perk, type InsertPerk,
   type PackagePerkValue, type InsertPackagePerkValue,
-  type Client, type InsertClient, type Sale, type InsertSale,
-  type Offer, type InsertOffer
+  type Client, type InsertClient, type Sale, type InsertSale
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, sql, desc } from "drizzle-orm";
@@ -64,17 +63,13 @@ export interface IStorage {
   
   // Sales
   createSale(sale: InsertSale): Promise<Sale>;
+  getSaleById(id: number): Promise<Sale | undefined>;
+  getSaleByOfferNumber(offerNumber: string): Promise<Sale | undefined>;
   getSalesByMaster(masterId: number): Promise<Sale[]>;
+  getAllSales(): Promise<Sale[]>;
+  updateSale(id: number, updates: Partial<InsertSale>): Promise<Sale | null>;
   getSalesStats(): Promise<any>;
   deleteSale(id: number): Promise<void>;
-  
-  // Offers
-  createOffer(offer: InsertOffer): Promise<Offer>;
-  getOfferByNumber(offerNumber: string): Promise<Offer | undefined>;
-  getOffersByMaster(masterId: number): Promise<Offer[]>;
-  getAllOffers(): Promise<Offer[]>;
-  updateOffer(id: number, updates: Partial<InsertOffer>): Promise<Offer | null>;
-  deleteOffer(id: number): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -313,11 +308,26 @@ export class DatabaseStorage implements IStorage {
     };
   }
 
+  async getSaleById(id: number): Promise<Sale | undefined> {
+    const [sale] = await db.select().from(sales).where(eq(sales.id, id));
+    return sale || undefined;
+  }
+
+  async getSaleByOfferNumber(offerNumber: string): Promise<Sale | undefined> {
+    const [sale] = await db.select().from(sales).where(eq(sales.offerNumber, offerNumber));
+    return sale || undefined;
+  }
+
+  async getAllSales(): Promise<Sale[]> {
+    return await db.select().from(sales).orderBy(desc(sales.createdAt));
+  }
+
+  async updateSale(id: number, updates: Partial<InsertSale>): Promise<Sale | null> {
+    const [updated] = await db.update(sales).set(updates).where(eq(sales.id, id)).returning();
+    return updated || null;
+  }
+
   async deleteSale(id: number): Promise<void> {
-    // Сначала удаляем все связанные оферты
-    await db.delete(offers).where(eq(offers.saleId, id));
-    
-    // Затем удаляем саму продажу
     await db.delete(sales).where(eq(sales.id, id));
   }
 
@@ -521,33 +531,6 @@ export class DatabaseStorage implements IStorage {
     }
   }
 
-  // Offers
-  async createOffer(offer: InsertOffer): Promise<Offer> {
-    const [createdOffer] = await db.insert(offers).values(offer).returning();
-    return createdOffer;
-  }
-
-  async getOfferByNumber(offerNumber: string): Promise<Offer | undefined> {
-    const [offer] = await db.select().from(offers).where(eq(offers.offerNumber, offerNumber));
-    return offer || undefined;
-  }
-
-  async getOffersByMaster(masterId: number): Promise<Offer[]> {
-    return await db.select().from(offers).where(eq(offers.masterId, masterId)).orderBy(desc(offers.createdAt));
-  }
-
-  async getAllOffers(): Promise<Offer[]> {
-    return await db.select().from(offers).orderBy(desc(offers.createdAt));
-  }
-
-  async updateOffer(id: number, updates: Partial<InsertOffer>): Promise<Offer | null> {
-    const [updatedOffer] = await db.update(offers).set(updates).where(eq(offers.id, id)).returning();
-    return updatedOffer || null;
-  }
-
-  async deleteOffer(id: number): Promise<void> {
-    await db.delete(offers).where(eq(offers.id, id));
-  }
 }
 
 export const storage = new DatabaseStorage();

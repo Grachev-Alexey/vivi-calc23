@@ -137,10 +137,11 @@ export default function ClientModal({
           usedCertificate,
           freeZones,
           appliedDiscounts: calculation.packages[selectedPackage].appliedDiscounts,
+          clientName,
           ...(isAdmin && {
             saleDate,
-            masterId: selectedMasterId
-            // Примечание: pdfVersion не передается здесь, так как он используется только при создании offer
+            masterId: selectedMasterId,
+            pdfVersion
           })
         }
       };
@@ -164,8 +165,8 @@ export default function ClientModal({
         setSubscriptionTitle(result.subscriptionType);
         setIsCompleted(true);
         
-        // Автоматически создаем и отправляем договор-оферту, передавая ID продажи
-        await createAndSendOffer(result.saleId);
+        // Автоматически формируем PDF договора-оферты по созданной продаже
+        await generateOfferPdf(result.saleId);
       } else {
         const error = await response.json();
         throw new Error(error.message);
@@ -181,119 +182,26 @@ export default function ClientModal({
     }
   };
 
-  const createAndSendOffer = async (saleId?: number) => {
-    if (!selectedPackage || !calculation) {
-      return;
-    }
-
+  const generateOfferPdf = async (saleId?: number) => {
+    if (!saleId) return;
     try {
-      // Создаем оферту
-      const packageData = calculation.packages[selectedPackage];
-      
-      // Используем дату продажи для расчета графика платежей
-      const startDate = isAdmin ? new Date(saleDate) : new Date();
-      
-      // Генерируем график платежей
-      const paymentSchedule = [];
-      if (selectedPackage === 'vip') {
-        // VIP - полная оплата
-        paymentSchedule.push({
-          date: startDate.toISOString().split('T')[0],
-          amount: packageData.finalCost,
-          description: 'Полная оплата'
-        });
-      } else {
-        // Стандарт/Эконом - рассрочка
-        paymentSchedule.push({
-          date: startDate.toISOString().split('T')[0],
-          amount: downPayment,
-          description: 'Первоначальный взнос'
-        });
-        
-        const remainingAmount = packageData.finalCost - downPayment;
-        const monthlyPayment = remainingAmount / installmentMonths;
-        
-        for (let i = 1; i <= installmentMonths; i++) {
-          const paymentDate = new Date(startDate);
-          paymentDate.setMonth(paymentDate.getMonth() + i);
-          
-          paymentSchedule.push({
-            date: paymentDate.toISOString().split('T')[0],
-            amount: monthlyPayment,
-            description: `Платеж ${i} из ${installmentMonths}`
-          });
-        }
-      }
-
-      const offerData = {
-        saleId, // Связываем оферту с продажей
-        clientName,
-        clientPhone: phone.replace(/\D/g, ''),
-        selectedPackage,
-        selectedServices: selectedServices.map(service => ({
-          id: service.yclientsId,
-          title: service.title,
-          price: service.editedPrice || service.customPrice || service.priceMin,
-          priceMin: service.priceMin,
-          editedPrice: service.editedPrice || service.customPrice,
-          quantity: service.quantity || 1,
-          sessionCount: service.sessionCount || 10,
-          count: service.sessionCount || 10
-        })),
-        baseCost: calculation.baseCost,
-        finalCost: packageData.finalCost,
-        totalSavings: packageData.totalSavings,
-        downPayment,
-        installmentMonths: selectedPackage === 'vip' ? undefined : installmentMonths,
-        monthlyPayment: selectedPackage === 'vip' ? undefined : packageData.monthlyPayment,
-        paymentSchedule,
-        appliedDiscounts: packageData.appliedDiscounts || [],
-        freeZones: freeZones || [],
-        usedCertificate,
-        manualGiftSessions: manualGiftSessions || {},
-        // Добавляем информацию о процедурах для PDF
-        procedureCount: procedureCount,
-        // Добавляем дату продажи и версию PDF (только для админов)
-        ...(isAdmin && {
-          saleDate,
-          pdfVersion
-        })
-      };
-
-      const createResponse = await fetch("/api/offers", {
+      const sendResponse = await fetch(`/api/sales/${saleId}/pdf`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        credentials: "include",
-        body: JSON.stringify(offerData)
+        credentials: "include"
       });
 
-      if (createResponse.ok) {
-        const offer = await createResponse.json();
-        
-        // Отправляем оферту
-        const sendResponse = await fetch(`/api/offers/${offer.id}/send`, {
-          method: "POST",
-          credentials: "include"
+      if (sendResponse.ok) {
+        setOfferSent(true);
+        toast({
+          title: "Договор сформирован!",
+          description: "Договор-оферта успешно сформирован",
         });
-
-        if (sendResponse.ok) {
-          setOfferSent(true);
-          toast({
-            title: "Договор сформирован!",
-            description: "Договор-оферта успешно сформирован",
-          });
-        } else {
-          throw new Error("Не удалось сформировать договор");
-        }
       } else {
-        throw new Error("Не удалось создать договор");
+        throw new Error("Не удалось сформировать договор");
       }
     } catch (error) {
-      console.error("Error creating/sending offer:", error);
+      console.error("Error generating offer PDF:", error);
       // Не показываем ошибку пользователю, чтобы не портить успешное создание абонемента
-      // Просто логируем ошибку
     }
   };
 
