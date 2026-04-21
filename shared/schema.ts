@@ -113,7 +113,6 @@ export const sales = pgTable("sales", {
   monthlyPayment: decimal("monthly_payment", { precision: 10, scale: 2 }),
   appliedDiscounts: json("applied_discounts"),
   freeZones: json("free_zones"),
-  usedCertificate: boolean("used_certificate").default(false),
   manualGiftSessions: json("manual_gift_sessions"),
   // Поля договора-оферты (раньше жили в отдельной таблице offers)
   offerNumber: text("offer_number").unique(),

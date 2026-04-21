@@ -52,7 +52,6 @@ interface ThreeBlockComparisonProps {
   installmentMonths: number;
   procedureCount: number;
   packagePerkValues?: PackagePerkValue[];
-  usedCertificate: boolean;
   calculatorSettings?: any;
   freeZones?: Array<{
     serviceId: number;
@@ -77,7 +76,6 @@ export default function ThreeBlockComparison({
   installmentMonths,
   procedureCount,
   packagePerkValues = [],
-  usedCertificate = false,
   calculatorSettings,
   freeZones = [],
   selectedServices = [],
@@ -490,22 +488,6 @@ export default function ThreeBlockComparison({
               );
             })}
           </div>
-
-          {/* Сертификат */}
-          {usedCertificate && (
-            <div className="grid grid-cols-4 gap-2.5 py-1 border-b border-gray-100">
-              <div className="text-xs font-medium text-gray-700">
-                Сертификат
-              </div>
-              {packageTypes.map((packageType) => (
-                <div key={packageType} className="text-center">
-                  <span className="text-xs font-semibold text-green-600">
-                    -{calculatorSettings?.certificateDiscountAmount?.toLocaleString() || '3 000'} ₽
-                  </span>
-                </div>
-              ))}
-            </div>
-          )}
 
           {/* Итого стоимость курса */}
           <div className="grid grid-cols-4 gap-2.5 py-1.5 mt-0.5">

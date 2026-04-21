@@ -34,7 +34,6 @@ interface SaleData {
   downPayment: string;
   installmentMonths: number;
   monthlyPayment: string;
-  usedCertificate: boolean;
   createdAt: string;
   selectedServices: any[];
   appliedDiscounts: any[];
@@ -231,9 +230,6 @@ export default function MasterSalesModal({ isOpen, onClose, masterName }: Master
                         {sale.installmentMonths && (
                           <span>Рассрочка: {sale.installmentMonths} мес.</span>
                         )}
-                        {sale.usedCertificate && (
-                          <Badge variant="outline" className="text-xs">Сертификат</Badge>
-                        )}
                       </div>
                       <div className="flex items-center space-x-1 text-muted-foreground">
                         <Calendar className="h-3 w-3" />
@@ -290,7 +286,6 @@ function SaleDetails({ sale }: { sale: SaleData }) {
       case 'package': return 'Скидка по пакету';
       case 'correction': return 'Коррекция';
       case 'gift_sessions': return 'Подарочные сеансы';
-      case 'certificate': return 'Сертификат';
       case 'bulk': return 'Скидка за количество';
       default: return type;
     }

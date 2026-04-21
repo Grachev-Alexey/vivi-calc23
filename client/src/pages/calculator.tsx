@@ -55,7 +55,6 @@ export default function CalculatorPage({ user, onLogout }: CalculatorPageProps) 
     procedureCount,
     downPayment,
     installmentMonths,
-    usedCertificate,
     freeZones,
     calculation,
     selectedPackage,
@@ -67,7 +66,6 @@ export default function CalculatorPage({ user, onLogout }: CalculatorPageProps) 
     setProcedureCount,
     setDownPayment,
     setInstallmentMonths,
-    setUsedCertificate,
     setFreeZones,
     setSelectedPackage,
     setManualGiftSessions,
@@ -185,7 +183,6 @@ export default function CalculatorPage({ user, onLogout }: CalculatorPageProps) 
             installmentMonths={installmentMonths}
             procedureCount={procedureCount}
             packagePerkValues={packagePerkValues}
-            usedCertificate={usedCertificate}
             calculatorSettings={calculatorSettings}
             freeZones={freeZones}
             selectedServices={selectedServices.map(service => ({
@@ -204,10 +201,8 @@ export default function CalculatorPage({ user, onLogout }: CalculatorPageProps) 
         <PaymentConfig
           downPayment={downPayment}
           installmentMonths={installmentMonths}
-          usedCertificate={usedCertificate}
           onDownPaymentChange={setDownPayment}
           onInstallmentMonthsChange={setInstallmentMonths}
-          onCertificateChange={setUsedCertificate}
           baseCost={calculation?.baseCost || 0}
           selectedPackage={selectedPackage}
           calculation={calculation}
@@ -255,7 +250,6 @@ export default function CalculatorPage({ user, onLogout }: CalculatorPageProps) 
           procedureCount={procedureCount}
           downPayment={downPayment}
           installmentMonths={installmentMonths}
-          usedCertificate={usedCertificate}
           freeZones={freeZones}
         />
       )}

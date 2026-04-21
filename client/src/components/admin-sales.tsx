@@ -41,7 +41,6 @@ interface SaleData {
   downPayment: string;
   installmentMonths: number;
   monthlyPayment: string;
-  usedCertificate: boolean;
   createdAt: string;
   selectedServices: any[];
   appliedDiscounts: any[];
@@ -424,9 +423,6 @@ export default function AdminSales() {
 
                         <div className="flex items-center justify-between text-sm">
                           <div className="flex items-center space-x-4">
-                            {sale.usedCertificate && (
-                              <Badge variant="outline">Сертификат</Badge>
-                            )}
                             {sale.freeZones && sale.freeZones.length > 0 && (
                               <Badge variant="outline">Бесплатные зоны</Badge>
                             )}
@@ -558,7 +554,6 @@ function SaleDetails({ sale }: { sale: SaleData }) {
       case 'package': return 'Скидка по пакету';
       case 'correction': return 'Коррекция';
       case 'gift_sessions': return 'Подарочные сеансы';
-      case 'certificate': return 'Сертификат';
       case 'bulk': return 'Скидка за количество';
       default: return type;
     }
@@ -749,27 +744,21 @@ function SaleDetails({ sale }: { sale: SaleData }) {
       )}
 
       {/* Дополнительные опции */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-sm">Дополнительные опции</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-2">
-            <div className="flex justify-between items-center">
-              <span className="text-muted-foreground">Использован сертификат:</span>
-              <Badge variant={sale.usedCertificate ? "default" : "secondary"}>
-                {sale.usedCertificate ? "Да" : "Нет"}
-              </Badge>
-            </div>
-            {sale.freeZones?.length > 0 && (
+      {sale.freeZones?.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-sm">Дополнительные опции</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
               <div className="flex justify-between items-center">
                 <span className="text-muted-foreground">Бесплатные зоны:</span>
                 <Badge variant="outline">{sale.freeZones.length} зон</Badge>
               </div>
-            )}
-          </div>
-        </CardContent>
-      </Card>
+            </div>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }

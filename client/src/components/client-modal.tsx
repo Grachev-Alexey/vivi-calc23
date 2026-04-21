@@ -25,7 +25,6 @@ interface ClientModalProps {
   procedureCount: number;
   downPayment: number;
   installmentMonths: number;
-  usedCertificate: boolean;
   freeZones: any[];
   manualGiftSessions?: Record<string, number>;
   user?: UserData;
@@ -40,7 +39,6 @@ export default function ClientModal({
   procedureCount,
   downPayment,
   installmentMonths,
-  usedCertificate,
   freeZones,
   manualGiftSessions = {},
   user
@@ -134,7 +132,6 @@ export default function ClientModal({
           downPayment,
           installmentMonths: selectedPackage === 'vip' ? undefined : installmentMonths,
           monthlyPayment: selectedPackage === 'vip' ? undefined : calculation.packages[selectedPackage].monthlyPayment,
-          usedCertificate,
           freeZones,
           appliedDiscounts: calculation.packages[selectedPackage].appliedDiscounts,
           clientName,

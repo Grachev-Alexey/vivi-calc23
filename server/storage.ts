@@ -255,7 +255,6 @@ export class DatabaseStorage implements IStorage {
       downPayment: sales.downPayment,
       installmentMonths: sales.installmentMonths,
       monthlyPayment: sales.monthlyPayment,
-      usedCertificate: sales.usedCertificate,
       createdAt: sales.createdAt,
       selectedServices: sales.selectedServices,
       appliedDiscounts: sales.appliedDiscounts,

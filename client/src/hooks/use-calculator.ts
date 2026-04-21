@@ -59,7 +59,6 @@ export function useCalculator() {
   const [procedureCount, setProcedureCount] = useState(10); // Теперь это максимальное количество сеансов
   const [downPayment, setDownPayment] = useState(0);
   const [installmentMonths, setInstallmentMonths] = useState(1);
-  const [usedCertificate, setUsedCertificate] = useState(false);
   const [freeZones, setFreeZones] = useState<FreeZone[]>([]);
   const [selectedPackage, setSelectedPackage] = useState<string | null>(null);
   const [correctionPercent, setCorrectionPercent] = useState(0);
@@ -92,12 +91,10 @@ export function useCalculator() {
         fetch('/api/config/minimum_down_payment', { credentials: 'include' }),
         fetch('/api/config/bulk_discount_threshold', { credentials: 'include' }),
         fetch('/api/config/bulk_discount_percentage', { credentials: 'include' }),
-        fetch('/api/config/installment_months_options', { credentials: 'include' }),
-        fetch('/api/config/certificate_discount_percentage', { credentials: 'include' }),
-        fetch('/api/config/certificate_min_course_amount', { credentials: 'include' })
+        fetch('/api/config/installment_months_options', { credentials: 'include' })
       ]);
 
-      const [minPayment, bulkThreshold, bulkPercentage, monthsOptions, certificateAmount, certificateMinAmount] = await Promise.all(
+      const [minPayment, bulkThreshold, bulkPercentage, monthsOptions] = await Promise.all(
         configs.map(response => response.ok ? response.json() : null)
       );
 
@@ -105,9 +102,7 @@ export function useCalculator() {
         minimumDownPayment: minPayment || 8000,
         bulkDiscountThreshold: bulkThreshold || 15,
         bulkDiscountPercentage: bulkPercentage || 0.05,
-        installmentMonthsOptions: monthsOptions || [1, 2, 3, 4, 5, 6],
-        certificateDiscountAmount: certificateAmount || 3000,
-        certificateMinCourseAmount: certificateMinAmount || 25000
+        installmentMonthsOptions: monthsOptions || [1, 2, 3, 4, 5, 6]
       };
     },
     enabled: true,
@@ -131,7 +126,6 @@ export function useCalculator() {
       procedures: number,
       payment: number,
       months: number,
-      certificate: boolean,
       zones: FreeZone[]
     ) => {
       if (servicesData.length === 0) {
@@ -195,7 +189,6 @@ export function useCalculator() {
         packageType: 'economy',
         downPayment: payment,
         installmentMonths: months,
-        usedCertificate: certificate,
         freeZones: zones,
         serviceMap,
         packageConfig,
@@ -226,11 +219,10 @@ export function useCalculator() {
         procedureCount,
         downPayment,
         installmentMonths,
-        usedCertificate,
         freeZones
       );
     }, isUserDragging.current ? 100 : 0); // Shorter debounce when dragging
-  }, [selectedServices, procedureCount, downPayment, installmentMonths, usedCertificate, freeZones, correctionPercent, calculateInstantly]);
+  }, [selectedServices, procedureCount, downPayment, installmentMonths, freeZones, correctionPercent, calculateInstantly]);
 
   // Initialize default installment months based on settings - set to minimum available
   useEffect(() => {
@@ -277,7 +269,6 @@ export function useCalculator() {
     procedureCount,
     downPayment,
     installmentMonths,
-    usedCertificate,
     freeZones,
     selectedPackage,
     calculation,
@@ -298,7 +289,6 @@ export function useCalculator() {
       }, 500);
     }, []),
     setInstallmentMonths,
-    setUsedCertificate,
     setFreeZones,
     setCorrectionPercent,
     setManualGiftSessions,

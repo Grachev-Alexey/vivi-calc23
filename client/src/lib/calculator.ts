@@ -10,7 +10,6 @@ export interface CalculationParams {
   packageType: string;
   downPayment: number;
   installmentMonths: number;
-  usedCertificate: boolean;
   freeZones: any[];
   serviceMap: Map<number, any>;
   packageConfig: any;
@@ -69,13 +68,6 @@ export function calculatePackagePricing(
       discount = Math.max(discount, packageData.dynamicDiscount);
     }
 
-    // Calculate certificate discount using configurable fixed amount
-    const certificateDiscountAmount = calculatorSettings?.certificateDiscountAmount || 3000;
-    const certificateMinAmount = calculatorSettings?.certificateMinCourseAmount || 25000;
-    const certificateDiscount = params.usedCertificate && baseCost >= certificateMinAmount ? certificateDiscountAmount : 0;
-    
-
-    
     // Calculate bulk discount using configurable threshold and percentage
     const bulkThreshold = calculatorSettings?.bulkDiscountThreshold || 15;
     const bulkDiscountPercent = calculatorSettings?.bulkDiscountPercentage || 0.025;
@@ -107,7 +99,7 @@ export function calculatePackagePricing(
     const freeZonesValue = params.freeZonesValue || 0;
     
     // Total savings - only actual discounts, free zones are separate gifts
-    const actualDiscounts = packageDiscount + certificateDiscount + additionalDiscount + correctionDiscount;
+    const actualDiscounts = packageDiscount + additionalDiscount + correctionDiscount;
     const totalSavings = actualDiscounts; // Only actual discounts, not gifts
     const finalCost = baseCost - actualDiscounts; // Actual cost without gift sessions
 
@@ -135,7 +127,6 @@ export function calculatePackagePricing(
       appliedDiscounts: [
         { type: 'package', amount: packageDiscount },
         ...(qualifiesForBulkDiscount && additionalDiscount > 0 ? [{ type: 'bulk', amount: additionalDiscount }] : []),
-        ...(certificateDiscount > 0 ? [{ type: 'certificate', amount: certificateDiscount }] : []),
         ...(correctionDiscount > 0 ? [{ type: 'correction', amount: correctionDiscount }] : []),
         ...(giftSessionValue > 0 ? [{ type: 'gift_sessions', amount: giftSessionValue }] : [])
       ]

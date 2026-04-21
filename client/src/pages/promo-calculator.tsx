@@ -78,7 +78,6 @@ export default function PromoCalculatorPage({
     procedureCount,
     downPayment,
     installmentMonths,
-    usedCertificate,
     freeZones,
     calculation,
     selectedPackage,
@@ -91,7 +90,6 @@ export default function PromoCalculatorPage({
     setProcedureCount,
     setDownPayment,
     setInstallmentMonths,
-    setUsedCertificate,
     setFreeZones,
     setCorrectionPercent,
     setManualGiftSessions,
@@ -391,48 +389,6 @@ export default function PromoCalculatorPage({
               </div>
             )}
 
-            {/* Certificate option - компактная версия */}
-            <div className="bg-white dark:bg-gray-900 rounded-lg p-2 border border-gray-200">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h4 className="font-bold text-gray-900 dark:text-white text-xs">
-                    Сертификат
-                  </h4>
-                  <div className="text-xs text-gray-500 dark:text-gray-400">
-                    Скидка{" "}
-                    {calculatorSettings?.certificateDiscountAmount?.toLocaleString() ||
-                      "3 000"}
-                    ₽
-                  </div>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={usedCertificate}
-                    onChange={(e) => setUsedCertificate(e.target.checked)}
-                    disabled={
-                      !calculation ||
-                      calculation.baseCost <
-                        (calculatorSettings?.certificateMinCourseAmount ||
-                          25000)
-                    }
-                    className="sr-only peer"
-                  />
-                  <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-0 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-gray-600 peer-checked:bg-premium peer-disabled:opacity-50 focus:outline-none focus:ring-0"></div>
-                </label>
-              </div>
-              {!calculation ||
-              calculation.baseCost <
-                (calculatorSettings?.certificateMinCourseAmount || 25000) ? (
-                <p className="text-xs text-red-500 dark:text-red-400 mt-1">
-                  Доступно при курсе от{" "}
-                  {calculatorSettings?.certificateMinCourseAmount?.toLocaleString() ||
-                    "25 000"}
-                  ₽
-                </p>
-              ) : null}
-            </div>
-
             {/* Correction block - компактная версия */}
             <div className="bg-white dark:bg-gray-900 rounded-lg p-2 border border-gray-200">
               {isEditingCorrection ? (
@@ -534,7 +490,6 @@ export default function PromoCalculatorPage({
                   installmentMonths={installmentMonths}
                   procedureCount={procedureCount}
                   packagePerkValues={packagePerkValues}
-                  usedCertificate={usedCertificate}
                   calculatorSettings={calculatorSettings}
                   freeZones={freeZones}
                   selectedServices={selectedServices.map(service => ({
@@ -619,7 +574,6 @@ export default function PromoCalculatorPage({
           procedureCount={procedureCount}
           downPayment={downPayment}
           installmentMonths={installmentMonths}
-          usedCertificate={usedCertificate}
           freeZones={freeZones}
           manualGiftSessions={manualGiftSessions}
           user={user}

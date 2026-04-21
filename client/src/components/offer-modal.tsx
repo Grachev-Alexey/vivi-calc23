@@ -17,7 +17,6 @@ interface OfferModalProps {
   selectedServices: any[];
   downPayment: number;
   installmentMonths: number;
-  usedCertificate: boolean;
   freeZones: any[];
   clientName: string;
   clientPhone: string;
@@ -32,7 +31,6 @@ export default function OfferModal({
   selectedServices,
   downPayment,
   installmentMonths,
-  usedCertificate,
   freeZones,
   clientName,
   clientPhone,
@@ -74,8 +72,7 @@ export default function OfferModal({
         installmentMonths: installmentMonths > 1 ? installmentMonths : null,
         monthlyPayment: packageData.monthlyPayment,
         appliedDiscounts: packageData.appliedDiscounts,
-        freeZones,
-        usedCertificate
+        freeZones
       };
 
       // Создаем оферту
@@ -339,12 +336,6 @@ export default function OfferModal({
                           <span className="font-medium">{formatAmount(packageData.monthlyPayment)} ₽</span>
                         </div>
                       </>
-                    )}
-                    {usedCertificate && (
-                      <div className="flex justify-between text-green-600">
-                        <span>Сертификат:</span>
-                        <span>Применён</span>
-                      </div>
                     )}
                   </div>
                 </div>

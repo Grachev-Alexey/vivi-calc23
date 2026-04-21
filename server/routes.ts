@@ -45,7 +45,6 @@ const calculationSchema = z.object({
   packageType: z.enum(['vip', 'standard', 'economy']),
   downPayment: z.number(),
   installmentMonths: z.number().optional(),
-  usedCertificate: z.boolean().default(false),
   freeZones: z.array(z.object({
     serviceId: z.number(),
     quantity: z.number()
@@ -485,7 +484,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         downPayment: sales.downPayment,
         installmentMonths: sales.installmentMonths,
         monthlyPayment: sales.monthlyPayment,
-        usedCertificate: sales.usedCertificate,
         createdAt: sales.createdAt,
         selectedServices: sales.selectedServices,
         appliedDiscounts: sales.appliedDiscounts,
@@ -561,7 +559,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         downPayment: sales.downPayment,
         installmentMonths: sales.installmentMonths,
         monthlyPayment: sales.monthlyPayment,
-        usedCertificate: sales.usedCertificate,
         createdAt: sales.createdAt,
         selectedServices: sales.selectedServices,
         appliedDiscounts: sales.appliedDiscounts,
@@ -841,7 +838,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         monthlyPayment: calculation.monthlyPayment?.toString() || null,
         appliedDiscounts: calculation.appliedDiscounts,
         freeZones: calculation.freeZones,
-        usedCertificate: calculation.usedCertificate,
         manualGiftSessions: calculation.manualGiftSessions || {},
         saleDate: calculation.saleDate ? new Date(calculation.saleDate) : undefined,
         offerNumber,
@@ -985,7 +981,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 }
 
 function calculatePackagePricing(baseCost: number, calculation: any, packages: any) {
-  const { services, packageType, downPayment, installmentMonths, usedCertificate, freeZones } = calculation;
+  const { services, packageType, downPayment, installmentMonths, freeZones } = calculation;
   
   // Calculate procedure count
   const totalProcedures = services.reduce((sum: number, service: any) => sum + service.quantity, 0);
@@ -1015,12 +1011,6 @@ function calculatePackagePricing(baseCost: number, calculation: any, packages: a
   if (totalProcedures >= 15) {
     additionalDiscount += 0.025; // +2.5%
   }
-  
-  // Certificate discount
-  let certificateDiscount = 0;
-  if (usedCertificate && baseCost >= 25000) {
-    certificateDiscount = 3000;
-  }
 
   // Calculate for each package
   const results: any = {};
@@ -1034,14 +1024,14 @@ function calculatePackagePricing(baseCost: number, calculation: any, packages: a
     }
     
     const discountAmount = baseCost * finalDiscount;
-    const finalCost = baseCost - discountAmount - certificateDiscount;
+    const finalCost = baseCost - discountAmount;
     
     // Calculate free zones value
     const freeZonesValue = freeZones.reduce((sum: number, zone: any) => {
       return sum + (zone.pricePerProcedure * zone.quantity);
     }, 0);
     
-    const totalSavings = discountAmount + certificateDiscount + freeZonesValue;
+    const totalSavings = discountAmount + freeZonesValue;
     
     // Check availability
     let isAvailable = true;
@@ -1077,8 +1067,7 @@ function calculatePackagePricing(baseCost: number, calculation: any, packages: a
       monthlyPayment,
       appliedDiscounts: [
         { type: 'package', amount: discountAmount },
-        ...(additionalDiscount > 0 ? [{ type: 'bulk', amount: baseCost * 0.025 }] : []),
-        ...(certificateDiscount > 0 ? [{ type: 'certificate', amount: certificateDiscount }] : [])
+        ...(additionalDiscount > 0 ? [{ type: 'bulk', amount: baseCost * 0.025 }] : [])
       ]
     };
   }
