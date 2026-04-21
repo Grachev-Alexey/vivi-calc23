@@ -155,8 +155,9 @@ export default function AuthPage({ onLogin }: AuthPageProps) {
                 <input
                   key={index}
                   ref={(el) => (inputRefs.current[index] = el)}
-                  type="password"
+                  type="text"
                   inputMode="numeric"
+                  pattern="[0-9]*"
                   maxLength={1}
                   value={digit}
                   onChange={(e) => handleInputChange(index, e.target.value)}
@@ -173,9 +174,17 @@ export default function AuthPage({ onLogin }: AuthPageProps) {
                     boxShadow: digit
                       ? "0 0 0 4px hsla(43, 88%, 56%, 0.1), 0 4px 12px hsla(43, 88%, 56%, 0.15)"
                       : "inset 0 2px 4px rgba(0,0,0,0.3)",
-                  }}
+                    WebkitTextSecurity: "disc",
+                  } as React.CSSProperties}
                   disabled={loading}
-                  autoComplete="off"
+                  autoComplete="one-time-code"
+                  autoCorrect="off"
+                  autoCapitalize="off"
+                  spellCheck={false}
+                  name={`pin-${index}`}
+                  data-lpignore="true"
+                  data-1p-ignore="true"
+                  data-form-type="other"
                   data-testid={`input-pin-${index}`}
                 />
               ))}
