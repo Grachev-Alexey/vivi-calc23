@@ -996,12 +996,16 @@ function SubscriptionTypesManagement() {
                         <div className="mt-2">
                           <p className="text-xs font-medium text-gray-700">Состав услуг:</p>
                           <div className="text-xs text-gray-600">
-                            {type.balanceContainer.links.map((link: any, idx: number) => (
-                              <span key={idx}>
-                                ID{link.service?.id || 'N/A'} (×{link.count})
-                                {idx < type.balanceContainer.links.length - 1 ? ', ' : ''}
-                              </span>
-                            ))}
+                            {type.balanceContainer.links.map((link: any, idx: number) => {
+                              const name = link.service?.title || `ID ${link.service?.id ?? 'N/A'}`;
+                              const qty = link.is_unlimited ? '∞' : link.count;
+                              return (
+                                <span key={idx}>
+                                  {name} (×{qty})
+                                  {idx < type.balanceContainer.links.length - 1 ? ', ' : ''}
+                                </span>
+                              );
+                            })}
                           </div>
                         </div>
                       )}
