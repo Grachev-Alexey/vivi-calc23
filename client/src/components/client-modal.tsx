@@ -6,9 +6,13 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery } from "@tanstack/react-query";
-import { User, Loader2, Copy, CheckCircle, FileText, Calendar, CreditCard } from "lucide-react";
+import { User, Loader2, Copy, CheckCircle, FileText, Calendar, CreditCard, CalendarDays } from "lucide-react";
 import { formatPhoneNumber, validatePhoneNumber, formatPrice } from "@/lib/utils";
 import PhoneInput from "./ui/phone-input";
+import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
+import { Calendar as CalendarPicker } from "@/components/ui/calendar";
+import { format, parseISO } from "date-fns";
+import { ru } from "date-fns/locale";
 
 interface UserData {
   id: number;
@@ -361,17 +365,34 @@ export default function ClientModal({
                 {isAdmin && (
                   <>
                     <div>
-                      <Label htmlFor="saleDate" className="block text-xs font-medium text-foreground/80 mb-1">
+                      <Label className="block text-xs font-medium text-foreground/80 mb-1">
                         Дата продажи *
                       </Label>
-                      <Input
-                        id="saleDate"
-                        type="date"
-                        value={saleDate}
-                        onChange={(e) => setSaleDate(e.target.value)}
-                        className="text-sm"
-                        required
-                      />
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <button
+                            type="button"
+                            className="w-full h-9 px-3 rounded-md text-sm flex items-center justify-between transition-colors bg-input/40 hover:bg-input/60 border border-input text-foreground"
+                          >
+                            <span>
+                              {saleDate
+                                ? format(parseISO(saleDate), "d MMMM yyyy", { locale: ru })
+                                : "Выберите дату"}
+                            </span>
+                            <CalendarDays className="w-4 h-4 opacity-60" />
+                          </button>
+                        </PopoverTrigger>
+                        <PopoverContent align="start" className="p-0">
+                          <CalendarPicker
+                            mode="single"
+                            selected={saleDate ? parseISO(saleDate) : undefined}
+                            onSelect={(d) => {
+                              if (d) setSaleDate(format(d, "yyyy-MM-dd"));
+                            }}
+                            initialFocus
+                          />
+                        </PopoverContent>
+                      </Popover>
                     </div>
 
                     <div>
