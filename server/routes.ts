@@ -100,15 +100,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
       (req.session as any).userId = user.id;
       (req.session as any).userRole = user.role;
       (req.session as any).userName = user.name;
-      
-      res.json({ 
-        user: { 
-          id: user.id, 
-          name: user.name, 
-          role: user.role,
-          isActive: user.isActive
-          // PIN is intentionally excluded for security
-        } 
+
+      // Persist the session before responding so the next request from the
+      // client (which usually fires immediately) sees the saved session.
+      req.session.save((err) => {
+        if (err) {
+          console.error('Session save error:', err);
+          return res.status(500).json({ message: "Ошибка сохранения сессии" });
+        }
+        res.json({
+          user: {
+            id: user.id,
+            name: user.name,
+            role: user.role,
+            isActive: user.isActive
+            // PIN is intentionally excluded for security
+          }
+        });
       });
     } catch (error) {
       res.status(400).json({ message: "Ошибка валидации данных" });

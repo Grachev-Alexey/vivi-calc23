@@ -72,7 +72,16 @@ function App() {
           <AuthPage onLogin={handleLogin} />
         ) : (
           <Switch>
-            <Route path="/admin" component={() => <AdminPage user={user} onLogout={handleLogout} />} />
+            <Route
+              path="/admin"
+              component={() =>
+                user.role === 'admin' ? (
+                  <AdminPage user={user} onLogout={handleLogout} />
+                ) : (
+                  <PromoCalculatorPage user={user} onLogout={handleLogout} />
+                )
+              }
+            />
             <Route component={() => <PromoCalculatorPage user={user} onLogout={handleLogout} />} />
           </Switch>
         )}
