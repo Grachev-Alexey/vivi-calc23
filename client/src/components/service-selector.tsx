@@ -66,14 +66,6 @@ export default function ServiceSelector({
       ? Math.max(...selectedServices.map(s => s.sessionCount || 10))
       : 10;
     
-    console.log('ServiceSelector: Updating session count:', {
-      selectedServices: selectedServices.map(s => ({ 
-        title: s.title, 
-        sessionCount: s.sessionCount || 10 
-      })),
-      maxSessionCount
-    });
-    
     if (onSessionCountChange) {
       onSessionCountChange(maxSessionCount);
     }
