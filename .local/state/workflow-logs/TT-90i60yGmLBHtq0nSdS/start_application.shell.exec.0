@@ -1,0 +1,186 @@
+
+> vivi-calc@1.0.1 dev
+> tsx server/index.ts
+
+[1G[0K4:00:35 PM [express] Development mode: using Vite middleware
+📱 Frontend: http://localhost:5000
+Environment: development
+
+Press Ctrl+C to stop the server
+
+4:00:35 PM [express] serving on port 5000
+
+A PostCSS plugin did not pass the `from` option to `postcss.parse`. This may cause imported assets to be incorrectly transformed. If you've recently added a PostCSS plugin that raised this warning, please contact the package author to fix the issue.
+4:00:41 PM [express] GET /api/auth/check 401 in 2ms :: {"message":"Не авторизован"}
+4:00:42 PM [express] GET /api/auth/check 304 in 6ms :: {"user":{"id":1,"name":"Администратор","role"…
+4:00:43 PM [express] GET /api/packages 304 in 8ms :: [{"id":1,"type":"vip","name":"VIP","discount":"…
+4:00:43 PM [express] GET /api/admin/users 304 in 12ms :: [{"id":1,"pin":"7571","role":"admin","name"…
+4:00:43 PM [express] GET /api/services 304 in 14ms :: [{"id":1,"yclientsId":15021575,"title":"Второй…
+4:00:43 PM [express] GET /api/config/yclients 304 in 16ms :: {"token":"u8xzkdpkgfc73uektn64","authCo…
+4:00:43 PM [express] GET /api/packages 304 in 7ms :: [{"id":1,"type":"vip","name":"VIP","discount":"…
+4:00:43 PM [express] GET /api/auth/check 304 in 6ms :: {"user":{"id":1,"name":"Администратор","role"…
+4:00:43 PM [express] GET /api/services 304 in 8ms :: [{"id":1,"yclientsId":15021575,"title":"Второй …
+4:00:43 PM [express] GET /api/packages 304 in 11ms :: [{"id":1,"type":"vip","name":"VIP","discount":…
+4:00:43 PM [express] GET /api/config/minimum_down_payment 304 in 13ms
+4:00:43 PM [express] GET /api/perks 200 in 17ms :: [{"id":2,"packageType":"standard","perkId":1,"val…
+4:00:43 PM [express] GET /api/config/bulk_discount_threshold 304 in 20ms
+4:00:43 PM [express] GET /api/config/bulk_discount_percentage 304 in 6ms
+4:00:43 PM [express] GET /api/config/installment_months_options 304 in 6ms
+4:00:44 PM [express] GET /api/admin/sales 304 in 8ms :: {"sales":[],"summary":{"totalSales":0,"total…
+4:00:45 PM [express] GET /api/admin/users 304 in 8ms :: [{"id":1,"pin":"7571","role":"admin","name":…
+4:00:48 PM [express] GET /api/admin/services 304 in 9ms :: [{"id":1,"yclientsId":15021575,"title":"В…
+4:00:49 PM [express] GET /api/auth/check 401 in 1ms :: {"message":"Не авторизован"}
+4:00:50 PM [express] GET /api/admin/subscription-types 304 in 8ms :: []
+4:00:51 PM [express] GET /api/admin/perk-values 304 in 9ms :: [{"id":2,"packageType":"standard","per…
+4:00:51 PM [express] GET /api/admin/perks 304 in 13ms :: [{"id":1,"name":"123","description":"123","…
+4:00:52 PM [express] GET /api/config/bulk_discount_threshold 304 in 9ms
+4:00:52 PM [express] GET /api/config/minimum_down_payment 304 in 14ms
+4:00:52 PM [express] GET /api/config/bulk_discount_percentage 304 in 15ms
+4:00:52 PM [express] GET /api/config/installment_months_options 304 in 22ms
+4:01:05 PM [express] GET /api/admin/subscription-types 304 in 7ms :: []
+4:01:11 PM [express] GET /api/admin/users 304 in 7ms :: [{"id":1,"pin":"7571","role":"admin","name":…
+4:01:12 PM [express] GET /api/admin/services 304 in 8ms :: [{"id":1,"yclientsId":15021575,"title":"В…
+4:01:12 PM [express] GET /api/admin/users 304 in 8ms :: [{"id":1,"pin":"7571","role":"admin","name":…
+4:01:21 PM [express] GET /api/admin/perks 304 in 7ms :: [{"id":1,"name":"123","description":"123","i…
+4:01:21 PM [express] GET /api/admin/perk-values 304 in 13ms :: [{"id":2,"packageType":"standard","pe…
+4:01:51 PM [express] GET /api/admin/perks 304 in 36ms :: [{"id":1,"name":"123","description":"123","…
+4:01:51 PM [express] GET /api/admin/perk-values 304 in 41ms :: [{"id":2,"packageType":"standard","pe…
+4:02:42 PM [express] GET /api/config/bulk_discount_percentage 304 in 11ms
+4:02:42 PM [express] GET /api/config/bulk_discount_threshold 304 in 14ms
+4:02:42 PM [express] GET /api/config/minimum_down_payment 304 in 15ms
+4:02:42 PM [express] GET /api/config/installment_months_options 304 in 6ms
+4:02:45 PM [express] GET /api/config/minimum_down_payment 304 in 15ms
+4:02:45 PM [express] GET /api/config/installment_months_options 304 in 15ms
+4:02:45 PM [express] GET /api/config/bulk_discount_percentage 304 in 23ms
+4:02:45 PM [express] GET /api/config/bulk_discount_threshold 304 in 8ms
+4:02:49 PM [express] GET /api/admin/services 304 in 8ms :: [{"id":1,"yclientsId":15021575,"title":"В…
+4:02:54 PM [express] GET /api/admin/users 304 in 48ms :: [{"id":1,"pin":"7571","role":"admin","name"…
+4:02:55 PM [express] GET /api/admin/users 304 in 8ms :: [{"id":1,"pin":"7571","role":"admin","name":…
+4:02:56 PM [express] GET /api/admin/services 304 in 10ms :: [{"id":1,"yclientsId":15021575,"title":"…
+4:03:02 PM [express] GET /api/admin/subscription-types 304 in 8ms :: []
+4:03:02 PM [express] GET /api/admin/services 304 in 7ms :: [{"id":1,"yclientsId":15021575,"title":"В…
+4:03:02 PM [express] GET /api/admin/subscription-types 304 in 6ms :: []
+4:03:03 PM [express] GET /api/admin/perk-values 304 in 10ms :: [{"id":2,"packageType":"standard","pe…
+4:03:03 PM [express] GET /api/admin/perks 304 in 12ms :: [{"id":1,"name":"123","description":"123","…
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[1;1H[0J[2m4:03:05 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/index.css[22m
+4:03:09 PM [express] GET /api/config/minimum_down_payment 304 in 11ms
+4:03:09 PM [express] GET /api/config/installment_months_options 304 in 21ms
+4:03:09 PM [express] GET /api/config/bulk_discount_percentage 304 in 33ms
+4:03:09 PM [express] GET /api/config/bulk_discount_threshold 304 in 38ms
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[1;1H[0J[2m4:03:15 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/admin.tsx, /src/index.css[22m
+4:03:17 PM [express] GET /api/config/bulk_discount_threshold 304 in 10ms
+4:03:17 PM [express] GET /api/config/bulk_discount_percentage 304 in 12ms
+4:03:17 PM [express] GET /api/config/minimum_down_payment 304 in 17ms
+4:03:17 PM [express] GET /api/config/installment_months_options 304 in 19ms
+4:03:17 PM [express] GET /api/packages 304 in 7ms :: [{"id":1,"type":"vip","name":"VIP","discount":"…
+4:03:17 PM [express] GET /api/config/yclients 304 in 6ms :: {"token":"u8xzkdpkgfc73uektn64","authCoo…
+4:03:18 PM [express] GET /api/admin/perk-values 304 in 10ms :: [{"id":2,"packageType":"standard","pe…
+4:03:18 PM [express] GET /api/admin/perks 304 in 13ms :: [{"id":1,"name":"123","description":"123","…
+4:03:19 PM [express] GET /api/admin/users 304 in 10ms :: [{"id":1,"pin":"7571","role":"admin","name"…
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[1;1H[0J[2m4:03:20 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/admin.tsx, /src/index.css[22m [33m(x2)[39m
+4:03:20 PM [express] GET /api/admin/users 304 in 7ms :: [{"id":1,"pin":"7571","role":"admin","name":…
+4:03:21 PM [express] GET /api/packages 304 in 8ms :: [{"id":1,"type":"vip","name":"VIP","discount":"…
+4:03:21 PM [express] GET /api/admin/users 304 in 13ms :: [{"id":1,"pin":"7571","role":"admin","name"…
+4:03:21 PM [express] GET /api/config/yclients 304 in 16ms :: {"token":"u8xzkdpkgfc73uektn64","authCo…
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[1;1H[0J[2m4:03:21 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/admin.tsx, /src/index.css[22m [33m(x3)[39m
+4:03:22 PM [express] GET /api/packages 304 in 9ms :: [{"id":1,"type":"vip","name":"VIP","discount":"…
+4:03:22 PM [express] GET /api/admin/users 304 in 13ms :: [{"id":1,"pin":"7571","role":"admin","name"…
+4:03:22 PM [express] GET /api/config/yclients 304 in 15ms :: {"token":"u8xzkdpkgfc73uektn64","authCo…
+4:03:24 PM [express] GET /api/admin/services 304 in 8ms :: [{"id":1,"yclientsId":15021575,"title":"В…
+4:03:25 PM [express] GET /api/admin/subscription-types 304 in 7ms :: []
+4:03:26 PM [express] GET /api/admin/perks 304 in 9ms :: [{"id":1,"name":"123","description":"123","i…
+4:03:26 PM [express] GET /api/admin/perk-values 304 in 16ms :: [{"id":2,"packageType":"standard","pe…
+4:03:27 PM [express] GET /api/admin/perk-values 304 in 10ms :: [{"id":2,"packageType":"standard","pe…
+4:03:27 PM [express] GET /api/admin/perks 304 in 12ms :: [{"id":1,"name":"123","description":"123","…
