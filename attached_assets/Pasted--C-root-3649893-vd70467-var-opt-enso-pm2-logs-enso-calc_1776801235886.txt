@@ -1,0 +1,36 @@
+^C
+root@3649893-vd70467:/var/opt/enso# pm2 logs enso-calc
+[TAILING] Tailing last 15 lines for [enso-calc] process (change the value with --lines option)
+/var/log/enso-calc/error.log last 15 lines:
+0|enso-cal | 2026-04-21T21:07:55:   detail: 'Key (package_type)=(vip) is not present in table "packages".',
+0|enso-cal | 2026-04-21T21:07:55:   hint: undefined,
+0|enso-cal | 2026-04-21T21:07:55:   position: undefined,
+0|enso-cal | 2026-04-21T21:07:55:   internalPosition: undefined,
+0|enso-cal | 2026-04-21T21:07:55:   internalQuery: undefined,
+0|enso-cal | 2026-04-21T21:07:55:   where: undefined,
+0|enso-cal | 2026-04-21T21:07:55:   schema: 'public',
+0|enso-cal | 2026-04-21T21:07:55:   table: 'package_perk_values',
+0|enso-cal | 2026-04-21T21:07:55:   column: undefined,
+0|enso-cal | 2026-04-21T21:07:55:   dataType: undefined,
+0|enso-cal | 2026-04-21T21:07:55:   constraint: 'package_perk_values_package_type_packages_type_fk',
+0|enso-cal | 2026-04-21T21:07:55:   file: 'ri_triggers.c',
+0|enso-cal | 2026-04-21T21:07:55:   line: '2528',
+0|enso-cal | 2026-04-21T21:07:55:   routine: 'ri_ReportViolation'
+0|enso-cal | 2026-04-21T21:07:55: }
+
+/var/log/enso-calc/out.log last 15 lines:
+0|enso-cal | 2026-04-21T22:49:32: 10:49:32 PM [express] POST /api/auth 200 in 30ms :: {"user":{"id":1,"name":"Администратор","role":"ad…
+0|enso-cal | 2026-04-21T22:49:32: 10:49:32 PM [express] GET /api/services 401 in 1ms :: {"message":"Требуется авторизация"}
+0|enso-cal | 2026-04-21T22:49:32: 10:49:32 PM [express] GET /api/admin/users 403 in 1ms :: {"message":"Требуются права администратора"}
+0|enso-cal | 2026-04-21T22:49:32: 10:49:32 PM [express] GET /api/config/yclients 403 in 1ms :: {"message":"Требуются права администрато…
+0|enso-cal | 2026-04-21T22:49:32: 10:49:32 PM [express] GET /api/packages 401 in 2ms :: {"message":"Требуется авторизация"}
+0|enso-cal | 2026-04-21T22:49:32: 10:49:32 PM [express] GET /api/packages 401 in 1ms :: {"message":"Требуется авторизация"}
+0|enso-cal | 2026-04-21T22:49:33: 10:49:33 PM [express] GET /api/admin/sales 403 in 1ms :: {"message":"Требуются права администратора"}
+0|enso-cal | 2026-04-21T22:49:34: 10:49:34 PM [express] GET /api/admin/users 403 in 6ms :: {"message":"Требуются права администратора"}
+0|enso-cal | 2026-04-21T22:49:34: 10:49:34 PM [express] GET /api/admin/sales 403 in 1ms :: {"message":"Требуются права администратора"}
+0|enso-cal | 2026-04-21T22:49:35: 10:49:35 PM [express] GET /api/admin/users 403 in 1ms :: {"message":"Требуются права администратора"}
+0|enso-cal | 2026-04-21T22:49:36: 10:49:36 PM [express] GET /api/admin/services 403 in 2ms :: {"message":"Требуются права администратор…
+0|enso-cal | 2026-04-21T22:49:37: 10:49:37 PM [express] GET /api/admin/subscription-types 403 in 2ms :: {"message":"Требуются права адм…
+0|enso-cal | 2026-04-21T22:50:04: 10:50:04 PM [express] POST /api/config 403 in 3ms :: {"message":"Требуются права администратора"}
+0|enso-cal | 2026-04-21T22:50:05: 10:50:05 PM [express] POST /api/config 403 in 2ms :: {"message":"Требуются права администратора"}
+0|enso-cal | 2026-04-21T22:50:05: 10:50:05 PM [express] POST /api/config 403 in 1ms :: {"message":"Требуются права администратора"}
