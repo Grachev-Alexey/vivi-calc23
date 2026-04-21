@@ -1,0 +1,454 @@
+
+> vivi-calc@1.0.1 dev
+> tsx server/index.ts
+
+[1G[0K5:50:03 PM [express] Development mode: using Vite middleware
+📱 Frontend: http://localhost:5000
+Environment: development
+
+Press Ctrl+C to stop the server
+
+5:50:03 PM [express] serving on port 5000
+5:50:07 PM [express] GET /api/auth/check 304 in 5ms :: {"user":{"id":1,"name":"Администратор","role"…
+5:50:07 PM [express] GET /api/perks 304 in 11ms :: []
+5:50:07 PM [express] GET /api/services 304 in 8ms :: []
+5:50:07 PM [express] GET /api/packages 304 in 8ms :: [{"id":1,"type":"vip","name":"VIP","discount":"…
+5:50:07 PM [express] GET /api/config/bulk_discount_threshold 304 in 10ms
+5:50:07 PM [express] GET /api/config/minimum_down_payment 304 in 6ms
+5:50:07 PM [express] GET /api/config/bulk_discount_percentage 304 in 6ms
+5:50:08 PM [express] GET /api/config/installment_months_options 304 in 4ms
+5:50:15 PM [express] GET /api/auth/check 304 in 3ms :: {"user":{"id":1,"name":"Администратор","role"…
+5:50:15 PM [express] GET /api/services 304 in 8ms :: []
+5:50:15 PM [express] GET /api/packages 304 in 10ms :: [{"id":1,"type":"vip","name":"VIP","discount":…
+5:50:15 PM [express] GET /api/config/minimum_down_payment 304 in 8ms
+5:50:15 PM [express] GET /api/config/bulk_discount_threshold 304 in 6ms
+5:50:15 PM [express] GET /api/perks 304 in 12ms :: []
+5:50:15 PM [express] GET /api/config/bulk_discount_percentage 304 in 9ms
+5:50:15 PM [express] GET /api/config/installment_months_options 304 in 5ms
+5:50:19 PM [express] POST /api/logout 200 in 4ms :: {"success":true}
+5:50:22 PM [express] POST /api/auth 200 in 6ms :: {"user":{"id":1,"name":"Администратор","role":"adm…
+5:50:22 PM [express] GET /api/packages 304 in 5ms :: [{"id":1,"type":"vip","name":"VIP","discount":"…
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[1;1H[0J[2m5:52:20 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/ui/toast.tsx, /src/index.css[22m
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[1;1H[0J[2m5:52:24 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/ui/toast.tsx, /src/index.css[22m [33m(x2)[39m
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[1;1H[0J[2m5:52:39 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/service-selector.tsx, /src/index.css[22m
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[1;1H[0J[2m5:52:44 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/service-selector.tsx, /src/index.css[22m [33m(x2)[39m
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[1;1H[0J[2m5:53:07 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/service-selector.tsx, /src/index.css[22m [33m(x3)[39m
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[1;1H[0J[2m5:53:16 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/service-selector.tsx, /src/index.css[22m [33m(x4)[39m
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[1;1H[0J[2m5:53:17 PM[22m [31m[1m[vite][22m[39m [31mInternal server error: /home/runner/workspace/client/src/components/service-selector.tsx: Missing semicolon. (417:9)
+
+[0m [90m 415 |[31m             [33m<[31m[33m/[31m[33mButton[31m[33m>[31m
+ [90m 416 |[31m           [33m<[31m[33m/[31m[33mdiv[31m[33m>[31m
+[31m[1m>[22m[31m[90m 417 |[31m         ))}
+ [90m     |[31m          [31m[1m^[22m[31m
+ [90m 418 |[31m       [33m<[31m[33m/[31m[33mdiv[31m[33m>[31m
+ [90m 419 |[31m
+ [90m 420 |[31m       {[90m/* Session count configuration for all services */[31m}[0m[39m
+  Plugin: [35mvite:react-babel[39m
+  File: [36m/home/runner/workspace/client/src/components/service-selector.tsx[39m:417:9
+[33m  415|              </Button>
+  416|            </div>
+  417|          ))}
+     |           ^
+  418|        </div>
+  419|  [39m
+      at toParseError (/home/runner/workspace/node_modules/@babel/parser/src/parse-error.ts:95:45)
+      at raise (/home/runner/workspace/node_modules/@babel/parser/src/tokenizer/index.ts:1504:19)
+      at semicolon (/home/runner/workspace/node_modules/@babel/parser/src/parser/util.ts:149:10)
+      at parseReturnStatement (/home/runner/workspace/node_modules/@babel/parser/src/parser/statement.ts:1116:12)
+      at parseStatementContent (/home/runner/workspace/node_modules/@babel/parser/src/parser/statement.ts:543:21)
+      at parseStatementContent (/home/runner/workspace/node_modules/@babel/parser/src/plugins/typescript/index.ts:3220:20)
+      at parseStatementLike (/home/runner/workspace/node_modules/@babel/parser/src/parser/statement.ts:482:17)
+      at parseStatementListItem (/home/runner/workspace/node_modules/@babel/parser/src/parser/statement.ts:431:17)
+      at parseBlockOrModuleBlockBody (/home/runner/workspace/node_modules/@babel/parser/src/parser/statement.ts:1444:16)
+      at parseBlockBody (/home/runner/workspace/node_modules/@babel/parser/src/parser/statement.ts:1417:10)
+      at parseBlock (/home/runner/workspace/node_modules/@babel/parser/src/parser/statement.ts:1385:10)
+      at parseFunctionBody (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:2621:24)
+      at parseArrowExpression (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:2562:10)
+      at parseParenAndDistinguishExpression (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:1850:12)
+      at parseExprAtom (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:1170:21)
+      at parseExprAtom (/home/runner/workspace/node_modules/@babel/parser/src/plugins/jsx/index.ts:583:22)
+      at parseExprSubscripts (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:742:23)
+      at parseUpdate (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:721:21)
+      at parseMaybeUnary (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:683:23)
+      at parseMaybeUnary (/home/runner/workspace/node_modules/@babel/parser/src/plugins/typescript/index.ts:3893:20)
+      at parseMaybeUnaryOrPrivate (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:417:14)
+      at parseExprOps (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:429:23)
+      at parseMaybeConditional (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:384:23)
+      at parseMaybeAssign (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:301:21)
+      at parseMaybeAssign (/home/runner/workspace/node_modules/@babel/parser/src/plugins/typescript/index.ts:3764:22)
+      at callback (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:257:12)
+      at allowInAnd (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:3197:12)
+      at parseMaybeAssignAllowIn (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:256:17)
+      at parseMaybeAssignAllowInOrVoidPattern (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:3311:17)
+      at parseExprListItem (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:2793:18)
+      at parseCallExpressionArguments (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:1042:14)
+      at parseCoverCallAndAsyncArrowHead (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:922:29)
+      at parseSubscript (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:804:19)
+      at parseSubscript (/home/runner/workspace/node_modules/@babel/parser/src/plugins/typescript/index.ts:2809:20)
+      at parseSubscripts (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:763:19)
+      at parseExprSubscripts (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:748:17)
+      at parseUpdate (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:721:21)
+      at parseMaybeUnary (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:683:23)
+      at parseMaybeUnary (/home/runner/workspace/node_modules/@babel/parser/src/plugins/typescript/index.ts:3893:20)
+      at parseMaybeUnaryOrPrivate (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:417:14)
+      at parseExprOps (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:429:23)
+      at parseMaybeConditional (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:384:23)
+      at parseMaybeAssign (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:301:21)
+      at parseMaybeAssign (/home/runner/workspace/node_modules/@babel/parser/src/plugins/typescript/index.ts:3764:22)
+      at parseExpressionBase (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:226:23)
+      at callback (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:217:39)
+      at allowInAnd (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:3197:12)
+      at parseExpression (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:217:17)
+      at jsxParseExpressionContainer (/home/runner/workspace/node_modules/@babel/parser/src/plugins/jsx/index.ts:376:33)
+      at jsxParseElementAt (/home/runner/workspace/node_modules/@babel/parser/src/plugins/jsx/index.ts:500:24)
+[2m5:53:17 PM[22m [31m[1m[vite][22m[39m Pre-transform error: Failed to load url /src/components/src/main.tsx (resolved id: /src/components/src/main.tsx). Does the file exist?
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[1;1H[0J[2m5:53:21 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/service-selector.tsx, /src/index.css[22m
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[1;1H[0J[2m5:53:22 PM[22m [31m[1m[vite][22m[39m [31mInternal server error: /home/runner/workspace/client/src/components/service-selector.tsx: Missing semicolon. (424:9)
+
+[0m [90m 422 |[31m             [33m<[31m[33m/[31m[33mButton[31m[33m>[31m
+ [90m 423 |[31m           [33m<[31m[33m/[31m[33mdiv[31m[33m>[31m
+[31m[1m>[22m[31m[90m 424 |[31m         ))}
+ [90m     |[31m          [31m[1m^[22m[31m
+ [90m 425 |[31m       [33m<[31m[33m/[31m[33mdiv[31m[33m>[31m
+ [90m 426 |[31m
+ [90m 427 |[31m       {[90m/* Session count configuration for all services */[31m}[0m[39m
+  Plugin: [35mvite:react-babel[39m
+  File: [36m/home/runner/workspace/client/src/components/service-selector.tsx[39m:424:9
+[33m  422|              </Button>
+  423|            </div>
+  424|          ))}
+     |           ^
+  425|        </div>
+  426|  [39m
+      at toParseError (/home/runner/workspace/node_modules/@babel/parser/src/parse-error.ts:95:45)
+      at raise (/home/runner/workspace/node_modules/@babel/parser/src/tokenizer/index.ts:1504:19)
+      at semicolon (/home/runner/workspace/node_modules/@babel/parser/src/parser/util.ts:149:10)
+      at parseReturnStatement (/home/runner/workspace/node_modules/@babel/parser/src/parser/statement.ts:1116:12)
+      at parseStatementContent (/home/runner/workspace/node_modules/@babel/parser/src/parser/statement.ts:543:21)
+      at parseStatementContent (/home/runner/workspace/node_modules/@babel/parser/src/plugins/typescript/index.ts:3220:20)
+      at parseStatementLike (/home/runner/workspace/node_modules/@babel/parser/src/parser/statement.ts:482:17)
+      at parseStatementListItem (/home/runner/workspace/node_modules/@babel/parser/src/parser/statement.ts:431:17)
+      at parseBlockOrModuleBlockBody (/home/runner/workspace/node_modules/@babel/parser/src/parser/statement.ts:1444:16)
+      at parseBlockBody (/home/runner/workspace/node_modules/@babel/parser/src/parser/statement.ts:1417:10)
+      at parseBlock (/home/runner/workspace/node_modules/@babel/parser/src/parser/statement.ts:1385:10)
+      at parseFunctionBody (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:2621:24)
+      at parseArrowExpression (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:2562:10)
+      at parseParenAndDistinguishExpression (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:1850:12)
+      at parseExprAtom (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:1170:21)
+      at parseExprAtom (/home/runner/workspace/node_modules/@babel/parser/src/plugins/jsx/index.ts:583:22)
+      at parseExprSubscripts (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:742:23)
+      at parseUpdate (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:721:21)
+      at parseMaybeUnary (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:683:23)
+      at parseMaybeUnary (/home/runner/workspace/node_modules/@babel/parser/src/plugins/typescript/index.ts:3893:20)
+      at parseMaybeUnaryOrPrivate (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:417:14)
+      at parseExprOps (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:429:23)
+      at parseMaybeConditional (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:384:23)
+      at parseMaybeAssign (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:301:21)
+      at parseMaybeAssign (/home/runner/workspace/node_modules/@babel/parser/src/plugins/typescript/index.ts:3764:22)
+      at callback (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:257:12)
+      at allowInAnd (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:3197:12)
+      at parseMaybeAssignAllowIn (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:256:17)
+      at parseMaybeAssignAllowInOrVoidPattern (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:3311:17)
+      at parseExprListItem (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:2793:18)
+      at parseCallExpressionArguments (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:1042:14)
+      at parseCoverCallAndAsyncArrowHead (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:922:29)
+      at parseSubscript (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:804:19)
+      at parseSubscript (/home/runner/workspace/node_modules/@babel/parser/src/plugins/typescript/index.ts:2809:20)
+      at parseSubscripts (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:763:19)
+      at parseExprSubscripts (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:748:17)
+      at parseUpdate (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:721:21)
+      at parseMaybeUnary (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:683:23)
+      at parseMaybeUnary (/home/runner/workspace/node_modules/@babel/parser/src/plugins/typescript/index.ts:3893:20)
+      at parseMaybeUnaryOrPrivate (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:417:14)
+      at parseExprOps (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:429:23)
+      at parseMaybeConditional (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:384:23)
+      at parseMaybeAssign (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:301:21)
+      at parseMaybeAssign (/home/runner/workspace/node_modules/@babel/parser/src/plugins/typescript/index.ts:3764:22)
+      at parseExpressionBase (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:226:23)
+      at callback (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:217:39)
+      at allowInAnd (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:3197:12)
+      at parseExpression (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:217:17)
+      at jsxParseExpressionContainer (/home/runner/workspace/node_modules/@babel/parser/src/plugins/jsx/index.ts:376:33)
+      at jsxParseElementAt (/home/runner/workspace/node_modules/@babel/parser/src/plugins/jsx/index.ts:500:24)
+[2m5:53:22 PM[22m [31m[1m[vite][22m[39m Pre-transform error: Failed to load url /src/components/src/main.tsx (resolved id: /src/components/src/main.tsx). Does the file exist?
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[1;1H[0J[2m5:53:24 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/service-selector.tsx, /src/index.css[22m
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[1;1H[0J[2m5:53:39 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/promo-calculator.tsx, /src/index.css[22m
+5:53:40 PM [express] GET /api/packages 304 in 5ms :: [{"id":1,"type":"vip","name":"VIP","discount":"…
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[1;1H[0J[2m5:53:41 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/promo-calculator.tsx, /src/index.css[22m [33m(x2)[39m
+5:53:41 PM [express] GET /api/packages 304 in 6ms :: [{"id":1,"type":"vip","name":"VIP","discount":"…

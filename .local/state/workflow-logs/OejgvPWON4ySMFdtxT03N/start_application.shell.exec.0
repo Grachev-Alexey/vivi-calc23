@@ -1,0 +1,19 @@
+
+> vivi-calc@1.0.1 dev
+> tsx server/index.ts
+
+[1G[0K5:47:34 PM [express] Development mode: using Vite middleware
+📱 Frontend: http://localhost:5000
+Environment: development
+
+Press Ctrl+C to stop the server
+
+5:47:34 PM [express] serving on port 5000
+5:47:41 PM [express] GET /api/auth/check 200 in 5ms :: {"user":{"id":1,"name":"Администратор","role"…
+5:47:41 PM [express] GET /api/services 200 in 7ms :: []
+5:47:41 PM [express] GET /api/packages 200 in 11ms :: [{"id":1,"type":"vip","name":"VIP","discount":…
+5:47:41 PM [express] GET /api/perks 200 in 9ms :: []
+5:47:41 PM [express] GET /api/config/minimum_down_payment 200 in 6ms
+5:47:41 PM [express] GET /api/config/bulk_discount_threshold 200 in 8ms
+5:47:41 PM [express] GET /api/config/bulk_discount_percentage 200 in 10ms
+5:47:41 PM [express] GET /api/config/installment_months_options 200 in 4ms
